@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 
 const ALL_IMAGES = Array.from({ length: 13 }, (_, i) => `/assets/our-story/image${String(i + 1).padStart(2, "0")}.jpg`);
 
+const polaroidZ = 5;
+
 type Pos = {
   top?: string;
   bottom?: string;
@@ -16,19 +18,19 @@ type Pos = {
 };
 
 const POSITIONS: Pos[] = [
-  { top: "1%", left: "1%", rotate: -7, width: "11rem", delay: 0 },
-  { top: "1%", right: "1%", rotate: 5, width: "10rem", delay: 0.08 },
-  { top: "16%", right: "1%", rotate: 9, width: "9rem", delay: 0.16 },
-  { top: "28%", left: "1%", rotate: -5, width: "10rem", delay: 0.12 },
-  { top: "40%", right: "1%", rotate: 6, width: "8rem", delay: 0.22 },
-  { top: "52%", left: "1%", rotate: -8, width: "9rem", delay: 0.28 },
-  { top: "62%", right: "1%", rotate: 4, width: "10rem", delay: 0.18 },
-  { top: "74%", left: "1%", rotate: -4, width: "8rem", delay: 0.32 },
-  { top: "84%", right: "1%", rotate: 7, width: "9rem", delay: 0.38 },
-  { bottom: "2%", left: "1%", rotate: -6, width: "10rem", delay: 0.26 },
-  { bottom: "8%", right: "1%", rotate: 8, width: "8rem", delay: 0.34 },
-  { top: "22%", left: "1%", rotate: -3, width: "9rem", delay: 0.2 },
-  { bottom: "4%", right: "1%", rotate: 9, width: "8rem", delay: 0.36 },
+  { top: "1%", left: "-2%", rotate: -7, width: "16rem", delay: 0 },
+  { top: "1%", right: "-2%", rotate: 5, width: "15rem", delay: 0.08 },
+  { top: "16%", right: "-2%", rotate: 9, width: "14rem", delay: 0.16 },
+  { top: "28%", left: "-2%", rotate: -5, width: "15rem", delay: 0.12 },
+  { top: "40%", right: "-2%", rotate: 6, width: "13rem", delay: 0.22 },
+  { top: "52%", left: "-2%", rotate: -8, width: "14rem", delay: 0.28 },
+  { top: "62%", right: "-2%", rotate: 4, width: "15rem", delay: 0.18 },
+  { top: "74%", left: "-2%", rotate: -4, width: "13rem", delay: 0.32 },
+  { top: "84%", right: "-2%", rotate: 7, width: "14rem", delay: 0.38 },
+  { bottom: "2%", left: "-2%", rotate: -6, width: "15rem", delay: 0.26 },
+  { bottom: "8%", right: "-2%", rotate: 8, width: "13rem", delay: 0.34 },
+  { top: "22%", left: "-2%", rotate: -3, width: "14rem", delay: 0.2 },
+  { bottom: "4%", right: "-2%", rotate: 9, width: "13rem", delay: 0.36 },
 ];
 
 const FLOATS = [
@@ -47,15 +49,12 @@ const FLOATS = [
   { y: [-2, 6, -2], duration: 4.7 },
 ];
 
-const SIZES = ["11rem", "10rem", "9rem", "10rem", "8rem", "9rem", "10rem", "8rem", "9rem", "10rem", "8rem", "9rem", "8rem"];
-
 export function FloatingPolaroids() {
   const items = useMemo(
     () =>
       ALL_IMAGES.map((src, i) => {
         const pos = POSITIONS[i % POSITIONS.length];
         const floatAnim = FLOATS[i % FLOATS.length];
-        const size = SIZES[i % SIZES.length];
         const extraRotate = (i % 3 - 1) * 2;
 
         return (
@@ -69,17 +68,16 @@ export function FloatingPolaroids() {
               delay: pos.delay,
               ease: [0.22, 1, 0.36, 1],
             }}
-            whileHover={{ rotate: 0, scale: 1.1, zIndex: 100 }}
             style={{
               position: "absolute",
               top: pos.top,
               bottom: pos.bottom,
               left: pos.left,
               right: pos.right,
-              zIndex: 30 + i,
-              width: size,
+              zIndex: polaroidZ + i,
+              width: pos.width,
             }}
-            className="hidden md:block"
+            className="pointer-events-none hidden md:block"
           >
             <motion.div
               animate={{ y: floatAnim.y }}
