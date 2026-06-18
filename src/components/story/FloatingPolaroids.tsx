@@ -18,19 +18,19 @@ type Pos = {
 };
 
 const POSITIONS: Pos[] = [
-  { top: "1%", left: "-2%", rotate: -7, width: "16rem", delay: 0 },
-  { top: "1%", right: "-2%", rotate: 5, width: "15rem", delay: 0.08 },
-  { top: "16%", right: "-2%", rotate: 9, width: "14rem", delay: 0.16 },
-  { top: "28%", left: "-2%", rotate: -5, width: "15rem", delay: 0.12 },
-  { top: "40%", right: "-2%", rotate: 6, width: "13rem", delay: 0.22 },
-  { top: "52%", left: "-2%", rotate: -8, width: "14rem", delay: 0.28 },
-  { top: "62%", right: "-2%", rotate: 4, width: "15rem", delay: 0.18 },
-  { top: "74%", left: "-2%", rotate: -4, width: "13rem", delay: 0.32 },
-  { top: "84%", right: "-2%", rotate: 7, width: "14rem", delay: 0.38 },
-  { bottom: "2%", left: "-2%", rotate: -6, width: "15rem", delay: 0.26 },
-  { bottom: "8%", right: "-2%", rotate: 8, width: "13rem", delay: 0.34 },
-  { top: "22%", left: "-2%", rotate: -3, width: "14rem", delay: 0.2 },
-  { bottom: "4%", right: "-2%", rotate: 9, width: "13rem", delay: 0.36 },
+  { top: "1%", left: "-14rem", rotate: -7, width: "18rem", delay: 0 },
+  { top: "1%", right: "-14rem", rotate: 5, width: "17rem", delay: 0.08 },
+  { top: "16%", right: "-14rem", rotate: 9, width: "16rem", delay: 0.16 },
+  { top: "28%", left: "-14rem", rotate: -5, width: "17rem", delay: 0.12 },
+  { top: "40%", right: "-14rem", rotate: 6, width: "15rem", delay: 0.22 },
+  { top: "52%", left: "-14rem", rotate: -8, width: "16rem", delay: 0.28 },
+  { top: "62%", right: "-14rem", rotate: 4, width: "17rem", delay: 0.18 },
+  { top: "74%", left: "-14rem", rotate: -4, width: "15rem", delay: 0.32 },
+  { top: "84%", right: "-14rem", rotate: 7, width: "16rem", delay: 0.38 },
+  { bottom: "2%", left: "-14rem", rotate: -6, width: "17rem", delay: 0.26 },
+  { bottom: "8%", right: "-14rem", rotate: 8, width: "15rem", delay: 0.34 },
+  { top: "22%", left: "-14rem", rotate: -3, width: "16rem", delay: 0.2 },
+  { bottom: "4%", right: "-14rem", rotate: 9, width: "15rem", delay: 0.36 },
 ];
 
 const FLOATS = [
