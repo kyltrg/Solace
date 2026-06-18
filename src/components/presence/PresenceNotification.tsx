@@ -115,7 +115,7 @@ export default function PresenceNotification() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -6, scale: 0.95 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed left-1/2 z-[90] -translate-x-1/2 top-[30%] max-sm:top-[5.5rem] max-sm:left-1/2 max-sm:-translate-x-1/2"
+          className="fixed left-1/2 z-[90] -translate-x-1/2 top-[45%] max-sm:top-[5.5rem] max-sm:left-1/2 max-sm:-translate-x-1/2"
         >
           <div className="flex items-center gap-3 rounded-2xl border border-[var(--accent)]/25 bg-gradient-to-br from-[var(--card-bg)]/95 to-[var(--accent-soft)]/30 px-5 py-3 shadow-[0_0_30px_rgba(168,141,114,0.15)] backdrop-blur-2xl">
             <div className="relative flex h-3 w-3 shrink-0">

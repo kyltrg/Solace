@@ -86,7 +86,7 @@ export default function ArrivalHero(): React.JSX.Element {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: .8, delay: 1.2 }}
-          className="mt-12 sm:mt-16 md:mt-24 flex flex-col items-center gap-2"
+          className="mt-12 sm:mt-16 md:mt-24 flex items-center justify-center gap-4"
         >
           <motion.div
             animate={{ y: [0, 10, 0] }}
