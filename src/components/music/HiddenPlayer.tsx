@@ -44,17 +44,12 @@ return <></>;
 
 return (
 
-<div
+      <div
 
 className="
 fixed
-left-0
+-left-[9999px]
 top-0
-
-h-0
-w-0
-
-overflow-hidden
 pointer-events-none
 "
 

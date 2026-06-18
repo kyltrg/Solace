@@ -93,12 +93,9 @@ export default function DailyVerse(): React.JSX.Element | null {
     try {
       const today = getToday();
       const history = JSON.parse(localStorage.getItem("solace-daily-verse-history") || "[]");
-      if (history.some((h: any) => h.date === today)) {
-        history.find((h: any) => h.date === today)!.index = 19;
-      } else {
-        history.push({ date: today, index: 19 });
-      }
-      localStorage.setItem("solace-daily-verse-history", JSON.stringify(history));
+      const filtered = history.filter((h: any) => h.date !== today);
+      filtered.push({ date: today, index: 19 });
+      localStorage.setItem("solace-daily-verse-history", JSON.stringify(filtered));
     } catch {}
     setVerse(getTodaysVerse());
 
