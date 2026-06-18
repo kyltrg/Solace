@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Cookies from "js-cookie";
 import { getPresence } from "@/actions/presence";
 
-const POLL_MS = 15000;
+const POLL_MS = 10000;
 const DISPLAY_DURATION_MS = 6000;
 const ACTIVE_THRESHOLD_MS = 120000;
 
@@ -112,9 +112,9 @@ export default function PresenceNotification() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -8, scale: 0.96 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed bottom-8 left-1/2 z-[100] -translate-x-1/2"
+          className="fixed top-24 left-1/2 z-[90] -translate-x-1/2"
         >
-          <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 shadow-lg backdrop-blur-2xl">
+          <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 shadow-lg backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,.3)]">
             <div className="relative flex h-2.5 w-2.5 shrink-0">
               <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/50" />
               <span className="relative inline-block h-2.5 w-2.5 rounded-full bg-emerald-400" />
