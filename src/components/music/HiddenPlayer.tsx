@@ -31,13 +31,11 @@ nextSong,
 
 
 
-
 if(!currentSong){
 
 return <></>;
 
 }
-
 
 
 
@@ -50,9 +48,9 @@ className="
 fixed
 -left-[9999px]
 top-0
+opacity-0
 pointer-events-none
 "
-
 >
 
 
@@ -68,14 +66,13 @@ playing={
 isPlaying
 }
 
-
 controls={false}
 
 
-width="0"
+width="1"
 
 
-height="0"
+height="1"
 
 
 
@@ -85,12 +82,8 @@ nextSong
 
 
 />
-
-
 </div>
 
 
 );
-
-
 }
