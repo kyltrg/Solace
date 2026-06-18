@@ -90,21 +90,7 @@ export default function DailyVerse(): React.JSX.Element | null {
   const [verse, setVerse] = useState<Verse | null>(null);
 
   useEffect(() => {
-    try {
-      const history = JSON.parse(localStorage.getItem("solace-daily-verse-history") || "[]");
-      const today = getToday();
-      const existingIndex = history.findIndex((h: any) => h.date === today);
-      if (existingIndex >= 0) {
-        const nextIndex = (history[existingIndex].index + 1) % VERSES.length;
-        history[existingIndex] = { date: today, index: nextIndex };
-        localStorage.setItem("solace-daily-verse-history", JSON.stringify(history));
-        setVerse(VERSES[nextIndex]);
-      } else {
-        setVerse(getTodaysVerse());
-      }
-    } catch {
-      setVerse(getTodaysVerse());
-    }
+    setVerse(getTodaysVerse());
 
     const checkDayChange = () => {
       try {

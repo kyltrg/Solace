@@ -68,17 +68,6 @@ export default function LetterContent({ letter }: { letter: Letter }) {
           })}
         </motion.p>
 
-        {letter.author && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: .6, delay: .25 }}
-            className="mt-1 text-xs uppercase tracking-[.25em] text-[var(--ink)]/40"
-          >
-            From {letter.author}
-          </motion.p>
-        )}
-
         <motion.hr
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
@@ -104,6 +93,17 @@ export default function LetterContent({ letter }: { letter: Letter }) {
           </motion.p>
         ))}
       </motion.div>
+
+      {letter.author && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: .5, delay: .6 }}
+          className="mt-8 text-right text-xs uppercase tracking-[.25em] text-[var(--ink)]/40"
+        >
+          —{letter.author}
+        </motion.p>
+      )}
 
       <WaxSeal />
     </div>
