@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Letter {
+
+  id        String   @id @default(cuid())
+
+  title     String
+
+  preview   String
+
+  content   String
+
+  category  String   @default("General")
+
+  createdAt DateTime @default(now())
+
+}
+
+model ComfortMessage {
+  id        String   @id @default(cuid())
+  category  String
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model StoryChapter {
+  id        String   @id @default(cuid())
+  title     String
+  excerpt   String
+  content   String
+  order     Int
+  createdAt DateTime @default(now())
+}
+
+model Song {
+  id        String   @id @default(cuid())
+  title     String
+  artist    String
+  url       String
+  note      String?
+  createdAt DateTime @default(now())
+}
+
+model DateMemory {
+  id          String   @id @default(cuid())
+
+  title       String
+
+  description String
+
+  location    String?
+
+  memoryDate  DateTime
+
+  createdAt   DateTime @default(now())
+}
+
+model DatePlan {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  location    String?
+  planDate    DateTime
+  time        String?
+  createdAt   DateTime @default(now())
+}
+
+model Dream {
+  id          String      @id @default(cuid())
+
+  title       String
+
+  description String
+
+  horizon     String
+
+  status      DreamStatus @default(PRAYING)
+
+  createdAt   DateTime    @default(now())
+}
+
+
+enum DreamStatus {
+  PRAYING
+  ACHIEVED
+}
+
+model TonightEntry {
+  id        String   @id @default(cuid())
+
+  gratitude String
+
+  challenge String
+
+  prayer    String
+
+  createdAt DateTime @default(now())
+}
