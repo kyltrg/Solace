@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import TransitionLink from "@/components/navigation/TransitionLink";
 import { motion } from "framer-motion";
 
 type RoomLayoutProps = {
@@ -39,7 +39,7 @@ export default function RoomLayout({
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: .4 }}
           >
-            <Link
+            <TransitionLink
               href="/home#rooms"
               className="group inline-flex items-center gap-2 text-xs tracking-[.25em] text-[var(--muted)]/60 uppercase transition-colors hover:text-[var(--accent)]"
             >
@@ -47,7 +47,7 @@ export default function RoomLayout({
                 <ArrowLeftIcon />
               </span>
               <span>Back to Rooms</span>
-            </Link>
+            </TransitionLink>
           </motion.div>
 
           <div className="mt-16 border-l-2 border-[var(--accent)]/30 pl-6 md:pl-10">

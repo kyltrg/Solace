@@ -90,23 +90,52 @@ export default function DailyVerse(): React.JSX.Element | null {
   const [verse, setVerse] = useState<Verse | null>(null);
 
   useEffect(() => {
-    setVerse(getTodaysVerse());
-
-    const timeout = setTimeout(() => {
+    try {
+      const history = JSON.parse(localStorage.getItem("solace-daily-verse-history") || "[]");
+      const today = getToday();
+      const existingIndex = history.findIndex((h: any) => h.date === today);
+      if (existingIndex >= 0) {
+        const nextIndex = (history[existingIndex].index + 1) % VERSES.length;
+        history[existingIndex] = { date: today, index: nextIndex };
+        localStorage.setItem("solace-daily-verse-history", JSON.stringify(history));
+        setVerse(VERSES[nextIndex]);
+      } else {
+        setVerse(getTodaysVerse());
+      }
+    } catch {
       setVerse(getTodaysVerse());
-    }, msUntilMidnight());
+    }
 
-    return () => clearTimeout(timeout);
+    const checkDayChange = () => {
+      try {
+        const stored = JSON.parse(localStorage.getItem("solace-daily-verse-history") || "[]");
+        if (!stored.some((h: any) => h.date === getToday())) {
+          setVerse(getTodaysVerse());
+        }
+      } catch {}
+    };
+
+    const interval = setInterval(checkDayChange, 30000);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") checkDayChange();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   if (!verse) return null;
 
   return (
-    <section className="relative overflow-hidden px-4 sm:px-6 py-20 sm:py-40">
+    <section className="relative overflow-hidden px-4 sm:px-6 py-20 sm:py-40 min-h-screen md:min-h-0 flex items-center">
       <div className="absolute left-1/2 top-24 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-[var(--accent)]/10 blur-[140px]" />
       <div className="absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-[var(--border)]" />
 
-      <div className="relative mx-auto max-w-5xl text-center">
+      <div className="relative mx-auto max-w-5xl text-center w-full">
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -143,6 +172,8 @@ export default function DailyVerse(): React.JSX.Element | null {
         >
           {verse.reference}
         </motion.p>
+
+
       </div>
     </section>
   );

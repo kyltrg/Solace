@@ -17,9 +17,9 @@ export default function HomePage(): React.JSX.Element {
       <div className="solace-divider" />
       <RelationshipTimer />
       <div className="solace-divider" />
-      <StoryPreview />
-      <div className="solace-divider" />
       <StoryOfUsHero />
+      <div className="solace-divider" />
+      <StoryPreview />
       <div className="solace-divider" />
       <MemoryOfDay />
       <div className="solace-divider" />
