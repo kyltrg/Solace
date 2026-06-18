@@ -28,8 +28,8 @@ export default function OurStoryPage(): React.JSX.Element {
       <div className="relative">
         <FloatingPolaroids />
 
-        <section className="relative z-20 mb-10 -mx-6 md:-mx-12">
-          <InfiniteRibbon repeat={8} duration={20} rotation={-1.5}>
+        <section className="relative z-20 mb-10">
+          <InfiniteRibbon repeat={8} duration={20} rotation={0}>
             <span className="mx-5 inline-flex items-center gap-5 font-display text-sm md:text-base tracking-[.2em] uppercase">
               <span className="text-[var(--accent)]/50" aria-hidden>✦</span>
               <span className="text-[var(--accent)]">Direk</span>

@@ -61,7 +61,7 @@ export default function StoryChapter({ number, title, date, content, images, has
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-      className="relative overflow-visible rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)] p-8 backdrop-blur-xl md:p-12 md:mx-16"
+      className="relative rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)] p-8 backdrop-blur-xl md:p-12 md:mx-16"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
