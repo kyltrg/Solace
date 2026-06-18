@@ -27,6 +27,12 @@ const VALID_NAMES: readonly string[] = [
   "angel", "allison", "angel allison", "angel allison melano", "angel allison melaño", "kyle",
 ] as const;
 
+function toDisplayName(raw: string): string {
+  const n = raw.toLowerCase().trim();
+  if (n === "kyle") return "Kyle";
+  return "Angel";
+}
+
 function HomeIcon({ className }: { className?: string }) {
   return (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="round" strokeLinejoin="round">
@@ -466,6 +472,7 @@ export default function AuthFlow(): React.JSX.Element {
   function verifyCode(): void {
     if (code === "022426") {
       Cookies.set("solace-access", String(Date.now()));
+      Cookies.set("solace-user", toDisplayName(name));
       setStep("success");
       setTimeout(() => { window.location.href = "/home"; }, 4200);
       return;
@@ -486,6 +493,7 @@ export default function AuthFlow(): React.JSX.Element {
         setTimeout(() => {
           if (next === "022426") {
             Cookies.set("solace-access", String(Date.now()));
+            Cookies.set("solace-user", toDisplayName(name));
             setStep("success");
             setTimeout(() => { window.location.href = "/home"; }, 4200);
           } else {

@@ -19,6 +19,13 @@ import { InactivityTimer }
 from "@/components/auth/InactivityTimer";
 
 import {
+  PresenceProvider,
+} from "@/components/presence/PresenceProvider";
+
+import PresenceNotification
+from "@/components/presence/PresenceNotification";
+
+import {
   MusicProvider,
 } from "@/components/music/MusicProvider";
 
@@ -92,10 +99,13 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <MusicProvider>
+            <PresenceProvider>
             <PageTransition />
             <SolaceIsland />
             <InactivityTimer />
             {children}
+            <PresenceNotification />
+            </PresenceProvider>
             <HiddenPlayer />
             <MusicPlayer />
             <ThemeToggle />

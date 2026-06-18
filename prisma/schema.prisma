@@ -93,6 +93,12 @@ enum DreamStatus {
   ACHIEVED
 }
 
+model Presence {
+  id        String   @id @default(cuid())
+  userName  String   @unique
+  lastSeen  DateTime
+}
+
 model StickyNote {
   id           String   @id @default(cuid())
   angelMessage String   @default("")
