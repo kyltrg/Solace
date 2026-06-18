@@ -6,7 +6,7 @@ export default function EndingSection() {
   return (
     <section className="flex min-h-screen items-center justify-center px-6">
       <div className="max-w-3xl text-center">
-        <div className="font-display text-6xl text-[var(--text)] md:text-8xl">
+        <div className="font-display text-4xl text-[var(--text)] sm:text-6xl md:text-8xl">
           <BlurReveal>
             Tonight
           </BlurReveal>

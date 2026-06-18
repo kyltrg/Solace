@@ -28,7 +28,7 @@ export default function RelationshipTimer() {
   ];
 
   return (
-    <section className="relative overflow-hidden px-6 py-32">
+    <section className="relative overflow-hidden px-4 sm:px-6 py-20 sm:py-32">
       <div className="mx-auto max-w-6xl text-center">
         <motion.p
           initial={{ opacity: 0, y: 10 }}

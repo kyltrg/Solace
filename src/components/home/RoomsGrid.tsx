@@ -80,13 +80,13 @@ const ROOMS: Room[] = [
 
 export default function RoomsGrid(): React.JSX.Element {
   return (
-    <section id="rooms" className="relative overflow-hidden px-6 py-40 scroll-mt-32">
+    <section id="rooms" className="relative overflow-hidden px-4 sm:px-6 py-20 sm:py-40 scroll-mt-32">
       <div className="mx-auto max-w-6xl">
         <p className="text-xs uppercase tracking-[.3em] text-[var(--accent)]">
           Our home
         </p>
 
-        <h2 className="mt-5 font-display text-6xl font-light md:text-8xl">
+        <h2 className="mt-5 font-display text-4xl sm:text-6xl font-light md:text-8xl">
           Rooms
         </h2>
 
@@ -110,7 +110,7 @@ export default function RoomsGrid(): React.JSX.Element {
                   {room.icon}
                 </div>
 
-                <h3 className="mt-8 font-display text-5xl font-light">
+                <h3 className="mt-8 font-display text-3xl sm:text-5xl font-light">
                   {room.title}
                 </h3>
 

@@ -33,7 +33,7 @@ const memories: Memory[] = [
 
 export default function MemoryOfDay(): React.JSX.Element {
   return (
-    <section className="relative overflow-hidden px-6 py-40">
+    <section className="relative overflow-hidden px-4 sm:px-6 py-20 sm:py-40">
       <div className="mx-auto max-w-6xl">
         <motion.p
           initial={{ opacity: 0 }}
@@ -49,7 +49,7 @@ export default function MemoryOfDay(): React.JSX.Element {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: .6, ease: [.22,1,.36,1] }}
-          className="mt-5 font-display text-6xl font-light md:text-8xl"
+          className="mt-5 font-display text-4xl sm:text-6xl font-light md:text-8xl"
         >
           Little moments
         </motion.h2>
@@ -84,7 +84,7 @@ export default function MemoryOfDay(): React.JSX.Element {
 
                   <div className="mt-6">
                     <p className="text-xs uppercase tracking-[.3em] text-[var(--accent)]">{memory.date}</p>
-                    <h3 className="mt-3 font-display text-4xl font-light">{memory.title}</h3>
+                    <h3 className="mt-3 font-display text-2xl sm:text-4xl font-light">{memory.title}</h3>
                     <p className="mt-4 leading-relaxed text-[var(--muted)]">{memory.text}</p>
                   </div>
                 </div>

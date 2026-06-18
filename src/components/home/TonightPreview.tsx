@@ -58,7 +58,8 @@ Tonight
 className="
 mt-8
 font-display
-text-6xl
+text-4xl
+sm:text-6xl
 font-light
 leading-tight
 md:text-8xl

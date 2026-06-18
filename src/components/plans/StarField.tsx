@@ -127,7 +127,7 @@ export default function StarField({ dreams }: { dreams: Dream[] }) {
       ref={containerRef}
       className="relative min-h-screen overflow-hidden rounded-[3rem] border border-[var(--border)]"
       style={{
-        background: "linear-gradient(180deg, #070714 0%, #0c0c24 30%, #151540 60%, #0a0a18 100%)",
+        background: "var(--star-bg)",
       }}
     >
       {/* 3D Particles background */}

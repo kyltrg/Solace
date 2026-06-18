@@ -3,14 +3,14 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-const roles = ["Home", "Sanctuary", "Solace", "Ours"];
+const roles = ["Home", "Sanctuary", "Solace", "Ours", "Direk"];
 
 export default function ArrivalHero(): React.JSX.Element {
   const [roleIndex, setRoleIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setRoleIndex((prev) => (prev + 1) % roles.length);
+      setRoleIndex((prev) => (prev + 1) % roles.length);  
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -86,7 +86,7 @@ export default function ArrivalHero(): React.JSX.Element {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: .8, delay: 1.2 }}
-          className="mt-24 flex flex-col items-center gap-2"
+          className="mt-12 sm:mt-16 md:mt-24 flex flex-col items-center gap-2"
         >
           <motion.div
             animate={{ y: [0, 10, 0] }}
@@ -97,7 +97,7 @@ export default function ArrivalHero(): React.JSX.Element {
               <path d="M6 9l6 6 6-6" />
             </svg>
           </motion.div>
-          <p className="text-xs uppercase tracking-[.4em] text-[var(--accent)]/50">Explore</p>
+          <p className="text-[10px] sm:text-xs uppercase tracking-[.4em] text-[var(--accent)]/50">Explore</p>
         </motion.div>
       </div>
     </section>

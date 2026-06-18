@@ -147,17 +147,17 @@ function FloatingOrbs() {
       <motion.div
         animate={{ y: [0, -40, 0], opacity: [0.06, 0.12, 0.06] }}
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute left-[15%] top-[10%] h-[30rem] w-[30rem] rounded-full bg-rose-500/10 blur-[180px]"
+        className="absolute left-[15%] top-[10%] h-[30rem] w-[30rem] rounded-full bg-[var(--accent)]/10 blur-[180px]"
       />
       <motion.div
         animate={{ y: [0, 30, 0], opacity: [0.04, 0.09, 0.04] }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-        className="absolute right-[10%] top-[35%] h-[25rem] w-[25rem] rounded-full bg-rose-400/8 blur-[150px]"
+        className="absolute right-[10%] top-[35%] h-[25rem] w-[25rem] rounded-full bg-[var(--accent)]/8 blur-[150px]"
       />
       <motion.div
         animate={{ y: [0, -30, 0], opacity: [0.03, 0.07, 0.03] }}
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 6 }}
-        className="absolute left-[35%] bottom-[8%] h-[22rem] w-[22rem] rounded-full bg-rose-400/8 blur-[160px]"
+        className="absolute left-[35%] bottom-[8%] h-[22rem] w-[22rem] rounded-full bg-[var(--accent)]/8 blur-[160px]"
       />
     </div>
   );
@@ -181,7 +181,7 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
       className={`relative overflow-hidden rounded-[32px] border border-[var(--border)] bg-[var(--card-bg)] backdrop-blur-2xl shadow-[0_0_100px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.02)_inset] ${className}`}
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.03] via-transparent to-black/[0.06]" />
-      <div className="pointer-events-none absolute -top-40 -right-40 h-80 w-80 rounded-full bg-rose-500/4 blur-[160px]" />
+      <div className="pointer-events-none absolute -top-40 -right-40 h-80 w-80 rounded-full bg-[var(--accent)]/4 blur-[160px]" />
       <div className="pointer-events-none absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-white/[0.01] blur-[160px]" />
       <div className="relative p-6 sm:p-8 md:p-10">{children}</div>
     </motion.div>
@@ -199,7 +199,7 @@ function ProgressTracker({ level }: { level: Level }): React.JSX.Element {
             transition={{ delay: index * 0.1, type: "spring", stiffness: 200, damping: 16 }}
             className={`flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg sm:rounded-xl border transition-all duration-500 ${
               level >= room.level
-                ? "border-rose-400/50 bg-rose-400/10 text-rose-300 shadow-[0_0_20px_rgba(251,113,133,0.1)]"
+                ? "border-[var(--accent)]/50 bg-[var(--accent)]/10 text-[var(--accent)] shadow-[0_0_20px_rgba(168,141,114,0.1)]"
                 : "border-[var(--border)] bg-[var(--card-bg)] text-[var(--muted)]/20"
             }`}
           >
@@ -210,7 +210,7 @@ function ProgressTracker({ level }: { level: Level }): React.JSX.Element {
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ delay: index * 0.1 + 0.15 }}
-              className={`h-[2px] w-4 sm:w-6 md:w-8 origin-left rounded-full transition-all duration-500 ${level > room.level ? "bg-rose-400/30" : "bg-[var(--border)]"}`}
+              className={`h-[2px] w-4 sm:w-6 md:w-8 origin-left rounded-full transition-all duration-500 ${level > room.level ? "bg-[var(--accent)]/30" : "bg-[var(--border)]"}`}
             />
           )}
         </React.Fragment>
@@ -237,7 +237,7 @@ function PasscodeTracker({ unlocked }: { unlocked: string[] }): React.JSX.Elemen
     >
       <div className="flex items-center gap-4 mb-4">
         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
-        <p className="text-[10px] uppercase tracking-[.35em] text-rose-400/50">Passcode fragments</p>
+        <p className="text-[10px] uppercase tracking-[.35em] text-[var(--accent)]/50">Passcode fragments</p>
         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
       </div>
       <div className="flex justify-center gap-3 sm:gap-4">
@@ -249,7 +249,7 @@ function PasscodeTracker({ unlocked }: { unlocked: string[] }): React.JSX.Elemen
             transition={{ delay: i * 0.1 }}
             className={`flex h-12 w-16 sm:h-14 sm:w-18 items-center justify-center rounded-lg sm:rounded-xl border font-display text-base sm:text-xl tracking-widest transition-all duration-500 ${
               unlocked[i]
-                ? "border-rose-400/40 bg-rose-400/8 text-rose-300 shadow-[0_0_12px_rgba(251,113,133,0.08)]"
+                ? "border-[var(--accent)]/40 bg-[var(--accent)]/8 text-[var(--accent)] shadow-[0_0_12px_rgba(168,141,114,0.08)]"
                 : "border-[var(--border)] bg-[var(--bg-soft)] text-[var(--muted)]/15"
             }`}
           >
@@ -345,7 +345,7 @@ function PasscodePad({
               error
                 ? "border-red-400/60 bg-red-400/20"
                 : code.length > i
-                  ? "border-rose-400 bg-rose-400 shadow-[0_0_10px_rgba(251,113,133,0.2)]"
+                  ? "border-[var(--accent)] bg-[var(--accent)] shadow-[0_0_10px_rgba(168,141,114,0.2)]"
                   : "border-[var(--border)] bg-transparent"
             }`}
           />
@@ -362,7 +362,7 @@ function PasscodePad({
                 whileTap={{ scale: 0.9 }}
                 onClick={onBackspace}
                 disabled={disabled || code.length === 0}
-                className="flex items-center justify-center h-[52px] sm:h-[56px] rounded-xl sm:rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] text-[var(--muted)]/60 transition-all duration-200 hover:border-rose-400/20 hover:text-rose-300/60 active:bg-rose-400/5 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="flex items-center justify-center h-[52px] sm:h-[56px] rounded-xl sm:rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] text-[var(--muted)]/60 transition-all duration-200 hover:border-[var(--accent)]/20 hover:text-[var(--accent)]/60 active:bg-[var(--accent)]/5 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -379,7 +379,7 @@ function PasscodePad({
               whileHover={{ scale: 1.05 }}
               onClick={() => onDigit(d)}
               disabled={disabled}
-              className="flex items-center justify-center h-[52px] sm:h-[56px] rounded-xl sm:rounded-2xl border border-[var(--accent)]/12 bg-gradient-to-b from-[var(--accent-soft)]/30 to-[var(--accent-soft)]/10 font-display text-lg sm:text-xl text-[var(--text)]/90 transition-all duration-200 hover:border-rose-400/25 hover:from-rose-400/10 hover:to-rose-400/5 hover:shadow-[0_0_20px_rgba(251,113,133,0.06)] active:from-rose-400/15 active:to-rose-400/8 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="flex items-center justify-center h-[52px] sm:h-[56px] rounded-xl sm:rounded-2xl border border-[var(--accent)]/12 bg-gradient-to-b from-[var(--accent-soft)]/30 to-[var(--accent-soft)]/10 font-display text-lg sm:text-xl text-[var(--text)]/90 transition-all duration-200 hover:border-[var(--accent)]/25 hover:from-[var(--accent)]/10 hover:to-[var(--accent)]/5 hover:shadow-[0_0_20px_rgba(168,141,114,0.06)] active:from-[var(--accent)]/15 active:to-[var(--accent)]/8 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {d}
             </motion.button>
@@ -539,7 +539,7 @@ export default function AuthFlow(): React.JSX.Element {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1, rotate: [0, -2, 2, 0] }}
                     transition={{ duration: 0.5, ease: "easeInOut", delay: 0.2 }}
-                    className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl border border-rose-400/20 bg-gradient-to-br from-rose-400/10 to-rose-400/5 text-rose-300 animate-float-slow"
+                    className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl border border-[var(--accent)]/20 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--accent)]/5 text-[var(--accent)] animate-float-slow"
                   >
                     <HomeIcon className="w-10 h-10" />
                   </motion.div>
@@ -564,33 +564,9 @@ export default function AuthFlow(): React.JSX.Element {
 
                 <FadeUp>
                   <div className="mx-auto mt-4 max-w-sm text-center text-sm leading-relaxed text-[var(--muted)]/80">
-                    <span className="font-display italic text-rose-300">/ˈsäləs/</span>
+                    <span className="font-display italic text-[var(--accent)]">/ˈsäləs/</span>
                     <span className="block mt-4 leading-relaxed">Comfort, relief, or consolation in a time of distress, sadness, or misfortune.</span>
                   </div>
-                </FadeUp>
-
-                <FadeUp>
-                  <button onClick={() => setStep("name")} className={`${btnBase} mt-8 border border-rose-400/30 bg-gradient-to-b from-rose-400/10 to-rose-400/5 text-rose-300/90 hover:from-rose-400/20 hover:to-rose-400/10 hover:shadow-[0_0_40px_rgba(251,113,133,0.12)]`}>
-                    Approach The House
-                  </button>
-                </FadeUp>
-
-                <FadeUp>
-                  <div className="mt-8 flex items-center justify-center gap-4">
-                    <div className="h-px w-16 bg-gradient-to-r from-transparent via-rose-400/20 to-transparent" />
-                    <CandleIcon className="w-3 h-3 text-rose-400/30 shrink-0" />
-                    <div className="h-px w-16 bg-gradient-to-r from-transparent via-rose-400/20 to-transparent" />
-                  </div>
-                </FadeUp>
-              </StaggerChildren>
-            </Card>
-          )}
-
-          {step === "name" && (
-            <Card key="name">
-              <StaggerChildren delay={0.1}>
-                <FadeUp>
-                  <h1 className="font-display text-3xl tracking-[-0.02em] text-center">Who arrives at the door?</h1>
                 </FadeUp>
 
                 <FadeUp>
@@ -600,20 +576,28 @@ export default function AuthFlow(): React.JSX.Element {
                       onChange={(e) => setName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && verifyName()}
                       placeholder="Type your name..."
-                      className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-6 py-4 text-center text-base sm:text-sm outline-none transition-all duration-300 placeholder:text-[var(--muted)]/15 focus:border-rose-400/40 focus:shadow-[0_0_30px_rgba(251,113,133,0.06)] focus:bg-[var(--bg-elevated)]"
+                      className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-6 py-4 text-center text-base sm:text-sm outline-none transition-all duration-300 placeholder:text-[var(--muted)]/15 focus:border-[var(--accent)]/40 focus:shadow-[0_0_30px_rgba(168,141,114,0.06)] focus:bg-[var(--bg-elevated)]"
                     />
                   </div>
                 </FadeUp>
 
                 <FadeUp>
-                  <button onClick={verifyName} className={`${btnBase} mt-6 border border-rose-400/30 bg-gradient-to-b from-rose-400/10 to-rose-400/5 text-rose-300/90 hover:from-rose-400/20 hover:to-rose-400/10`}>
-                    Continue
+                  <button onClick={verifyName} className={`${btnBase} mt-6 border border-[var(--accent)]/30 bg-gradient-to-b from-[var(--accent)]/10 to-[var(--accent)]/5 text-[var(--accent)]/90 hover:from-[var(--accent)]/20 hover:to-[var(--accent)]/10 hover:shadow-[0_0_40px_rgba(168,141,114,0.12)]`}>
+                    Enter the house
                   </button>
                 </FadeUp>
 
                 <AnimatePresence mode="wait">
                   {error && <ShakeError key={errorKey} message={error} onClose={() => setError("")} />}
                 </AnimatePresence>
+
+                <FadeUp>
+                  <div className="mt-8 flex items-center justify-center gap-4">
+                    <div className="h-px w-16 bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
+                    <CandleIcon className="w-3 h-3 text-[var(--accent)]/30 shrink-0" />
+                    <div className="h-px w-16 bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
+                  </div>
+                </FadeUp>
               </StaggerChildren>
             </Card>
           )}
@@ -626,7 +610,7 @@ export default function AuthFlow(): React.JSX.Element {
                     initial={{ scale: 0, rotate: -15 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ type: "spring", stiffness: 180, damping: 14, delay: 0.1 }}
-                    className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-rose-400/20 bg-gradient-to-br from-rose-400/10 to-rose-400/5 text-rose-300"
+                    className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--accent)]/20 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--accent)]/5 text-[var(--accent)]"
                   >
                     <DoorOpenIcon className="w-8 h-8" />
                   </motion.div>
@@ -640,14 +624,14 @@ export default function AuthFlow(): React.JSX.Element {
 
                 <FadeUp>
                   <div className="mt-4 flex items-center justify-center gap-4">
-                    <div className="h-px w-10 bg-gradient-to-r from-transparent via-rose-400/20 to-transparent" />
+                    <div className="h-px w-10 bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
                     <p className="text-sm text-[var(--muted)]/60">The house has been waiting.</p>
-                    <div className="h-px w-10 bg-gradient-to-r from-transparent via-rose-400/20 to-transparent" />
+                    <div className="h-px w-10 bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
                   </div>
                 </FadeUp>
 
                 <FadeUp>
-                  <button onClick={() => setStep("choice")} className={`${btnBase} mt-8 border border-rose-400/30 bg-gradient-to-b from-rose-400/10 to-rose-400/5 text-rose-300/90 hover:from-rose-400/20 hover:to-rose-400/10`}>
+                  <button onClick={() => setStep("choice")} className={`${btnBase} mt-8 border border-[var(--accent)]/30 bg-gradient-to-b from-[var(--accent)]/10 to-[var(--accent)]/5 text-[var(--accent)]/90 hover:from-[var(--accent)]/20 hover:to-[var(--accent)]/10`}>
                     Enter
                   </button>
                 </FadeUp>
@@ -668,10 +652,10 @@ export default function AuthFlow(): React.JSX.Element {
 
                 <FadeUp>
                   <div className="mt-8 flex flex-col gap-3">
-                    <button onClick={() => setStep("vault")} className={`${btnBase} border border-[var(--border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover)] hover:border-rose-400/20`}>
+                    <button onClick={() => setStep("vault")} className={`${btnBase} border border-[var(--border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover)] hover:border-[var(--accent)]/20`}>
                       I Remember
                     </button>
-                    <button onClick={startQuiz} className={`${btnBase} border border-rose-400/30 bg-gradient-to-b from-rose-400/10 to-rose-400/5 text-rose-300/90 hover:from-rose-400/20 hover:to-rose-400/10`}>
+                    <button onClick={startQuiz} className={`${btnBase} border border-[var(--accent)]/30 bg-gradient-to-b from-[var(--accent)]/10 to-[var(--accent)]/5 text-[var(--accent)]/90 hover:from-[var(--accent)]/20 hover:to-[var(--accent)]/10`}>
                       Explore The House
                     </button>
                   </div>
@@ -688,7 +672,7 @@ export default function AuthFlow(): React.JSX.Element {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 200, damping: 14 }}
-                    className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl border border-rose-400/30 bg-gradient-to-br from-rose-400/10 to-rose-400/5 text-rose-300"
+                    className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl border border-[var(--accent)]/30 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--accent)]/5 text-[var(--accent)]"
                   >
                     {currentRoom.icon}
                   </motion.div>
@@ -696,7 +680,7 @@ export default function AuthFlow(): React.JSX.Element {
 
                 <FadeUp>
                   <div className="mt-6 text-center">
-                    <p className="text-[10px] uppercase tracking-[.4em] text-rose-400/50">{currentRoom.name}</p>
+                    <p className="text-[10px] uppercase tracking-[.4em] text-[var(--accent)]/50">{currentRoom.name}</p>
                     <h2 className="mt-3 font-display text-xl tracking-[-0.02em]">Riddle {questionIndex + 1} / {QUIZZES[level].length}</h2>
                   </div>
                 </FadeUp>
@@ -716,12 +700,12 @@ export default function AuthFlow(): React.JSX.Element {
                           onChange={(e) => setInputAnswer(e.target.value)}
                           onKeyDown={(e) => e.key === "Enter" && handleInputSubmit()}
                           placeholder="Separate each name with a comma..."
-                          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-6 py-4 text-center text-sm outline-none transition-all duration-300 placeholder:text-[var(--muted)]/15 focus:border-rose-400/40 focus:shadow-[0_0_30px_rgba(251,113,133,0.06)] focus:bg-[var(--bg-elevated)]"
+                          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-6 py-4 text-center text-sm outline-none transition-all duration-300 placeholder:text-[var(--muted)]/15 focus:border-[var(--accent)]/40 focus:shadow-[0_0_30px_rgba(168,141,114,0.06)] focus:bg-[var(--bg-elevated)]"
                         />
                         <motion.button
                           whileTap={{ scale: 0.97 }}
                           onClick={handleInputSubmit}
-                          className="w-full rounded-2xl border border-rose-400/30 bg-gradient-to-b from-rose-400/10 to-rose-400/5 px-6 py-4 text-sm font-medium tracking-wide text-rose-300/90 transition-all duration-300 hover:from-rose-400/20 hover:to-rose-400/10 hover:shadow-lg active:scale-[0.97]"
+                          className="w-full rounded-2xl border border-[var(--accent)]/30 bg-gradient-to-b from-[var(--accent)]/10 to-[var(--accent)]/5 px-6 py-4 text-sm font-medium tracking-wide text-[var(--accent)]/90 transition-all duration-300 hover:from-[var(--accent)]/20 hover:to-[var(--accent)]/10 hover:shadow-lg active:scale-[0.97]"
                         >
                           Submit
                         </motion.button>
@@ -735,7 +719,7 @@ export default function AuthFlow(): React.JSX.Element {
                             visible: { opacity: 1, x: 0, transition: { delay: 0.4 + i * 0.08 } },
                           }}
                           onClick={() => answerQuestion(choice)}
-                          className="w-full rounded-2xl border border-rose-400/15 bg-rose-400/5 px-6 py-4 text-sm text-left transition-all duration-300 hover:border-rose-400/30 hover:bg-rose-400/10 hover:pl-7 active:scale-[0.99]"
+                          className="w-full rounded-2xl border border-[var(--accent)]/15 bg-[var(--accent)]/5 px-6 py-4 text-sm text-left transition-all duration-300 hover:border-[var(--accent)]/30 hover:bg-[var(--accent)]/10 hover:pl-7 active:scale-[0.99]"
                         >
                           {choice}
                         </motion.button>
@@ -759,7 +743,7 @@ export default function AuthFlow(): React.JSX.Element {
                     initial={{ scale: 0, rotate: -20 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ type: "spring", stiffness: 180, damping: 12 }}
-                    className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl border border-rose-400/30 bg-gradient-to-br from-rose-400/10 to-rose-400/5 text-rose-300"
+                    className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl border border-[var(--accent)]/30 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--accent)]/5 text-[var(--accent)]"
                   >
                     <LockIcon className="w-7 h-7" />
                   </motion.div>
@@ -767,20 +751,20 @@ export default function AuthFlow(): React.JSX.Element {
 
                 <FadeUp>
                   <div className="text-center mt-6">
-                    <p className="text-[10px] uppercase tracking-[.4em] text-rose-400/50">Room Complete</p>
+                    <p className="text-[10px] uppercase tracking-[.4em] text-[var(--accent)]/50">Room Complete</p>
                     <h1 className="mt-3 font-display text-3xl tracking-[-0.02em]">You found a digit.</h1>
                     <p className="mt-3 text-sm text-[var(--muted)]/60">A number is engraved on it.</p>
                   </div>
                 </FadeUp>
 
                 <FadeUp>
-                  <div className="mt-8 font-display text-6xl tracking-widest text-center text-rose-300 drop-shadow-[0_0_20px_rgba(251,113,133,0.15)]">{currentRoom.code}</div>
+                  <div className="mt-8 font-display text-6xl tracking-widest text-center text-[var(--accent)] drop-shadow-[0_0_20px_rgba(168,141,114,0.15)]">{currentRoom.code}</div>
                 </FadeUp>
 
                 <PasscodeTracker unlocked={unlockedCodes} />
 
                 <FadeUp>
-                  <button onClick={continueAfterRoom} className={`${btnBase} mt-8 border border-rose-400/30 bg-gradient-to-b from-rose-400/10 to-rose-400/5 text-rose-300/90 hover:from-rose-400/20 hover:to-rose-400/10`}>
+                  <button onClick={continueAfterRoom} className={`${btnBase} mt-8 border border-[var(--accent)]/30 bg-gradient-to-b from-[var(--accent)]/10 to-[var(--accent)]/5 text-[var(--accent)]/90 hover:from-[var(--accent)]/20 hover:to-[var(--accent)]/10`}>
                     Continue
                   </button>
                 </FadeUp>
@@ -796,7 +780,7 @@ export default function AuthFlow(): React.JSX.Element {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 200, damping: 14 }}
-                    className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl border border-rose-400/20 bg-gradient-to-br from-rose-400/10 to-rose-400/5 text-rose-300"
+                    className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl border border-[var(--accent)]/20 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--accent)]/5 text-[var(--accent)]"
                   >
                     <LockIcon className="w-8 h-8" />
                   </motion.div>
@@ -804,7 +788,7 @@ export default function AuthFlow(): React.JSX.Element {
 
                 <FadeUp>
                   <div className="text-center">
-                    <p className="text-[10px] uppercase tracking-[.4em] text-rose-400/50">Vault Door</p>
+                    <p className="text-[10px] uppercase tracking-[.4em] text-[var(--accent)]/50">Vault Door</p>
                     <h1 className="mt-3 font-display text-3xl tracking-[-0.02em]">The House Remembers</h1>
                     <p className="mt-4 text-sm text-[var(--muted)]/60 max-w-xs mx-auto leading-relaxed">
                       Three fragments form the key. Enter the passcode and the final door will open.
@@ -839,7 +823,7 @@ export default function AuthFlow(): React.JSX.Element {
               className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
               style={{ background: "radial-gradient(ellipse at 50% 50%, var(--bg-elevated) 0%, var(--bg-soft) 100%)" }}
             >
-              <div className="flex items-center justify-center w-full h-full [transform:scale(0.35)_translateY(0)] sm:[transform:scale(0.55)_translateY(0)] md:[transform:scale(0.75)_translateY(0)] lg:[transform:scale(1)_translateY(0)] [transform-origin:center_center]">
+              <div className="flex items-center justify-center w-full h-full [transform:scale(0.55)_translateY(0)] sm:[transform:scale(0.65)_translateY(0)] md:[transform:scale(0.85)_translateY(0)] lg:[transform:scale(1)_translateY(0)] [transform-origin:center_center]">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -856,9 +840,9 @@ export default function AuthFlow(): React.JSX.Element {
                   className="relative h-[460px] w-[120px] origin-right overflow-hidden rounded-l-[32px] border-r border-[var(--border)] bg-gradient-to-b from-[#1C201E] via-[#161918] to-[#0C0E0D] shadow-2xl z-10"
                 >
                   <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.02),transparent_50%)]" />
-                  <div className="absolute top-[20%] left-[30%] w-[40px] h-[55px] rounded-sm border border-rose-400/8 bg-rose-400/8" />
-                  <div className="absolute top-[20%] left-[30%] w-[40px] h-[55px] rounded-sm border border-rose-400/8 bg-rose-400/8 mt-[64px]" />
-                  <div className="absolute bottom-[25%] right-[18%] w-2 h-2 rounded-full border border-rose-400/20 bg-rose-400/20" />
+                  <div className="absolute top-[20%] left-[30%] w-[40px] h-[55px] rounded-sm border border-[var(--accent)]/8 bg-[var(--accent)]/8" />
+                  <div className="absolute top-[20%] left-[30%] w-[40px] h-[55px] rounded-sm border border-[var(--accent)]/8 bg-[var(--accent)]/8 mt-[64px]" />
+                  <div className="absolute bottom-[25%] right-[18%] w-2 h-2 rounded-full border border-[var(--accent)]/20 bg-[var(--accent)]/20" />
                   <motion.div
                     initial={{ opacity: 1 }}
                     animate={{ opacity: 0 }}
@@ -874,8 +858,8 @@ export default function AuthFlow(): React.JSX.Element {
                   className="relative h-[460px] w-[120px] origin-left overflow-hidden rounded-r-[32px] border-l border-[var(--border)] bg-gradient-to-b from-[#1C201E] via-[#161918] to-[#0C0E0D] shadow-2xl z-10"
                 >
                   <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.02),transparent_50%)]" />
-                  <div className="absolute top-[20%] right-[30%] w-[40px] h-[55px] rounded-sm border border-rose-400/8 bg-rose-400/8" />
-                  <div className="absolute top-[20%] right-[30%] w-[40px] h-[55px] rounded-sm border border-rose-400/8 bg-rose-400/8 mt-[64px]" />
+                  <div className="absolute top-[20%] right-[30%] w-[40px] h-[55px] rounded-sm border border-[var(--accent)]/8 bg-[var(--accent)]/8" />
+                  <div className="absolute top-[20%] right-[30%] w-[40px] h-[55px] rounded-sm border border-[var(--accent)]/8 bg-[var(--accent)]/8 mt-[64px]" />
                   <motion.div
                     initial={{ opacity: 1 }}
                     animate={{ opacity: 0 }}
@@ -888,7 +872,7 @@ export default function AuthFlow(): React.JSX.Element {
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: [0, 0.9, 0.5], scale: [0.5, 2, 1.4] }}
                   transition={{ duration: 1.5, ease: "easeOut", delay: 0.6 }}
-                  className="absolute h-[600px] w-[600px] rounded-full bg-rose-500/15 blur-[150px]"
+                  className="absolute h-[600px] w-[600px] rounded-full bg-[var(--accent)]/15 blur-[150px]"
                 />
 
                 <motion.div

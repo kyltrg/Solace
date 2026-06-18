@@ -3,7 +3,14 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 
-const ALL_IMAGES = Array.from({ length: 13 }, (_, i) => `/assets/our-story/image${String(i + 1).padStart(2, "0")}.jpg`);
+const UNASSIGNED_IMAGES = [
+  "/assets/our-story/image08.jpg",
+  "/assets/our-story/image09.jpg",
+  "/assets/our-story/image10.jpg",
+  "/assets/our-story/image11.jpg",
+  "/assets/our-story/image12.jpg",
+  "/assets/our-story/image13.jpg",
+];
 
 const polaroidZ = 5;
 
@@ -18,19 +25,12 @@ type Pos = {
 };
 
 const POSITIONS: Pos[] = [
-  { top: "1%", left: "-14rem", rotate: -7, width: "18rem", delay: 0 },
-  { top: "1%", right: "-14rem", rotate: 5, width: "17rem", delay: 0.08 },
-  { top: "16%", right: "-14rem", rotate: 9, width: "16rem", delay: 0.16 },
-  { top: "28%", left: "-14rem", rotate: -5, width: "17rem", delay: 0.12 },
-  { top: "40%", right: "-14rem", rotate: 6, width: "15rem", delay: 0.22 },
-  { top: "52%", left: "-14rem", rotate: -8, width: "16rem", delay: 0.28 },
-  { top: "62%", right: "-14rem", rotate: 4, width: "17rem", delay: 0.18 },
-  { top: "74%", left: "-14rem", rotate: -4, width: "15rem", delay: 0.32 },
-  { top: "84%", right: "-14rem", rotate: 7, width: "16rem", delay: 0.38 },
-  { bottom: "2%", left: "-14rem", rotate: -6, width: "17rem", delay: 0.26 },
-  { bottom: "8%", right: "-14rem", rotate: 8, width: "15rem", delay: 0.34 },
-  { top: "22%", left: "-14rem", rotate: -3, width: "16rem", delay: 0.2 },
-  { bottom: "4%", right: "-14rem", rotate: 9, width: "15rem", delay: 0.36 },
+  { top: "8%",  left: "-14rem",  rotate: -7, width: "17rem", delay: 0 },
+  { top: "22%", right: "-14rem", rotate: 5,  width: "16rem", delay: 0.1 },
+  { top: "40%", left: "-14rem",  rotate: -5, width: "18rem", delay: 0.2 },
+  { top: "58%", right: "-14rem", rotate: 7,  width: "15rem", delay: 0.15 },
+  { top: "76%", left: "-14rem",  rotate: -8, width: "16rem", delay: 0.25 },
+  { bottom: "5%", right: "-14rem", rotate: 6,  width: "17rem", delay: 0.3 },
 ];
 
 const FLOATS = [
@@ -40,20 +40,13 @@ const FLOATS = [
   { y: [5, -4, 5], duration: 4.8 },
   { y: [-6, 2, -6], duration: 5.5 },
   { y: [3, -5, 3], duration: 4.2 },
-  { y: [-4, 4, -4], duration: 5 },
-  { y: [6, -2, 6], duration: 4.6 },
-  { y: [-5, 3, -5], duration: 5.8 },
-  { y: [2, -6, 2], duration: 4 },
-  { y: [-3, 5, -3], duration: 4.3 },
-  { y: [4, -4, 4], duration: 5.1 },
-  { y: [-2, 6, -2], duration: 4.7 },
 ];
 
 export function FloatingPolaroids() {
   const items = useMemo(
     () =>
-      ALL_IMAGES.map((src, i) => {
-        const pos = POSITIONS[i % POSITIONS.length];
+      UNASSIGNED_IMAGES.map((src, i) => {
+        const pos = POSITIONS[i];
         const floatAnim = FLOATS[i % FLOATS.length];
         const extraRotate = (i % 3 - 1) * 2;
 
@@ -88,7 +81,8 @@ export function FloatingPolaroids() {
               }}
               className="relative"
             >
-              <div className="group relative bg-[var(--paper)] p-2 pb-10 shadow-2xl transition-shadow duration-500 hover:shadow-[0_25px_70px_rgba(0,0,0,0.45)]">
+              <div className="group relative bg-[var(--paper)] p-2 pb-10 shadow-2xl transition-shadow duration-500 hover:shadow-[0_25px_70px_rgba(0,0,0,0.45)]"
+              >
                 <div className="aspect-[4/3] overflow-hidden bg-[var(--bg-soft)]">
                   <img
                     src={src}

@@ -7,7 +7,7 @@ import { STORY_CHAPTERS } from "@/app/our-story/data";
 
 export default function StoryPreview(): React.JSX.Element {
   return (
-    <section className="relative overflow-hidden px-6 py-40">
+    <section className="relative overflow-hidden px-4 sm:px-6 py-20 sm:py-40">
       <div className="mx-auto max-w-6xl">
         <motion.p
           initial={{ opacity: 0 }}
@@ -23,7 +23,7 @@ export default function StoryPreview(): React.JSX.Element {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: .6, ease: [.22,1,.36,1] }}
-          className="mt-5 font-display text-6xl font-light md:text-8xl"
+          className="mt-5 font-display text-4xl sm:text-6xl font-light md:text-8xl"
         >
           Our Story
         </motion.h2>

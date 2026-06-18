@@ -32,7 +32,7 @@ export default function RoomLayout({
         <div className="absolute bottom-0 right-0 h-[30rem] w-[30rem] rounded-full bg-white/[0.02] blur-[160px] animate-pulse-glow" />
       </div>
 
-      <section className="relative px-6 pt-36 pb-28">
+      <section className="relative px-4 sm:px-6 pt-24 sm:pt-36 pb-20 sm:pb-28">
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, x: -12 }}
@@ -96,7 +96,7 @@ export default function RoomLayout({
         </div>
       </section>
 
-      <section className="relative px-6 pb-32">
+      <section className="relative px-4 sm:px-6 pb-20 sm:pb-32">
         <div className="mx-auto max-w-5xl">{children}</div>
       </section>
     </main>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Cookies from "js-cookie";
+import { usePathname } from "next/navigation";
 import { getPresence } from "@/actions/presence";
 
 const POLL_MS = 10000;
@@ -38,11 +39,11 @@ function shouldShowNotification(
 }
 
 export default function PresenceNotification() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState("");
   const [myName, setMyName] = useState<string | null>(null);
   const prevRef = useRef<OtherStatus>(null);
-  const mountedRef = useRef(true);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -103,23 +104,25 @@ export default function PresenceNotification() {
     };
   }, [myName]);
 
+  if (pathname === "/welcome") return null;
+
   return (
     <AnimatePresence>
       {visible && message && (
         <motion.div
           key="presence-toast"
-          initial={{ opacity: 0, y: 16, scale: 0.96 }}
+          initial={{ opacity: 0, y: 10, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -8, scale: 0.96 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed top-24 left-1/2 z-[90] -translate-x-1/2"
+          exit={{ opacity: 0, y: -6, scale: 0.95 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed top-6 right-6 z-[90]"
         >
-          <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 shadow-lg backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,.3)]">
+          <div className="flex items-center gap-3 rounded-xl border border-[var(--border)]/60 bg-[var(--glass)]/95 px-4 py-2.5 shadow-lg backdrop-blur-2xl shadow-[0_4px_20px_rgba(0,0,0,.25)]">
             <div className="relative flex h-2.5 w-2.5 shrink-0">
-              <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/50" />
+              <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/60" />
               <span className="relative inline-block h-2.5 w-2.5 rounded-full bg-emerald-400" />
             </div>
-            <p className="font-body text-sm font-medium tracking-wide text-white/80">
+            <p className="font-body text-xs font-medium tracking-wide text-[var(--text)]/80">
               {message === "you are both here."
                 ? message
                 : message.charAt(0).toUpperCase() + message.slice(1)}

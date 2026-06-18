@@ -78,17 +78,31 @@ function getTodaysVerse(): Verse {
   return VERSES[pick];
 }
 
+function msUntilMidnight(): number {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setDate(midnight.getDate() + 1);
+  midnight.setHours(0, 0, 0, 0);
+  return midnight.getTime() - now.getTime();
+}
+
 export default function DailyVerse(): React.JSX.Element | null {
   const [verse, setVerse] = useState<Verse | null>(null);
 
   useEffect(() => {
     setVerse(getTodaysVerse());
+
+    const timeout = setTimeout(() => {
+      setVerse(getTodaysVerse());
+    }, msUntilMidnight());
+
+    return () => clearTimeout(timeout);
   }, []);
 
   if (!verse) return null;
 
   return (
-    <section className="relative overflow-hidden px-6 py-40">
+    <section className="relative overflow-hidden px-4 sm:px-6 py-20 sm:py-40">
       <div className="absolute left-1/2 top-24 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-[var(--accent)]/10 blur-[140px]" />
       <div className="absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-[var(--border)]" />
 
@@ -107,7 +121,7 @@ export default function DailyVerse(): React.JSX.Element | null {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: .8, ease: [.22,1,.36,1] }}
-          className="mx-auto mt-10 max-w-4xl font-display text-5xl font-light leading-tight md:text-7xl"
+          className="mx-auto mt-10 max-w-4xl font-display text-3xl sm:text-5xl font-light leading-tight md:text-7xl"
         >
           {verse.text}
         </motion.h3>

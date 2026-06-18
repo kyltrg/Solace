@@ -37,6 +37,7 @@ from "@/components/music/HiddenPlayer";
 
 import { ThemeProvider } from "@/context/ThemeContext";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import Footer from "@/components/layout/Footer";
 
 const display =
 Playfair_Display({
@@ -104,6 +105,7 @@ export default function RootLayout({
             <SolaceIsland />
             <InactivityTimer />
             {children}
+            <Footer />
             <PresenceNotification />
             </PresenceProvider>
             <HiddenPlayer />

@@ -1,0 +1,26 @@
+"use server";
+
+import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
+
+export async function createLetter(formData: FormData): Promise<{ ok: boolean; error?: string }> {
+  const title = formData.get("title")?.toString().trim();
+  const content = formData.get("content")?.toString().trim();
+  const category = formData.get("category")?.toString().trim() || "General";
+
+  if (!title || !content) {
+    return { ok: false, error: "Title and content are required." };
+  }
+
+  const preview = content.length > 160 ? content.slice(0, 160) + "…" : content;
+
+  try {
+    await prisma.letter.create({
+      data: { title, content, preview, category },
+    });
+    revalidatePath("/letters");
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Failed to create letter." };
+  }
+}

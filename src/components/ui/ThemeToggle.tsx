@@ -4,11 +4,15 @@ import { useContext } from "react";
 import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 import { ThemeContext } from "@/context/ThemeContext";
+import { usePathname } from "next/navigation";
 
 export default function ThemeToggle() {
+  const pathname = usePathname();
   const ctx = useContext(ThemeContext);
   const theme = ctx?.theme ?? "dark";
   const toggleTheme = ctx?.toggleTheme ?? (() => {});
+
+  if (pathname === "/" || pathname === "/welcome") return null;
 
   return (
     <motion.button
