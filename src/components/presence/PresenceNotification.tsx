@@ -115,14 +115,14 @@ export default function PresenceNotification() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -6, scale: 0.95 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed top-6 right-6 z-[90] md:top-6 max-sm:top-[5.5rem] max-sm:left-1/2 max-sm:-translate-x-1/2 max-sm:right-auto"
+          className="fixed left-1/2 z-[90] -translate-x-1/2 top-[30%] max-sm:top-[5.5rem] max-sm:left-1/2 max-sm:-translate-x-1/2"
         >
-          <div className="flex items-center gap-3 rounded-xl border border-[var(--border)]/60 bg-[var(--glass)]/95 px-4 py-2.5 shadow-lg backdrop-blur-2xl shadow-[0_4px_20px_rgba(0,0,0,.25)]">
-            <div className="relative flex h-2.5 w-2.5 shrink-0">
-              <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/60" />
-              <span className="relative inline-block h-2.5 w-2.5 rounded-full bg-emerald-400" />
+          <div className="flex items-center gap-3 rounded-2xl border border-[var(--accent)]/25 bg-gradient-to-br from-[var(--card-bg)]/95 to-[var(--accent-soft)]/30 px-5 py-3 shadow-[0_0_30px_rgba(168,141,114,0.15)] backdrop-blur-2xl">
+            <div className="relative flex h-3 w-3 shrink-0">
+              <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
+              <span className="relative inline-block h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
             </div>
-            <p className="font-body text-xs font-medium tracking-wide text-[var(--text)]/80">
+            <p className="font-body text-sm font-semibold tracking-wide text-[var(--accent)] drop-shadow-[0_0_6px_rgba(168,141,114,0.2)]">
               {message === "you are both here."
                 ? message
                 : message.charAt(0).toUpperCase() + message.slice(1)}
