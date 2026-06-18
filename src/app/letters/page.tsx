@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PenLine } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import LetterArchive from "@/components/letters/LetterArchive";
+import ScrollToTop from "@/components/ui/ScrollToTop";
 
 export default async function LettersPage() {
   const letters = await prisma.letter.findMany({
@@ -106,6 +107,8 @@ export default async function LettersPage() {
           </GlassCard>
         </div>
       </div>
+
+      <ScrollToTop />
     </RoomLayout>
   );
 }

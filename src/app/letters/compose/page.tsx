@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
 import ComposerForm from "./ComposerForm";
+import ScrollToTop from "@/components/ui/ScrollToTop";
 
 export default async function ComposePage() {
   const cookieStore = await cookies();
@@ -19,6 +20,8 @@ export default async function ComposePage() {
 
         <ComposerForm user={user || ""} />
       </div>
+
+      <ScrollToTop />
     </main>
   );
 }

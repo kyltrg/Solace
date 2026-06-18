@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import LetterContent from "./LetterContent";
 import LetterReaderWrapper from "./LetterReaderWrapper";
+import ScrollToTop from "@/components/ui/ScrollToTop";
 
 interface LetterPageProps {
   params: Promise<{ id: string }>;
@@ -31,6 +32,7 @@ export default async function LetterPage({ params }: LetterPageProps) {
           </article>
         </div>
       </main>
+      <ScrollToTop />
     </LetterReaderWrapper>
   );
 }

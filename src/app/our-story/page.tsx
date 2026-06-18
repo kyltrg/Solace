@@ -5,6 +5,7 @@ import RoomLayout from "@/components/layout/RoomLayout";
 import StoryChapter from "@/components/story/StoryChapter";
 import { FloatingPolaroids } from "@/components/story/FloatingPolaroids";
 import { InfiniteRibbon } from "@/components/ui/infinite-ribbon";
+import ScrollToTop from "@/components/ui/ScrollToTop";
 import { motion, AnimatePresence } from "framer-motion";
 
 import {
@@ -78,6 +79,8 @@ export default function OurStoryPage(): React.JSX.Element {
           ))}
         </section>
       </div>
+
+      <ScrollToTop />
     </RoomLayout>
   );
 }
