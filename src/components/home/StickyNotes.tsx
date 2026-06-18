@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
+import { getStickyNotes, saveStickyNotes } from "@/actions/stickynotes";
 
 type StickyData = {
   angel: string;
@@ -9,8 +10,9 @@ type StickyData = {
 };
 
 const STORAGE_KEY = "solace-stickynotes";
+const DEBOUNCE_MS = 1500;
 
-function loadNotes(): StickyData {
+function loadFromLocal(): StickyData {
   if (typeof window === "undefined") return { angel: "", kyle: "" };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -19,24 +21,58 @@ function loadNotes(): StickyData {
   return { angel: "", kyle: "" };
 }
 
-function saveNotes(data: StickyData) {
+function saveToLocal(data: StickyData) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
 export default function StickyNotes() {
   const [notes, setNotes] = useState<StickyData>({ angel: "", kyle: "" });
   const [mounted, setMounted] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latestRef = useRef<StickyData>(notes);
 
   useEffect(() => {
-    setNotes(loadNotes());
-    setMounted(true);
+    latestRef.current = notes;
+  }, [notes]);
+
+  useEffect(() => {
+    const local = loadFromLocal();
+
+    getStickyNotes()
+      .then((server) => {
+        const merged: StickyData = {
+          angel: server.angelMessage || local.angel,
+          kyle: server.kyleMessage || local.kyle,
+        };
+        setNotes(merged);
+        saveToLocal(merged);
+        setMounted(true);
+      })
+      .catch(() => {
+        setNotes(local);
+        setMounted(true);
+      });
   }, []);
 
-  const updateNote = (who: "angel" | "kyle", value: string) => {
-    const next = { ...notes, [who]: value };
-    setNotes(next);
-    saveNotes(next);
-  };
+  const updateNote = useCallback(
+    (who: "angel" | "kyle", value: string) => {
+      const next = { ...latestRef.current, [who]: value };
+      latestRef.current = next;
+      setNotes(next);
+      saveToLocal(next);
+
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        setSaving(true);
+        const fd = new FormData();
+        fd.append("angelMessage", next.angel);
+        fd.append("kyleMessage", next.kyle);
+        saveStickyNotes(fd).finally(() => setSaving(false));
+      }, DEBOUNCE_MS);
+    },
+    [],
+  );
 
   if (!mounted) return null;
 
@@ -88,7 +124,10 @@ export default function StickyNotes() {
               />
               <div className="mt-3 flex items-center justify-between border-t border-white/20 pt-3">
                 <span className="text-[10px] uppercase tracking-[.15em] text-white/40">Angel&apos;s note</span>
-                <p className="sticky-note-char-angel text-xs text-pink-800/40">{notes.angel.length}/500</p>
+                <div className="flex items-center gap-2">
+                  {saving && <span className="text-[9px] uppercase tracking-[.2em] text-white/30">Saving...</span>}
+                  <p className="sticky-note-char-angel text-xs text-pink-800/40">{notes.angel.length}/500</p>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -119,7 +158,10 @@ export default function StickyNotes() {
               />
               <div className="mt-3 flex items-center justify-between border-t border-white/20 pt-3">
                 <span className="text-[10px] uppercase tracking-[.15em] text-white/40">Kyle&apos;s note</span>
-                <p className="sticky-note-char-kyle mt-2 text-right text-xs text-blue-800/40">{notes.kyle.length}/500</p>
+                <div className="flex items-center gap-2">
+                  {saving && <span className="text-[9px] uppercase tracking-[.2em] text-white/30">Saving...</span>}
+                  <p className="sticky-note-char-kyle text-xs text-blue-800/40">{notes.kyle.length}/500</p>
+                </div>
               </div>
             </motion.div>
           </div>

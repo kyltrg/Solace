@@ -93,6 +93,14 @@ enum DreamStatus {
   ACHIEVED
 }
 
+model StickyNote {
+  id           String   @id @default(cuid())
+  angelMessage String   @default("")
+  kyleMessage  String   @default("")
+  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now())
+}
+
 model TonightEntry {
   id        String   @id @default(cuid())
 
