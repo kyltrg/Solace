@@ -19,6 +19,8 @@ model Letter {
 
   category  String   @default("General")
 
+  author    String?
+
   createdAt DateTime @default(now())
 
 }

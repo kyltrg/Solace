@@ -8,7 +8,8 @@ export default function ScrollToTop(): React.JSX.Element {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setShow(window.scrollY > 300);
+    const handleScroll = () => setShow(window.scrollY > 200);
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
