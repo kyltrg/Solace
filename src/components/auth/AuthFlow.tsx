@@ -493,7 +493,7 @@ export default function AuthFlow(): React.JSX.Element {
         setTimeout(() => {
           if (next === "022426") {
             Cookies.set("solace-access", String(Date.now()));
-            Cookies.set("solace-user", toDisplayName(name));
+            Cookies.set("solace-user", toDisplayName(nameRef.current));
             setStep("success");
             setTimeout(() => { window.location.href = "/home"; }, 4200);
           } else {
@@ -511,6 +511,9 @@ export default function AuthFlow(): React.JSX.Element {
       return next;
     });
   }, []);
+
+  const nameRef = useRef(name);
+  useEffect(() => { nameRef.current = name; }, [name]);
 
   const handleBackspace = useCallback(() => {
     setCode((prev) => prev.slice(0, -1));
