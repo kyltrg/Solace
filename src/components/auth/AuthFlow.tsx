@@ -475,7 +475,10 @@ export default function AuthFlow(): React.JSX.Element {
       Cookies.set("solace-access", String(Date.now()));
       Cookies.set("solace-user", toDisplayName(name));
       const targetAuthor = name.toLowerCase().includes("kyle") ? "angel" : "kyle";
-      sendPushToAuthor(targetAuthor, `${toDisplayName(name)} is at home`, "Come home now \u{1F60A}", "/home").catch((e) => console.error("[push] login push failed", e));
+      const displayName = toDisplayName(name);
+      const lTitles = [`${displayName} is at home`, `${displayName} just arrived home`, `${displayName} is here`];
+      const lBodies = ["Come home now \u{1F60A}", "Join them at home \u{1F60A}", "See you at home \u{1F60A}"];
+      sendPushToAuthor(targetAuthor, lTitles[Math.floor(Math.random() * lTitles.length)], lBodies[Math.floor(Math.random() * lBodies.length)], "/home").catch((e) => console.error("[push] login push failed", e));
       setStep("success");
       setTimeout(() => { window.location.href = "/home"; }, 4200);
       return;
@@ -498,7 +501,10 @@ export default function AuthFlow(): React.JSX.Element {
             Cookies.set("solace-access", String(Date.now()));
             Cookies.set("solace-user", toDisplayName(nameRef.current));
             const targetAuthor = nameRef.current.toLowerCase().includes("kyle") ? "angel" : "kyle";
-            sendPushToAuthor(targetAuthor, `${toDisplayName(nameRef.current)} is at home`, "Come home now \u{1F60A}", "/home").catch((e) => console.error("[push] login push failed", e));
+            const displayName = toDisplayName(nameRef.current);
+            const lTitles = [`${displayName} is at home`, `${displayName} just arrived home`, `${displayName} is here`];
+            const lBodies = ["Come home now \u{1F60A}", "Join them at home \u{1F60A}", "See you at home \u{1F60A}"];
+            sendPushToAuthor(targetAuthor, lTitles[Math.floor(Math.random() * lTitles.length)], lBodies[Math.floor(Math.random() * lBodies.length)], "/home").catch((e) => console.error("[push] login push failed", e));
             setStep("success");
             setTimeout(() => { window.location.href = "/home"; }, 4200);
           } else {
