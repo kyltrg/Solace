@@ -117,14 +117,3 @@ export async function sendRandomPush(targetAuthor: string) {
   const msg = RANDOM_MESSAGES[Math.floor(Math.random() * RANDOM_MESSAGES.length)];
   return sendPushToAuthor(targetAuthor, msg.title, msg.body, "/home");
 }
-
-export async function testPush(author: string) {
-  return sendPushToAuthor(author, "Test \u2705", "This is a test push from Solace. If you see this, push is working!", "/home");
-}
-
-export async function getSubscriptionCount(author: string) {
-  const count = await prisma.pushSubscription.count({
-    where: { author },
-  });
-  return count;
-}
