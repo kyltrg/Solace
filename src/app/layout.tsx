@@ -77,9 +77,10 @@ export const metadata: Metadata = {
   description: "A digital home for Kyle & Angel",
   manifest: "/manifest.json",
   icons: {
-    icon: "/icon.svg",
-    apple: "/apple-icon.svg",
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
   },
+  formatDetection: { telephone: false },
   appleWebApp: {
     capable: true,
     title: "Solace",
