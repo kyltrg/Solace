@@ -24,6 +24,8 @@ import {
 
 import PresenceNotification
 from "@/components/presence/PresenceNotification";
+import PushSetup
+from "@/components/home/PushSetup";
 
 import {
   MusicProvider,
@@ -71,6 +73,7 @@ Poppins({
 export const metadata: Metadata = {
   title: "SOLACE",
   description: "A digital home for Kyle & Angel",
+  manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {
@@ -107,6 +110,7 @@ export default function RootLayout({
             {children}
             <Footer />
             <PresenceNotification />
+            <PushSetup />
             </PresenceProvider>
             <HiddenPlayer />
             <MusicPlayer />

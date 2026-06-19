@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { getStickyNotes, saveStickyNote } from "@/actions/stickynotes";
+import { getCurrentUser, setCurrentUser } from "./PushSetup";
 
 type NoteRecord = {
   message: string;
@@ -38,6 +39,7 @@ export default function StickyNotes() {
   const [angel, setAngel] = useState<NoteRecord | null>(null);
   const [kyle, setKyle] = useState<NoteRecord | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [identity, setIdentity] = useState("");
   const [saving, setSaving] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const angelRef = useRef(angel);
@@ -52,10 +54,12 @@ export default function StickyNotes() {
     getStickyNotes().then((server) => {
       setAngel(server.angel ?? { message: local.angel ?? "", updatedAt: "" });
       setKyle(server.kyle ?? { message: local.kyle ?? "", updatedAt: "" });
+      setIdentity(getCurrentUser());
       setMounted(true);
     }).catch(() => {
       setAngel({ message: local.angel ?? "", updatedAt: "" });
       setKyle({ message: local.kyle ?? "", updatedAt: "" });
+      setIdentity(getCurrentUser());
       setMounted(true);
     });
   }, []);
@@ -117,9 +121,13 @@ export default function StickyNotes() {
               transition={{ duration: .6, ease: [.22,1,.36,1] }}
                className="mb-5"
             >
-              <span className="sticky-note-title-angel font-display font-bold text-2xl md:text-3xl tracking-tight -rotate-1">
+              <button
+                onClick={() => { setCurrentUser("angel"); setIdentity("angel"); }}
+                className="sticky-note-title-angel font-display font-bold text-2xl md:text-3xl tracking-tight -rotate-1 cursor-pointer text-left"
+              >
                 Angel&apos;s Sticky Note
-              </span>
+                {identity === "angel" && <span className="ml-2 text-[10px] opacity-60">(You)</span>}
+              </button>
             </motion.p>
             <motion.div
               initial={{ opacity: 0, x: -30, rotate: -2 }}
@@ -160,9 +168,13 @@ export default function StickyNotes() {
               transition={{ duration: .6, ease: [.22,1,.36,1] }}
                className="mb-5 text-right"
             >
-              <span className="sticky-note-title-kyle font-display font-bold text-2xl md:text-3xl tracking-tight rotate-1">
+              <button
+                onClick={() => { setCurrentUser("kyle"); setIdentity("kyle"); }}
+                className="sticky-note-title-kyle font-display font-bold text-2xl md:text-3xl tracking-tight rotate-1 cursor-pointer text-right"
+              >
                 Kyle&apos;s Sticky Note
-              </span>
+                {identity === "kyle" && <span className="ml-2 text-[10px] opacity-60">(You)</span>}
+              </button>
             </motion.p>
             <motion.div
               initial={{ opacity: 0, x: 30, rotate: 2 }}

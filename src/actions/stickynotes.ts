@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 
 import { revalidatePath } from "next/cache";
+import { sendPushToAuthor } from "./push";
 
 type NoteRecord = {
   message: string;
@@ -56,5 +57,17 @@ export async function saveStickyNote(formData: FormData): Promise<{ updatedAt: s
   }
 
   revalidatePath("/home");
+
+  if (message.trim()) {
+    const name = author === "angel" ? "Angel" : "Kyle";
+    const target = author === "angel" ? "kyle" : "angel";
+    sendPushToAuthor(
+      target,
+      "New Sticky Note",
+      `${name} added a new note. Read it now!`,
+      "/home",
+    );
+  }
+
   return { updatedAt: record.updatedAt.toISOString() };
 }
