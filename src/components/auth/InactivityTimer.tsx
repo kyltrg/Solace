@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
-const THIRTY_MINUTES = 30 * 60 * 1000;
+const TWENTY_MINUTES = 20 * 60 * 1000;
 
 export function InactivityTimer() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export function InactivityTimer() {
       timerRef.current = setTimeout(() => {
         Cookies.remove("solace-access");
         router.push("/");
-      }, THIRTY_MINUTES);
+      }, TWENTY_MINUTES);
     };
 
     resetTimer();

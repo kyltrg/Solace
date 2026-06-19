@@ -71,3 +71,39 @@ export async function sendPushToAuthor(
     return { ok: false, sent: 0 };
   }
 }
+
+export async function sendInactivityPush(
+  targetAuthor: string,
+  hours: number,
+) {
+  const messages: Record<number, string> = {
+    3: "It's been 3 hours since I last saw you here. Come home.",
+    5: "5 hours without you. The house feels empty.",
+    7: "7 hours. Are you okay? Come home.",
+    10: "10 hours. I miss you at home.",
+    15: "15 hours. Please come home.",
+    20: "20 hours. Our home is waiting for you.",
+    24: "It's been a day. Come home now.",
+  };
+
+  const body = messages[hours] ?? `It's been ${hours} hours. Come home.`;
+  return sendPushToAuthor(targetAuthor, "Missing You \u{1F49B}", body, "/home");
+}
+
+const RANDOM_MESSAGES = [
+  { title: "Read a Letter \u{1F4EC}", body: "Want to read a letter? Open Solace now." },
+  { title: "Sticky Note \u{1F4AD}", body: "Someone might have left you a sticky note. Come home." },
+  { title: "Our Songs \u{1F3B5}", body: "Want to listen to our songs? Open Solace." },
+  { title: "Plan a Date \u{1F48D}", body: "Plan your next date? Come home." },
+  { title: "Tonight \u{1F31F}", body: "How was your day? Write in Tonight. Open Solace." },
+  { title: "Our Story \u{1F4D6}", body: "Read our story again. Open Solace." },
+  { title: "Dreams \u{2728}", body: "Check our dreams board. Open Solace." },
+  { title: "Come Home \u{1F3E0}", body: "Your home is waiting for you. Come home now." },
+  { title: "Explore \u{1F453}", body: "Want to visit the rooms? Open Solace." },
+  { title: "Plans & Dreams \u{1F3AF}", body: "Check our plans and dreams. Open Solace." },
+];
+
+export async function sendRandomPush(targetAuthor: string) {
+  const msg = RANDOM_MESSAGES[Math.floor(Math.random() * RANDOM_MESSAGES.length)];
+  return sendPushToAuthor(targetAuthor, msg.title, msg.body, "/home");
+}

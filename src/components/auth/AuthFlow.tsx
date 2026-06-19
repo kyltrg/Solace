@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import Cookies from "js-cookie";
 import { motion, AnimatePresence } from "framer-motion";
+import { sendPushToAuthor } from "@/actions/push";
 
 type Step = "gate" | "name" | "welcome" | "choice" | "quiz" | "vault" | "success" | "wrong-door";
 type Level = 1 | 2 | 3;
@@ -473,6 +474,8 @@ export default function AuthFlow(): React.JSX.Element {
     if (code === "022426") {
       Cookies.set("solace-access", String(Date.now()));
       Cookies.set("solace-user", toDisplayName(name));
+      const targetAuthor = name.toLowerCase().includes("kyle") ? "angel" : "kyle";
+      sendPushToAuthor(targetAuthor, "Welcome Home \u{1F4AB}", `${toDisplayName(name)} is at home. Come home now. :)`, "/home");
       setStep("success");
       setTimeout(() => { window.location.href = "/home"; }, 4200);
       return;
@@ -494,6 +497,8 @@ export default function AuthFlow(): React.JSX.Element {
           if (next === "022426") {
             Cookies.set("solace-access", String(Date.now()));
             Cookies.set("solace-user", toDisplayName(nameRef.current));
+            const targetAuthor = nameRef.current.toLowerCase().includes("kyle") ? "angel" : "kyle";
+            sendPushToAuthor(targetAuthor, "Welcome Home \u{1F4AB}", `${toDisplayName(nameRef.current)} is at home. Come home now. :)`, "/home");
             setStep("success");
             setTimeout(() => { window.location.href = "/home"; }, 4200);
           } else {

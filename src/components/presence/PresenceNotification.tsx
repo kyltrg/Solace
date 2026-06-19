@@ -8,7 +8,7 @@ import { getPresence } from "@/actions/presence";
 
 const POLL_MS = 10000;
 const DISPLAY_DURATION_MS = 6000;
-const ACTIVE_THRESHOLD_MS = 120000;
+const ACTIVE_THRESHOLD_MS = 180000;
 
 type OtherStatus = "active" | "recent" | "offline" | null;
 

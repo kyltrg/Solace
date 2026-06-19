@@ -18,6 +18,9 @@ from "@/components/navigation/PageTransition";
 import { InactivityTimer }
 from "@/components/auth/InactivityTimer";
 
+import { InactivityScheduler }
+from "@/components/cron/InactivityScheduler";
+
 import {
   PresenceProvider,
 } from "@/components/presence/PresenceProvider";
@@ -122,6 +125,7 @@ export default function RootLayout({
             <PageTransition />
             <SolaceIsland />
             <InactivityTimer />
+            <InactivityScheduler />
             {children}
             <Footer />
             <PresenceNotification />

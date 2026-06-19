@@ -110,6 +110,15 @@ model PushSubscription {
   createdAt DateTime @default(now())
 }
 
+model NotificationLog {
+  id        String   @id @default(cuid())
+  type      String // "presence" | "inactivity" | "random"
+  key       String
+  createdAt DateTime @default(now())
+
+  @@unique([type, key])
+}
+
 model StickyNote {
   id        String   @id @default(cuid())
   author    String
