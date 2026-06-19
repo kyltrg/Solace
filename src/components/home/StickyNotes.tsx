@@ -137,14 +137,14 @@ export default function StickyNotes() {
               />
               <div className="mt-3 flex flex-col gap-1.5 border-t border-[var(--border)] pt-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-[.15em] text-[var(--muted)]">Angel&apos;s note</span>
+                  <span className="text-[10px] uppercase tracking-[.15em] text-black">Angel&apos;s note</span>
                   <div className="flex items-center gap-2">
-                    {saving === "angel" && <span className="text-[9px] uppercase tracking-[.2em] text-[var(--muted)]">Saving...</span>}
-                    <p className="sticky-note-char-angel text-xs text-pink-800/40">{(angel?.message ?? "").length}/500</p>
+                    {saving === "angel" && <span className="text-[9px] uppercase tracking-[.2em] text-black">Saving...</span>}
+                    <p className="sticky-note-char-angel text-xs text-black/60">{(angel?.message ?? "").length}/500</p>
                   </div>
                 </div>
                 {angel?.updatedAt && (
-                  <p className="text-[9px] tracking-wide text-[var(--muted)]/60">
+                  <p className="text-[9px] tracking-wide text-black">
                     {formatWrittenDate(angel.updatedAt)}
                   </p>
                 )}
@@ -180,14 +180,14 @@ export default function StickyNotes() {
               />
               <div className="mt-3 flex flex-col gap-1.5 border-t border-[var(--border)] pt-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-[.15em] text-[var(--muted)]">Kyle&apos;s note</span>
+                  <span className="text-[10px] uppercase tracking-[.15em] text-black">Kyle&apos;s note</span>
                   <div className="flex items-center gap-2">
-                    {saving === "kyle" && <span className="text-[9px] uppercase tracking-[.2em] text-[var(--muted)]">Saving...</span>}
-                    <p className="sticky-note-char-kyle text-xs text-blue-800/40">{(kyle?.message ?? "").length}/500</p>
+                    {saving === "kyle" && <span className="text-[9px] uppercase tracking-[.2em] text-black">Saving...</span>}
+                    <p className="sticky-note-char-kyle text-xs text-black/60">{(kyle?.message ?? "").length}/500</p>
                   </div>
                 </div>
                 {kyle?.updatedAt && (
-                  <p className="text-[9px] tracking-wide text-[var(--muted)]/60">
+                  <p className="text-[9px] tracking-wide text-black">
                     {formatWrittenDate(kyle.updatedAt)}
                   </p>
                 )}
