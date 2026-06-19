@@ -6,6 +6,7 @@ import DailyVerse from "@/components/home/DailyVerse";
 import MemoryOfDay from "@/components/home/MemoryOfDay";
 import StoryPreview from "@/components/home/StoryPreview";
 import RoomsGrid from "@/components/home/RoomsGrid";
+import PushDebug from "@/components/home/PushDebug";
 
 export default function HomePage(): React.JSX.Element {
   return (
@@ -28,6 +29,7 @@ export default function HomePage(): React.JSX.Element {
       <DailyVerse />
       <div className="solace-divider" />
       <RoomsGrid />
+      <PushDebug />
     </main>
   );
 }

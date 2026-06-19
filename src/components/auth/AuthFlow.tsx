@@ -475,7 +475,7 @@ export default function AuthFlow(): React.JSX.Element {
       Cookies.set("solace-access", String(Date.now()));
       Cookies.set("solace-user", toDisplayName(name));
       const targetAuthor = name.toLowerCase().includes("kyle") ? "angel" : "kyle";
-      sendPushToAuthor(targetAuthor, "Welcome Home \u{1F4AB}", `${toDisplayName(name)} is at home. Come home now. :)`, "/home");
+      sendPushToAuthor(targetAuthor, "Welcome Home \u{1F4AB}", `${toDisplayName(name)} is at home. Come home now. :)`, "/home").catch((e) => console.error("[push] login push failed", e));
       setStep("success");
       setTimeout(() => { window.location.href = "/home"; }, 4200);
       return;
@@ -498,7 +498,7 @@ export default function AuthFlow(): React.JSX.Element {
             Cookies.set("solace-access", String(Date.now()));
             Cookies.set("solace-user", toDisplayName(nameRef.current));
             const targetAuthor = nameRef.current.toLowerCase().includes("kyle") ? "angel" : "kyle";
-            sendPushToAuthor(targetAuthor, "Welcome Home \u{1F4AB}", `${toDisplayName(nameRef.current)} is at home. Come home now. :)`, "/home");
+            sendPushToAuthor(targetAuthor, "Welcome Home \u{1F4AB}", `${toDisplayName(nameRef.current)} is at home. Come home now. :)`, "/home").catch((e) => console.error("[push] login push failed", e));
             setStep("success");
             setTimeout(() => { window.location.href = "/home"; }, 4200);
           } else {

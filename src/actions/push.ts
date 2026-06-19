@@ -44,32 +44,42 @@ export async function sendPushToAuthor(
   body: string,
   url?: string,
 ) {
-  try {
-    const subs = await prisma.pushSubscription.findMany({
-      where: { author: targetAuthor },
-    });
+  const subs = await prisma.pushSubscription.findMany({
+    where: { author: targetAuthor },
+  });
 
-    if (subs.length === 0) return { ok: true, sent: 0 };
+  if (subs.length === 0) return { ok: true, sent: 0 };
 
-    const results = await Promise.allSettled(
-      subs.map((sub) =>
-        webpush.sendNotification(
-          {
-            endpoint: sub.endpoint,
-            keys: { p256dh: sub.p256dh, auth: sub.auth },
-          },
-          JSON.stringify({ title, body, url }),
-        ),
-      ),
-    );
+  const toDelete: string[] = [];
+  let sentCount = 0;
 
-    return {
-      ok: true,
-      sent: results.filter((r) => r.status === "fulfilled").length,
-    };
-  } catch {
-    return { ok: false, sent: 0 };
+  for (const sub of subs) {
+    try {
+      await webpush.sendNotification(
+        {
+          endpoint: sub.endpoint,
+          keys: { p256dh: sub.p256dh, auth: sub.auth },
+        },
+        JSON.stringify({ title, body, url }),
+      );
+      sentCount++;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[push] send failed for ${sub.author} (${sub.endpoint.slice(0, 40)}...): ${msg}`);
+      if (msg.includes("410") || msg.includes("Gone") || msg.includes("expired") || msg.includes("unregistered")) {
+        toDelete.push(sub.id);
+      }
+    }
   }
+
+  if (toDelete.length > 0) {
+    await prisma.pushSubscription.deleteMany({
+      where: { id: { in: toDelete } },
+    });
+    console.error(`[push] cleaned up ${toDelete.length} expired subscriptions for ${targetAuthor}`);
+  }
+
+  return { ok: true, sent: sentCount };
 }
 
 export async function sendInactivityPush(
@@ -106,4 +116,15 @@ const RANDOM_MESSAGES = [
 export async function sendRandomPush(targetAuthor: string) {
   const msg = RANDOM_MESSAGES[Math.floor(Math.random() * RANDOM_MESSAGES.length)];
   return sendPushToAuthor(targetAuthor, msg.title, msg.body, "/home");
+}
+
+export async function testPush(author: string) {
+  return sendPushToAuthor(author, "Test \u2705", "This is a test push from Solace. If you see this, push is working!", "/home");
+}
+
+export async function getSubscriptionCount(author: string) {
+  const count = await prisma.pushSubscription.count({
+    where: { author },
+  });
+  return count;
 }

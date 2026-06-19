@@ -61,7 +61,7 @@ export async function saveStickyNote(formData: FormData): Promise<{ updatedAt: s
   if (message.trim()) {
     const name = author === "angel" ? "Angel" : "Kyle";
     const target = author === "angel" ? "kyle" : "angel";
-    sendPushToAuthor(
+    await sendPushToAuthor(
       target,
       "New Sticky Note",
       `${name} added a new note. Read it now!`,
