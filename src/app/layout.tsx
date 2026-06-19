@@ -24,6 +24,8 @@ import {
 
 import PresenceNotification
 from "@/components/presence/PresenceNotification";
+import NotificationPrompt
+from "@/components/home/NotificationPrompt";
 import PushSetup
 from "@/components/home/PushSetup";
 
@@ -110,6 +112,7 @@ export default function RootLayout({
             {children}
             <Footer />
             <PresenceNotification />
+            <NotificationPrompt />
             <PushSetup />
             </PresenceProvider>
             <HiddenPlayer />

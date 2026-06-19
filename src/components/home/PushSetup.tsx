@@ -9,13 +9,15 @@ export default function PushSetup() {
 
   useEffect(() => {
     if (done.current) return;
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) return;
+    if (Notification.permission !== "granted") return;
 
     let cancelled = false;
 
     async function setup() {
       try {
         const userName = Cookies.get("solace-user") ?? "";
+        if (!userName) return;
         const author = userName.toLowerCase() === "kyle" ? "kyle" : "angel";
 
         const reg = await navigator.serviceWorker.register("/sw.js");
@@ -27,9 +29,6 @@ export default function PushSetup() {
           done.current = true;
           return;
         }
-
-        const perm = await Notification.requestPermission();
-        if (perm !== "granted" || cancelled) return;
 
         const key = urlBase64ToUint8Array(
           process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
