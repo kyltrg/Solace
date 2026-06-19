@@ -77,17 +77,17 @@ export const metadata: Metadata = {
   description: "A digital home for Kyle & Angel",
   manifest: "/manifest.json",
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
+    icon: [{ url: "/icon.svg?v=2", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon.svg?v=2", type: "image/svg+xml" }],
   },
   formatDetection: { telephone: false },
   appleWebApp: {
-    capable: true,
     title: "Solace",
     statusBarStyle: "black-translucent",
   },
   other: {
     "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
   },
 };
 
