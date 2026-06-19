@@ -88,7 +88,7 @@ export default function RelationshipTimer() {
           </div>
 
           <div className="glass-card rounded-2xl px-6 py-4 text-center">
-            <p className="text-xs uppercase tracking-[.25em] text-[var(--accent)]">Next Anniversary</p>
+            <p className="text-xs uppercase tracking-[.25em] text-[var(--accent)]">First Anniversary</p>
             <p className="mt-1 font-display text-xl">
               {nextA.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
             </p>

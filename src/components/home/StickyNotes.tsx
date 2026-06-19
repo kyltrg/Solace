@@ -2,77 +2,84 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { getStickyNotes, saveStickyNotes } from "@/actions/stickynotes";
+import { getStickyNotes, saveStickyNote } from "@/actions/stickynotes";
 
-type StickyData = {
-  angel: string;
-  kyle: string;
+type NoteRecord = {
+  message: string;
+  updatedAt: string;
 };
 
 const STORAGE_KEY = "solace-stickynotes";
 const DEBOUNCE_MS = 1500;
 
-function loadFromLocal(): StickyData {
-  if (typeof window === "undefined") return { angel: "", kyle: "" };
+function loadFromLocal(): Record<string, string> {
+  if (typeof window === "undefined") return {};
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
   } catch {}
-  return { angel: "", kyle: "" };
+  return {};
 }
 
-function saveToLocal(data: StickyData) {
+function saveToLocal(author: string, message: string) {
+  const data = loadFromLocal();
+  data[author] = message;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-export default function StickyNotes() {
-  const [notes, setNotes] = useState<StickyData>({ angel: "", kyle: "" });
-  const [mounted, setMounted] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const latestRef = useRef<StickyData>(notes);
+function formatWrittenDate(iso: string) {
+  const d = new Date(iso);
+  const date = d.toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase();
+  const time = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+  return `Written on ${date} | ${time}`;
+}
 
-  useEffect(() => {
-    latestRef.current = notes;
-  }, [notes]);
+export default function StickyNotes() {
+  const [angel, setAngel] = useState<NoteRecord | null>(null);
+  const [kyle, setKyle] = useState<NoteRecord | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [saving, setSaving] = useState<string | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const angelRef = useRef(angel);
+  const kyleRef = useRef(kyle);
+
+  useEffect(() => { angelRef.current = angel; }, [angel]);
+  useEffect(() => { kyleRef.current = kyle; }, [kyle]);
 
   useEffect(() => {
     const local = loadFromLocal();
 
-    getStickyNotes()
-      .then((server) => {
-        const merged: StickyData = {
-          angel: server.angelMessage || local.angel,
-          kyle: server.kyleMessage || local.kyle,
-        };
-        setNotes(merged);
-        if (server.updatedAt) setUpdatedAt(server.updatedAt);
-        saveToLocal(merged);
-        setMounted(true);
-      })
-      .catch(() => {
-        setNotes(local);
-        setMounted(true);
-      });
+    getStickyNotes().then((server) => {
+      setAngel(server.angel ?? { message: local.angel ?? "", updatedAt: "" });
+      setKyle(server.kyle ?? { message: local.kyle ?? "", updatedAt: "" });
+      setMounted(true);
+    }).catch(() => {
+      setAngel({ message: local.angel ?? "", updatedAt: "" });
+      setKyle({ message: local.kyle ?? "", updatedAt: "" });
+      setMounted(true);
+    });
   }, []);
 
   const updateNote = useCallback(
     (who: "angel" | "kyle", value: string) => {
-      const next = { ...latestRef.current, [who]: value };
-      latestRef.current = next;
-      setNotes(next);
-      saveToLocal(next);
+      if (who === "angel") {
+        setAngel((prev) => prev ? { ...prev, message: value } : { message: value, updatedAt: "" });
+      } else {
+        setKyle((prev) => prev ? { ...prev, message: value } : { message: value, updatedAt: "" });
+      }
+      saveToLocal(who, value);
 
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
-        setSaving(true);
+        setSaving(who);
         const fd = new FormData();
-        fd.append("angelMessage", next.angel);
-        fd.append("kyleMessage", next.kyle);
-        saveStickyNotes(fd).then((res) => {
-          if (res?.updatedAt) setUpdatedAt(res.updatedAt);
-        }).finally(() => setSaving(false));
+        fd.append("author", who);
+        fd.append("message", value);
+        saveStickyNote(fd).then((res) => {
+          const record: NoteRecord = { message: value, updatedAt: res.updatedAt };
+          if (who === "angel") setAngel(record);
+          else setKyle(record);
+        }).finally(() => setSaving(null));
       }, DEBOUNCE_MS);
     },
     [],
@@ -122,7 +129,7 @@ export default function StickyNotes() {
               className="sticky-note sticky-note-angel rounded-2xl p-6 shadow-lg"
             >
               <textarea
-                value={notes.angel}
+                value={angel?.message ?? ""}
                 onChange={(e) => updateNote("angel", e.target.value)}
                 placeholder="Write a message for Kyle..."
                 className="min-h-[140px] w-full resize-none bg-transparent font-poppins text-base leading-relaxed outline-none placeholder:text-[var(--muted)]/50"
@@ -132,16 +139,13 @@ export default function StickyNotes() {
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] uppercase tracking-[.15em] text-[var(--muted)]">Angel&apos;s note</span>
                   <div className="flex items-center gap-2">
-                    {saving && <span className="text-[9px] uppercase tracking-[.2em] text-[var(--muted)]">Saving...</span>}
-                    <p className="sticky-note-char-angel text-xs text-pink-800/40">{notes.angel.length}/500</p>
+                    {saving === "angel" && <span className="text-[9px] uppercase tracking-[.2em] text-[var(--muted)]">Saving...</span>}
+                    <p className="sticky-note-char-angel text-xs text-pink-800/40">{(angel?.message ?? "").length}/500</p>
                   </div>
                 </div>
-                {updatedAt && (
+                {angel?.updatedAt && (
                   <p className="text-[9px] tracking-wide text-[var(--muted)]/60">
-                    Last edited {new Date(updatedAt).toLocaleDateString("en-US", {
-                      year: "numeric", month: "short", day: "numeric",
-                      hour: "2-digit", minute: "2-digit"
-                    })}
+                    {formatWrittenDate(angel.updatedAt)}
                   </p>
                 )}
               </div>
@@ -168,7 +172,7 @@ export default function StickyNotes() {
               className="sticky-note sticky-note-kyle rounded-2xl p-6 shadow-lg"
             >
               <textarea
-                value={notes.kyle}
+                value={kyle?.message ?? ""}
                 onChange={(e) => updateNote("kyle", e.target.value)}
                 placeholder="Write a message for Angel..."
                 className="min-h-[140px] w-full resize-none bg-transparent font-poppins text-base leading-relaxed outline-none placeholder:text-[var(--muted)]/50"
@@ -178,16 +182,13 @@ export default function StickyNotes() {
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] uppercase tracking-[.15em] text-[var(--muted)]">Kyle&apos;s note</span>
                   <div className="flex items-center gap-2">
-                    {saving && <span className="text-[9px] uppercase tracking-[.2em] text-[var(--muted)]">Saving...</span>}
-                    <p className="sticky-note-char-kyle text-xs text-blue-800/40">{notes.kyle.length}/500</p>
+                    {saving === "kyle" && <span className="text-[9px] uppercase tracking-[.2em] text-[var(--muted)]">Saving...</span>}
+                    <p className="sticky-note-char-kyle text-xs text-blue-800/40">{(kyle?.message ?? "").length}/500</p>
                   </div>
                 </div>
-                {updatedAt && (
+                {kyle?.updatedAt && (
                   <p className="text-[9px] tracking-wide text-[var(--muted)]/60">
-                    Last edited {new Date(updatedAt).toLocaleDateString("en-US", {
-                      year: "numeric", month: "short", day: "numeric",
-                      hour: "2-digit", minute: "2-digit"
-                    })}
+                    {formatWrittenDate(kyle.updatedAt)}
                   </p>
                 )}
               </div>

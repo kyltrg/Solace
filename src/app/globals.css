@@ -375,7 +375,7 @@ body::after {
 }
 
 .sticky-note-angel textarea {
-  color: #3a101e;
+  color: #000;
 }
 
 .sticky-note-kyle {
@@ -384,7 +384,7 @@ body::after {
 }
 
 .sticky-note-kyle textarea {
-  color: #0f263a;
+  color: #000;
 }
 
 [data-theme="light"] .sticky-note {

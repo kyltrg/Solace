@@ -102,11 +102,11 @@ model Presence {
 }
 
 model StickyNote {
-  id           String   @id @default(cuid())
-  angelMessage String   @default("")
-  kyleMessage  String   @default("")
-  updatedAt    DateTime @updatedAt
-  createdAt    DateTime @default(now())
+  id        String   @id @default(cuid())
+  author    String
+  message   String   @default("")
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
 }
 
 model TonightEntry {
