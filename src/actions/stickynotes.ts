@@ -63,8 +63,8 @@ export async function saveStickyNote(formData: FormData): Promise<{ updatedAt: s
     const target = author === "angel" ? "kyle" : "angel";
     await sendPushToAuthor(
       target,
-      "New Sticky Note",
-      `${name} added a new note. Read it now!`,
+      "New Sticky Note \u{1F4AD}",
+      `${name} left you a note. Read it on Solace.`,
       "/home",
     );
   }
