@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
+import Cookies from "js-cookie";
 import { getStickyNotes, saveStickyNote } from "@/actions/stickynotes";
-import { getCurrentUser, setCurrentUser } from "./PushSetup";
 
 type NoteRecord = {
   message: string;
@@ -12,6 +12,7 @@ type NoteRecord = {
 
 const STORAGE_KEY = "solace-stickynotes";
 const DEBOUNCE_MS = 1500;
+const POLL_MS = 3000;
 
 function loadFromLocal(): Record<string, string> {
   if (typeof window === "undefined") return {};
@@ -39,55 +40,62 @@ export default function StickyNotes() {
   const [angel, setAngel] = useState<NoteRecord | null>(null);
   const [kyle, setKyle] = useState<NoteRecord | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [identity, setIdentity] = useState("");
-  const [saving, setSaving] = useState<string | null>(null);
+  const [identity, setIdentity] = useState<string>("");
+  const [saving, setSaving] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const angelRef = useRef(angel);
-  const kyleRef = useRef(kyle);
-
-  useEffect(() => { angelRef.current = angel; }, [angel]);
-  useEffect(() => { kyleRef.current = kyle; }, [kyle]);
 
   useEffect(() => {
-    const local = loadFromLocal();
+    const cookieUser = Cookies.get("solace-user") ?? "";
+    const me = cookieUser.toLowerCase() === "kyle" ? "kyle" : "angel";
+    setIdentity(me);
 
+    const local = loadFromLocal();
     getStickyNotes().then((server) => {
       setAngel(server.angel ?? { message: local.angel ?? "", updatedAt: "" });
       setKyle(server.kyle ?? { message: local.kyle ?? "", updatedAt: "" });
-      setIdentity(getCurrentUser());
       setMounted(true);
     }).catch(() => {
       setAngel({ message: local.angel ?? "", updatedAt: "" });
       setKyle({ message: local.kyle ?? "", updatedAt: "" });
-      setIdentity(getCurrentUser());
       setMounted(true);
     });
   }, []);
 
-  const updateNote = useCallback(
-    (who: "angel" | "kyle", value: string) => {
-      if (who === "angel") {
-        setAngel((prev) => prev ? { ...prev, message: value } : { message: value, updatedAt: "" });
-      } else {
-        setKyle((prev) => prev ? { ...prev, message: value } : { message: value, updatedAt: "" });
-      }
-      saveToLocal(who, value);
+  useEffect(() => {
+    if (!mounted || !identity) return;
+    const interval = setInterval(() => {
+      getStickyNotes().then((server) => {
+        if (identity === "angel" && server.kyle && server.kyle.updatedAt) setKyle(server.kyle);
+        if (identity === "kyle" && server.angel && server.angel.updatedAt) setAngel(server.angel);
+      }).catch(() => {});
+    }, POLL_MS);
+    return () => clearInterval(interval);
+  }, [mounted, identity]);
 
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => {
-        setSaving(who);
-        const fd = new FormData();
-        fd.append("author", who);
-        fd.append("message", value);
-        saveStickyNote(fd).then((res) => {
-          const record: NoteRecord = { message: value, updatedAt: res.updatedAt };
-          if (who === "angel") setAngel(record);
-          else setKyle(record);
-        }).finally(() => setSaving(null));
-      }, DEBOUNCE_MS);
-    },
-    [],
-  );
+  const updateNote = useCallback((value: string) => {
+    const me = identity;
+    if (!me) return;
+
+    if (me === "angel") {
+      setAngel((prev) => prev ? { ...prev, message: value } : { message: value, updatedAt: "" });
+    } else {
+      setKyle((prev) => prev ? { ...prev, message: value } : { message: value, updatedAt: "" });
+    }
+    saveToLocal(me, value);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setSaving(true);
+      const fd = new FormData();
+      fd.append("author", me);
+      fd.append("message", value);
+      saveStickyNote(fd).then((res) => {
+        const record: NoteRecord = { message: value, updatedAt: res.updatedAt };
+        if (me === "angel") setAngel(record);
+        else setKyle(record);
+      }).finally(() => setSaving(false));
+    }, DEBOUNCE_MS);
+  }, [identity]);
 
   if (!mounted) return null;
 
@@ -121,13 +129,10 @@ export default function StickyNotes() {
               transition={{ duration: .6, ease: [.22,1,.36,1] }}
                className="mb-5"
             >
-              <button
-                onClick={() => { setCurrentUser("angel"); setIdentity("angel"); }}
-                className="sticky-note-title-angel font-display font-bold text-2xl md:text-3xl tracking-tight -rotate-1 cursor-pointer text-left"
-              >
+              <span className="sticky-note-title-angel font-display font-bold text-2xl md:text-3xl tracking-tight -rotate-1">
                 Angel&apos;s Sticky Note
                 {identity === "angel" && <span className="ml-2 text-[10px] opacity-60">(You)</span>}
-              </button>
+              </span>
             </motion.p>
             <motion.div
               initial={{ opacity: 0, x: -30, rotate: -2 }}
@@ -138,8 +143,9 @@ export default function StickyNotes() {
             >
               <textarea
                 value={angel?.message ?? ""}
-                onChange={(e) => updateNote("angel", e.target.value)}
+                onChange={(e) => identity === "angel" && updateNote(e.target.value)}
                 placeholder="Write a message for Kyle..."
+                readOnly={identity !== "angel"}
                 className="min-h-[140px] w-full resize-none bg-transparent font-poppins text-base leading-relaxed outline-none placeholder:text-[var(--muted)]/50"
                 maxLength={500}
               />
@@ -147,7 +153,7 @@ export default function StickyNotes() {
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] uppercase tracking-[.15em] text-black">Angel&apos;s note</span>
                   <div className="flex items-center gap-2">
-                    {saving === "angel" && <span className="text-[9px] uppercase tracking-[.2em] text-black">Saving...</span>}
+                    {saving && identity === "angel" && <span className="text-[9px] uppercase tracking-[.2em] text-black">Saving...</span>}
                     <p className="sticky-note-char-angel text-xs text-black/60">{(angel?.message ?? "").length}/500</p>
                   </div>
                 </div>
@@ -168,13 +174,10 @@ export default function StickyNotes() {
               transition={{ duration: .6, ease: [.22,1,.36,1] }}
                className="mb-5 text-right"
             >
-              <button
-                onClick={() => { setCurrentUser("kyle"); setIdentity("kyle"); }}
-                className="sticky-note-title-kyle font-display font-bold text-2xl md:text-3xl tracking-tight rotate-1 cursor-pointer text-right"
-              >
+              <span className="sticky-note-title-kyle font-display font-bold text-2xl md:text-3xl tracking-tight rotate-1">
                 Kyle&apos;s Sticky Note
                 {identity === "kyle" && <span className="ml-2 text-[10px] opacity-60">(You)</span>}
-              </button>
+              </span>
             </motion.p>
             <motion.div
               initial={{ opacity: 0, x: 30, rotate: 2 }}
@@ -185,8 +188,9 @@ export default function StickyNotes() {
             >
               <textarea
                 value={kyle?.message ?? ""}
-                onChange={(e) => updateNote("kyle", e.target.value)}
+                onChange={(e) => identity === "kyle" && updateNote(e.target.value)}
                 placeholder="Write a message for Angel..."
+                readOnly={identity !== "kyle"}
                 className="min-h-[140px] w-full resize-none bg-transparent font-poppins text-base leading-relaxed outline-none placeholder:text-[var(--muted)]/50"
                 maxLength={500}
               />
@@ -194,7 +198,7 @@ export default function StickyNotes() {
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] uppercase tracking-[.15em] text-black">Kyle&apos;s note</span>
                   <div className="flex items-center gap-2">
-                    {saving === "kyle" && <span className="text-[9px] uppercase tracking-[.2em] text-black">Saving...</span>}
+                    {saving && identity === "kyle" && <span className="text-[9px] uppercase tracking-[.2em] text-black">Saving...</span>}
                     <p className="sticky-note-char-kyle text-xs text-black/60">{(kyle?.message ?? "").length}/500</p>
                   </div>
                 </div>

@@ -1,18 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Cookies from "js-cookie";
 import { subscribePush } from "@/actions/push";
-
-const USER_KEY = "solace-user";
-
-export function getCurrentUser(): string {
-  if (typeof window === "undefined") return "angel";
-  return localStorage.getItem(USER_KEY) ?? "angel";
-}
-
-export function setCurrentUser(name: string) {
-  localStorage.setItem(USER_KEY, name);
-}
 
 export default function PushSetup() {
   const done = useRef(false);
@@ -25,12 +15,15 @@ export default function PushSetup() {
 
     async function setup() {
       try {
+        const userName = Cookies.get("solace-user") ?? "";
+        const author = userName.toLowerCase() === "kyle" ? "kyle" : "angel";
+
         const reg = await navigator.serviceWorker.register("/sw.js");
         const existingSub = await reg.pushManager.getSubscription();
 
         if (existingSub) {
           const raw = existingSub.toJSON();
-          await subscribePush(raw.endpoint!, raw.keys!.p256dh, raw.keys!.auth, getCurrentUser());
+          await subscribePush(raw.endpoint!, raw.keys!.p256dh, raw.keys!.auth, author);
           done.current = true;
           return;
         }
@@ -47,11 +40,9 @@ export default function PushSetup() {
         });
 
         const raw = newSub.toJSON();
-        await subscribePush(raw.endpoint!, raw.keys!.p256dh, raw.keys!.auth, getCurrentUser());
+        await subscribePush(raw.endpoint!, raw.keys!.p256dh, raw.keys!.auth, author);
         done.current = true;
-      } catch {
-        // silently fail
-      }
+      } catch {}
     }
 
     setup();
@@ -69,4 +60,3 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
   for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
   return arr;
 }
-

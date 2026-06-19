@@ -1,11 +1,10 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-
-const webpush = require("web-push");
+import webpush from "web-push";
 
 webpush.setVapidDetails(
-  "mailto:kyle@solace.app",
+  "mailto:hello@solace.app",
   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
   process.env.VAPID_PRIVATE_KEY!,
 );
@@ -49,6 +48,9 @@ export async function sendPushToAuthor(
     const subs = await prisma.pushSubscription.findMany({
       where: { author: targetAuthor },
     });
+
+    if (subs.length === 0) return { ok: true, sent: 0 };
+
     const results = await Promise.allSettled(
       subs.map((sub) =>
         webpush.sendNotification(
@@ -60,7 +62,11 @@ export async function sendPushToAuthor(
         ),
       ),
     );
-    return { ok: true, sent: results.filter((r) => r.status === "fulfilled").length };
+
+    return {
+      ok: true,
+      sent: results.filter((r) => r.status === "fulfilled").length,
+    };
   } catch {
     return { ok: false, sent: 0 };
   }
