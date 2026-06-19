@@ -29,6 +29,7 @@ export default function StickyNotes() {
   const [notes, setNotes] = useState<StickyData>({ angel: "", kyle: "" });
   const [mounted, setMounted] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestRef = useRef<StickyData>(notes);
 
@@ -46,6 +47,7 @@ export default function StickyNotes() {
           kyle: server.kyleMessage || local.kyle,
         };
         setNotes(merged);
+        if (server.updatedAt) setUpdatedAt(server.updatedAt);
         saveToLocal(merged);
         setMounted(true);
       })
@@ -68,7 +70,9 @@ export default function StickyNotes() {
         const fd = new FormData();
         fd.append("angelMessage", next.angel);
         fd.append("kyleMessage", next.kyle);
-        saveStickyNotes(fd).finally(() => setSaving(false));
+        saveStickyNotes(fd).then((res) => {
+          if (res?.updatedAt) setUpdatedAt(res.updatedAt);
+        }).finally(() => setSaving(false));
       }, DEBOUNCE_MS);
     },
     [],
@@ -124,12 +128,22 @@ export default function StickyNotes() {
                 className="min-h-[140px] w-full resize-none bg-transparent font-poppins text-base leading-relaxed outline-none placeholder:text-[var(--muted)]/50"
                 maxLength={500}
               />
-              <div className="mt-3 flex items-center justify-between border-t border-[var(--border)] pt-3">
-                <span className="text-[10px] uppercase tracking-[.15em] text-[var(--muted)]">Angel&apos;s note</span>
-                <div className="flex items-center gap-2">
-                  {saving && <span className="text-[9px] uppercase tracking-[.2em] text-[var(--muted)]">Saving...</span>}
-                  <p className="sticky-note-char-angel text-xs text-pink-800/40">{notes.angel.length}/500</p>
+              <div className="mt-3 flex flex-col gap-1.5 border-t border-[var(--border)] pt-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase tracking-[.15em] text-[var(--muted)]">Angel&apos;s note</span>
+                  <div className="flex items-center gap-2">
+                    {saving && <span className="text-[9px] uppercase tracking-[.2em] text-[var(--muted)]">Saving...</span>}
+                    <p className="sticky-note-char-angel text-xs text-pink-800/40">{notes.angel.length}/500</p>
+                  </div>
                 </div>
+                {updatedAt && (
+                  <p className="text-[9px] tracking-wide text-[var(--muted)]/60">
+                    Last edited {new Date(updatedAt).toLocaleDateString("en-US", {
+                      year: "numeric", month: "short", day: "numeric",
+                      hour: "2-digit", minute: "2-digit"
+                    })}
+                  </p>
+                )}
               </div>
             </motion.div>
           </div>
@@ -160,12 +174,22 @@ export default function StickyNotes() {
                 className="min-h-[140px] w-full resize-none bg-transparent font-poppins text-base leading-relaxed outline-none placeholder:text-[var(--muted)]/50"
                 maxLength={500}
               />
-              <div className="mt-3 flex items-center justify-between border-t border-[var(--border)] pt-3">
-                <span className="text-[10px] uppercase tracking-[.15em] text-[var(--muted)]">Kyle&apos;s note</span>
-                <div className="flex items-center gap-2">
-                  {saving && <span className="text-[9px] uppercase tracking-[.2em] text-[var(--muted)]">Saving...</span>}
-                  <p className="sticky-note-char-kyle text-xs text-blue-800/40">{notes.kyle.length}/500</p>
+              <div className="mt-3 flex flex-col gap-1.5 border-t border-[var(--border)] pt-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase tracking-[.15em] text-[var(--muted)]">Kyle&apos;s note</span>
+                  <div className="flex items-center gap-2">
+                    {saving && <span className="text-[9px] uppercase tracking-[.2em] text-[var(--muted)]">Saving...</span>}
+                    <p className="sticky-note-char-kyle text-xs text-blue-800/40">{notes.kyle.length}/500</p>
+                  </div>
                 </div>
+                {updatedAt && (
+                  <p className="text-[9px] tracking-wide text-[var(--muted)]/60">
+                    Last edited {new Date(updatedAt).toLocaleDateString("en-US", {
+                      year: "numeric", month: "short", day: "numeric",
+                      hour: "2-digit", minute: "2-digit"
+                    })}
+                  </p>
+                )}
               </div>
             </motion.div>
           </div>

@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 export async function getStickyNotes(): Promise<{
   angelMessage: string;
   kyleMessage: string;
+  updatedAt: string | null;
 }> {
   try {
     const note = await prisma.stickyNote.findFirst({
@@ -14,19 +15,20 @@ export async function getStickyNotes(): Promise<{
     });
 
     if (!note) {
-      return { angelMessage: "", kyleMessage: "" };
+      return { angelMessage: "", kyleMessage: "", updatedAt: null };
     }
 
     return {
       angelMessage: note.angelMessage,
       kyleMessage: note.kyleMessage,
+      updatedAt: note.updatedAt.toISOString(),
     };
   } catch {
-    return { angelMessage: "", kyleMessage: "" };
+    return { angelMessage: "", kyleMessage: "", updatedAt: null };
   }
 }
 
-export async function saveStickyNotes(formData: FormData): Promise<void> {
+export async function saveStickyNotes(formData: FormData): Promise<{ updatedAt: string }> {
   const angelMessage =
     formData.get("angelMessage")?.toString() ?? "";
   const kyleMessage =
@@ -36,16 +38,18 @@ export async function saveStickyNotes(formData: FormData): Promise<void> {
     orderBy: { updatedAt: "desc" },
   });
 
+  let record;
   if (existing) {
-    await prisma.stickyNote.update({
+    record = await prisma.stickyNote.update({
       where: { id: existing.id },
       data: { angelMessage, kyleMessage },
     });
   } else {
-    await prisma.stickyNote.create({
+    record = await prisma.stickyNote.create({
       data: { angelMessage, kyleMessage },
     });
   }
 
   revalidatePath("/home");
+  return { updatedAt: record.updatedAt.toISOString() };
 }
