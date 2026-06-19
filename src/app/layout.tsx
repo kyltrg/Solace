@@ -76,6 +76,18 @@ export const metadata: Metadata = {
   title: "SOLACE",
   description: "A digital home for Kyle & Angel",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.svg",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Solace",
+    statusBarStyle: "black-translucent",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export const viewport: Viewport = {
