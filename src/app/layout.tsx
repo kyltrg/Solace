@@ -42,9 +42,14 @@ from "@/components/music/MusicPlayer";
 import HiddenPlayer
 from "@/components/music/HiddenPlayer";
 
+import AutoPlayOnInteraction
+from "@/components/music/AutoPlayOnInteraction";
+
 import { ThemeProvider } from "@/context/ThemeContext";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import Footer from "@/components/layout/Footer";
+
+import { prisma } from "@/lib/prisma";
 
 const display =
 Playfair_Display({
@@ -111,10 +116,15 @@ type RootLayoutProps = {
   children: React.ReactNode;
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: RootLayoutProps)
-: React.JSX.Element {
+: Promise<React.JSX.Element> {
+  const defaultSong = await prisma.song.findFirst({
+    orderBy: { createdAt: "desc" },
+    select: { id: true, title: true, artist: true, url: true, note: true },
+  });
+
   return (
     <html lang="en" suppressHydrationWarning data-theme="dark">
       <body
@@ -126,7 +136,9 @@ export default function RootLayout({
         `}
       >
         <ThemeProvider>
-          <MusicProvider>
+          <MusicProvider
+            initialSong={defaultSong ?? undefined}
+          >
             <PresenceProvider>
             <PageTransition />
             <SolaceIsland />
@@ -140,6 +152,7 @@ export default function RootLayout({
             </PresenceProvider>
             <HiddenPlayer />
             <MusicPlayer />
+            <AutoPlayOnInteraction />
             <ThemeToggle />
           </MusicProvider>
         </ThemeProvider>

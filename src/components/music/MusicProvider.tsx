@@ -74,13 +74,12 @@ createContext<MusicContextType|null>(null);
 
 
 export function MusicProvider({
-
-children,
-
-}:{
-children:React.ReactNode;
-
-}):React.JSX.Element {
+  children,
+  initialSong,
+}: {
+  children: React.ReactNode;
+  initialSong?: Song | null;
+}): React.JSX.Element {
 
 
 
@@ -95,7 +94,7 @@ setSongs
 const [
 currentSong,
 setCurrentSong
-]=useState<Song|null>(null);
+]=useState<Song|null>(initialSong ?? null);
 
 
 
