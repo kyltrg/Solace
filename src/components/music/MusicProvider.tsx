@@ -3,7 +3,9 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
+  useMemo,
   useState,
 } from "react";
 
@@ -108,39 +110,15 @@ setPlaying
 
 
 
-
-function playSong(
-song:Song
-){
-
-
+const playSong = useCallback(
+function(song: Song) {
 setCurrentSong(song);
-
 setPlaying(true);
-
-
-}
-
-
-
-
-
-
-
-
-function togglePlay(){
-
-
-if(!currentSong)
-return;
-
-
-setPlaying(
-prev=>!prev
+},
+[]
 );
 
 
-}
 
 
 
@@ -148,26 +126,31 @@ prev=>!prev
 
 
 
-function nextSong(){
+const togglePlay = useCallback(
+function() {
+if(!currentSong)
+return;
+setPlaying(
+prev=>!prev
+);
+},
+[currentSong]
+);
 
 
+const nextSong = useCallback(
+function() {
 if(
 !currentSong ||
 songs.length===0
 )
 return;
 
-
-
-
 const index =
 songs.findIndex(
 song =>
 song.id === currentSong.id
 );
-
-
-
 
 const next =
 songs[
@@ -176,43 +159,33 @@ songs[
 songs.length
 ];
 
-
-
 setCurrentSong(next);
-
 setPlaying(true);
-
-
-}
-
-
-
+},
+[currentSong, songs]
+);
 
 
 
 
 
 
-function previousSong(){
 
 
+
+const previousSong = useCallback(
+function() {
 if(
 !currentSong ||
 songs.length===0
 )
 return;
 
-
-
-
 const index =
 songs.findIndex(
 song =>
 song.id === currentSong.id
 );
-
-
-
 
 const previous =
 songs[
@@ -223,49 +196,46 @@ songs.length - 1
 index - 1
 ];
 
-
-
 setCurrentSong(previous);
-
 setPlaying(true);
-
-
-}
-
-
-
+},
+[currentSong, songs]
+);
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+const value = useMemo(
+() => ({
+songs,
+setSongs,
+currentSong,
+isPlaying,
+setPlaying,
+playSong,
+nextSong,
+previousSong,
+togglePlay,
+}),
+[songs, currentSong, isPlaying, setPlaying, playSong, nextSong, previousSong, togglePlay]
+);
 
 return (
 
 <MusicContext.Provider
-
-value={{
-
-songs,
-
-setSongs,
-
-currentSong,
-
-isPlaying,
-
-setPlaying,
-
-playSong,
-
-nextSong,
-
-previousSong,
-
-togglePlay,
-
-}}
-
+value={value}
 >
 
 {children}

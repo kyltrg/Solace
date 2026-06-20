@@ -11,8 +11,8 @@ type NoteRecord = {
 };
 
 const STORAGE_KEY = "solace-stickynotes";
-const DEBOUNCE_MS = 1500;
-const POLL_MS = 3000;
+const DEBOUNCE_MS = 3000;
+const POLL_MS = 1000;
 
 function loadFromLocal(): Record<string, string> {
   if (typeof window === "undefined") return {};
@@ -43,6 +43,7 @@ export default function StickyNotes() {
   const [identity, setIdentity] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedRef = useRef<Record<string, string>>({});
 
   useEffect(() => {
     const cookieUser = Cookies.get("solace-user") ?? "";
@@ -65,12 +66,26 @@ export default function StickyNotes() {
     if (!mounted || !identity) return;
     const interval = setInterval(() => {
       getStickyNotes().then((server) => {
-        if (identity === "angel" && server.kyle && server.kyle.updatedAt) setKyle(server.kyle);
-        if (identity === "kyle" && server.angel && server.angel.updatedAt) setAngel(server.angel);
+        if (server.angel && server.angel.updatedAt) setAngel(server.angel);
+        if (server.kyle && server.kyle.updatedAt) setKyle(server.kyle);
       }).catch(() => {});
     }, POLL_MS);
     return () => clearInterval(interval);
   }, [mounted, identity]);
+
+  const saveToServer = useCallback((me: string, value: string) => {
+    if (lastSavedRef.current[me] === value) return;
+    setSaving(true);
+    const fd = new FormData();
+    fd.append("author", me);
+    fd.append("message", value);
+    saveStickyNote(fd).then((res) => {
+      lastSavedRef.current[me] = value;
+      const record: NoteRecord = { message: value, updatedAt: res.updatedAt };
+      if (me === "angel") setAngel(record);
+      else setKyle(record);
+    }).finally(() => setSaving(false));
+  }, []);
 
   const updateNote = useCallback((value: string) => {
     const me = identity;
@@ -85,17 +100,19 @@ export default function StickyNotes() {
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      setSaving(true);
-      const fd = new FormData();
-      fd.append("author", me);
-      fd.append("message", value);
-      saveStickyNote(fd).then((res) => {
-        const record: NoteRecord = { message: value, updatedAt: res.updatedAt };
-        if (me === "angel") setAngel(record);
-        else setKyle(record);
-      }).finally(() => setSaving(false));
+      saveToServer(me, value);
     }, DEBOUNCE_MS);
-  }, [identity]);
+  }, [identity, saveToServer]);
+
+  const handleBlur = useCallback(() => {
+    const me = identity;
+    if (!me) return;
+    const current = me === "angel" ? angel?.message : kyle?.message;
+    if (current !== undefined) {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      saveToServer(me, current);
+    }
+  }, [identity, angel, kyle, saveToServer]);
 
   if (!mounted) return null;
 
@@ -144,6 +161,7 @@ export default function StickyNotes() {
               <textarea
                 value={angel?.message ?? ""}
                 onChange={(e) => identity === "angel" && updateNote(e.target.value)}
+                onBlur={() => identity === "angel" && handleBlur()}
                 placeholder="Write a message for Kyle..."
                 readOnly={identity !== "angel"}
                 className="min-h-[140px] w-full resize-none bg-transparent font-poppins text-base leading-relaxed outline-none placeholder:text-[var(--muted)]/50"
@@ -189,6 +207,7 @@ export default function StickyNotes() {
               <textarea
                 value={kyle?.message ?? ""}
                 onChange={(e) => identity === "kyle" && updateNote(e.target.value)}
+                onBlur={() => identity === "kyle" && handleBlur()}
                 placeholder="Write a message for Angel..."
                 readOnly={identity !== "kyle"}
                 className="min-h-[140px] w-full resize-none bg-transparent font-poppins text-base leading-relaxed outline-none placeholder:text-[var(--muted)]/50"

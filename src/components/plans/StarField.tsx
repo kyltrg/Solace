@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles, CheckCircle, Star, ArrowUp } from "lucide-react";
 import { toggleDreamStatus } from "@/actions/plans";
@@ -66,10 +66,10 @@ export default function StarField({ dreams }: { dreams: Dream[] }) {
   const stars = useMemo(() => buildStars(dreams), [dreams]);
   const [selected, setSelected] = useState<Dream | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [randomPopups, setRandomPopups] = useState<Array<{ dream: Dream; x: number; y: number; id: number }>>([]);
+  const [activePopupId, setActivePopupId] = useState<string | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  const popupCounterRef = useRef(0);
+
 
   useEffect(() => {
     const handleMouse = (e: MouseEvent) => {
@@ -86,41 +86,42 @@ export default function StarField({ dreams }: { dreams: Dream[] }) {
   }, []);
 
   useEffect(() => {
+    if (dreams.length === 0) return;
+
+    let index = 0;
+    let hideTimer: number | null = null;
+    let nextTimer: number | null = null;
+
     const scheduleNext = () => {
-      if (dreams.length < 2) return;
-      const shuffled = [...dreams].sort(() => 0.5 - Math.random());
-      const next = shuffled.slice(0, 2).map((dream) => ({
-        dream,
-        x: 10 + ((dream.id.charCodeAt(0) * 7 + shuffled.indexOf(dream) * 13) % 75),
-        y: 10 + ((dream.id.charCodeAt(1) || 42) * 11 + shuffled.indexOf(dream) * 17) % 60,
-        id: ++popupCounterRef.current,
-      }));
-      setRandomPopups(next);
+      const dream = dreams[index % dreams.length];
+      setActivePopupId(dream.id);
 
-      setTimeout(() => {
-        setRandomPopups([]);
-      }, 3500);
+      hideTimer = window.setTimeout(() => {
+        setActivePopupId(null);
+      }, 5000);
 
-      timeoutRef.current = window.setTimeout(scheduleNext, 6000 + (popupCounterRef.current * 17) % 7000);
+      index++;
+
+      nextTimer = window.setTimeout(scheduleNext, 7000);
     };
 
-    const timeoutRef: { current: number | null } = { current: null };
-    const initialDelay = window.setTimeout(scheduleNext, 3000 + (dreams.length * 13) % 4000);
+    const initialDelay = window.setTimeout(scheduleNext, 3000);
 
     return () => {
       clearTimeout(initialDelay);
-      if (timeoutRef.current !== null) clearTimeout(timeoutRef.current);
+      if (hideTimer !== null) clearTimeout(hideTimer);
+      if (nextTimer !== null) clearTimeout(nextTimer);
     };
   }, [dreams]);
 
-  const handleToggleStatus = async (dream: Dream) => {
+  const handleToggleStatus = useCallback(async (dream: Dream) => {
     await toggleDreamStatus(dream.id);
     setSelected((prev) =>
       prev?.id === dream.id
         ? { ...prev, status: prev.status === "PRAYING" ? "ACHIEVED" : "PRAYING" }
         : prev
     );
-  };
+  }, []);
 
   return (
     <section
@@ -283,7 +284,6 @@ export default function StarField({ dreams }: { dreams: Dream[] }) {
                       </span>
                     </div>
                     <div className="mt-1 flex items-center gap-3 text-[10px] uppercase tracking-[.1em]">
-                      <span className="text-white/40">{star.horizon}</span>
                       <span
                         className="font-medium"
                         style={{
@@ -297,6 +297,47 @@ export default function StarField({ dreams }: { dreams: Dream[] }) {
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* Rotating popup anchored to star */}
+              <AnimatePresence>
+                {activePopupId === star.id && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.6, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.6, y: -10 }}
+                    transition={{ duration: 0.4 }}
+                    className="absolute z-40 cursor-pointer"
+                    style={{
+                      left: "50%",
+                      bottom: "calc(100% + 8px)",
+                      transform: "translateX(-50%)",
+                    }}
+                    onClick={() => {
+                      const dream = dreams.find((d) => d.id === star.id);
+                      if (dream) setSelected(dream);
+                    }}
+                  >
+                    <div className="rounded-2xl border border-white/10 bg-black/60 p-3 backdrop-blur-xl shadow-lg transition-transform hover:scale-105">
+                      <div className="flex items-center gap-2">
+                        <Star
+                          size={10}
+                          className={
+                            star.status === "ACHIEVED"
+                              ? "text-emerald-300"
+                              : "text-yellow-300"
+                          }
+                        />
+                        <span className="font-display text-xs text-white">
+                          {star.title}
+                        </span>
+                      </div>
+                      <p className="mt-1 max-w-[140px] truncate text-[10px] text-white/40">
+                        {star.description}
+                      </p>
+                    </div>
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </motion.div>
           </div>
         ))}
@@ -304,7 +345,7 @@ export default function StarField({ dreams }: { dreams: Dream[] }) {
 
       {/* Stats — pointer-events-none so stars below stay clickable */}
       <div className="pointer-events-none relative z-30 mx-auto mt-75 max-w-5xl px-8 pb-16">
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-[var(--border)] bg-black/20 p-4 text-center backdrop-blur-xl">
             <p className="text-xs uppercase tracking-[.2em] text-[var(--accent)]/60">
               Total Dreams
@@ -329,51 +370,10 @@ export default function StarField({ dreams }: { dreams: Dream[] }) {
               {dreams.filter((d) => d.status === "ACHIEVED").length}
             </p>
           </div>
-          <div className="rounded-2xl border border-[var(--border)] bg-black/20 p-4 text-center backdrop-blur-xl">
-            <p className="text-xs uppercase tracking-[.2em] text-[var(--accent)]/60">
-              Horizons
-            </p>
-            <p className="mt-1 font-display text-2xl text-white">
-              {new Set(dreams.map((d) => d.horizon)).size}
-            </p>
-          </div>
         </div>
       </div>
 
-      {/* Random popups (2 at a time) */}
-      <AnimatePresence>
-        {randomPopups.map((p) => (
-          <motion.button
-            key={`popup-${p.dream.id}-${p.id}`}
-            initial={{ opacity: 0, scale: 0.6, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.6, y: -20 }}
-            transition={{ duration: 0.5 }}
-            className="absolute z-30 cursor-pointer"
-            style={{ left: `${p.x}%`, top: `${p.y}%` }}
-            onClick={() => setSelected(p.dream)}
-          >
-            <div className="rounded-2xl border border-white/10 bg-black/60 p-3 backdrop-blur-xl shadow-lg transition-transform hover:scale-105">
-              <div className="flex items-center gap-2">
-                <Star
-                  size={10}
-                  className={
-                    p.dream.status === "ACHIEVED"
-                      ? "text-emerald-300"
-                      : "text-yellow-300"
-                  }
-                />
-                <span className="font-display text-xs text-white">
-                  {p.dream.title}
-                </span>
-              </div>
-              <p className="mt-1 max-w-[140px] truncate text-[10px] text-white/40">
-                {p.dream.description}
-              </p>
-            </div>
-          </motion.button>
-        ))}
-      </AnimatePresence>
+
 
       {/* GradualBlur bottom overlay */}
       <GradualBlur
@@ -473,9 +473,6 @@ export default function StarField({ dreams }: { dreams: Dream[] }) {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[10px] uppercase tracking-[.25em] text-white/30">
-                      {selected.horizon}
-                    </p>
                     <p
                       className={`text-xs font-medium uppercase tracking-[.2em] ${
                         selected.status === "ACHIEVED"

@@ -87,13 +87,17 @@ export async function sendInactivityPush(
   hours: number,
 ) {
   const messages: Record<number, string> = {
-    3: "It's been 3 hours since I last saw you here. Come home.",
-    5: "5 hours without you. The house feels empty.",
-    7: "7 hours. Are you okay? Come home.",
-    10: "10 hours. I miss you at home.",
-    15: "15 hours. Please come home.",
-    20: "20 hours. Our home is waiting for you.",
-    24: "It's been a day. Come home now.",
+    5: "Come home. I miss you.",
+    8: "The house feels empty without you.",
+    12: "I miss you. I wish you were here.",
+    15: "Please come home soon.",
+    20: "Our home is waiting for you.",
+    24: "Come home now. I really miss you.",
+    36: "I miss you so much. Come home.",
+    48: "Please come home. I'm waiting.",
+    60: "Our home isn't the same without you.",
+    72: "Come home. I need you here.",
+    84: "I'm still here waiting. Come home.",
   };
 
   const body = messages[hours] ?? `It's been ${hours} hours. Come home.`;

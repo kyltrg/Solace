@@ -8,11 +8,6 @@ type Verse = {
   text: string;
 };
 
-type HistoryEntry = {
-  date: string;
-  index: number;
-};
-
 const VERSES: Verse[] = [
   { reference: "Song of Solomon 2:16", text: "My beloved is mine and I am his." },
   { reference: "Song of Solomon 4:7", text: "You are altogether beautiful, my darling; there is no flaw in you." },
@@ -36,89 +31,31 @@ const VERSES: Verse[] = [
   { reference: "1 Corinthians 13:7", text: "Love bears all things, believes all things, hopes all things." },
 ];
 
-const HISTORY_KEY = "solace-daily-verse-history";
-const MAX_HISTORY = 10;
-
-function getToday(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function loadHistory(): HistoryEntry[] {
-  try {
-    const raw = localStorage.getItem(HISTORY_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return [];
-}
-
-function saveHistory(history: HistoryEntry[]) {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+function getDateSeed(): number {
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
 }
 
 function getTodaysVerse(): Verse {
-  const today = getToday();
-  const history = loadHistory();
-
-  const existing = history.find((entry) => entry.date === today);
-  if (existing !== undefined) return VERSES[existing.index];
-
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - MAX_HISTORY);
-  const cutoffStr = cutoff.toISOString().slice(0, 10);
-  const recent = history.filter((entry) => entry.date >= cutoffStr);
-  const used = new Set(recent.map((entry) => entry.index));
-
-  const todayNum = today.split("-").reduce((acc, s) => acc + parseInt(s, 10), 0);
-  const available = VERSES.map((_, i) => i).filter((i) => !used.has(i));
-  const pick = available.length > 0
-    ? available[todayNum % available.length]
-    : todayNum % VERSES.length;
-
-  saveHistory([...recent, { date: today, index: pick }]);
-  return VERSES[pick];
-}
-
-function msUntilMidnight(): number {
-  const now = new Date();
-  const midnight = new Date(now);
-  midnight.setDate(midnight.getDate() + 1);
-  midnight.setHours(0, 0, 0, 0);
-  return midnight.getTime() - now.getTime();
+  const seed = getDateSeed();
+  return VERSES[seed % VERSES.length];
 }
 
 export default function DailyVerse(): React.JSX.Element | null {
   const [verse, setVerse] = useState<Verse | null>(null);
 
   useEffect(() => {
-    try {
-      const today = getToday();
-      const history = JSON.parse(localStorage.getItem("solace-daily-verse-history") || "[]");
-      const filtered = history.filter((h: any) => h.date !== today);
-      filtered.push({ date: today, index: 19 });
-      localStorage.setItem("solace-daily-verse-history", JSON.stringify(filtered));
-    } catch {}
-    setVerse(getTodaysVerse());
-
-    const checkDayChange = () => {
-      try {
-        const stored = JSON.parse(localStorage.getItem("solace-daily-verse-history") || "[]");
-        if (!stored.some((h: any) => h.date === getToday())) {
-          setVerse(getTodaysVerse());
-        }
-      } catch {}
+    let lastSeed = -1;
+    const update = () => {
+      const seed = getDateSeed();
+      if (seed !== lastSeed) {
+        lastSeed = seed;
+        setVerse(getTodaysVerse());
+      }
     };
-
-    const interval = setInterval(checkDayChange, 30000);
-
-    const handleVisibility = () => {
-      if (document.visibilityState === "visible") checkDayChange();
-    };
-    document.addEventListener("visibilitychange", handleVisibility);
-
-    return () => {
-      clearInterval(interval);
-      document.removeEventListener("visibilitychange", handleVisibility);
-    };
+    update();
+    const interval = setInterval(update, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   if (!verse) return null;
