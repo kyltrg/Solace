@@ -17,12 +17,6 @@ export default function ArrivalHero(): React.JSX.Element {
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6">
-      <div className="absolute inset-0">
-        <div className="absolute left-1/2 top-0 h-[60rem] w-[60rem] -translate-x-1/2 rounded-full bg-[var(--accent)]/8 blur-[180px] animate-pulse-glow" />
-        <div className="absolute bottom-0 left-1/4 h-[35rem] w-[35rem] -translate-x-1/2 rounded-full bg-[var(--glass)] blur-[160px] animate-drift" />
-        <div className="absolute -right-32 top-1/3 h-[25rem] w-[25rem] rounded-full bg-[var(--accent)]/5 blur-[120px] animate-float-slow" />
-      </div>
-
       <div className="relative z-10 text-center">
         <motion.div
           initial={{ opacity: 0, y: -15 }}
@@ -79,7 +73,7 @@ export default function ArrivalHero(): React.JSX.Element {
           transition={{ duration: .8, delay: .7 }}
           className="mx-auto mt-6 max-w-xl leading-relaxed text-[var(--muted)]/70"
         >
-          The memories we&apos;ve made, the faith that keeps us going, and the love that makes it all matter.
+          Every memory we've made, every prayer we've shared, and the love that keeps choosing us every day.
         </motion.p>
 
         <motion.div
