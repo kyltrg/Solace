@@ -80,8 +80,14 @@ export const metadata: Metadata = {
   description: "A digital home for Kyle & Angel",
   manifest: "/manifest.json",
   icons: {
-    icon: [{ url: "/icon.svg?v=2", type: "image/svg+xml" }],
-    apple: [{ url: "/apple-icon.svg?v=2", type: "image/svg+xml" }],
+    icon: [
+      { url: "/icon.svg?v=3", type: "image/svg+xml" },
+      { url: "/icon-512.png?v=3", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-icon.svg?v=3", type: "image/svg+xml" },
+      { url: "/apple-icon.png?v=3", sizes: "180x180", type: "image/png" },
+    ],
   },
   formatDetection: { telephone: false },
   appleWebApp: {
