@@ -8,26 +8,15 @@ import {
   useMemo,
   useState,
 } from "react";
-
-
+import { loadAndPlay, extractYoutubeId } from "./yt-manager";
 
 export type Song = {
-
-  id:string;
-
-  title:string;
-
-  artist:string;
-
-  url:string;
-
-  note:string | null;
-
+  id: string;
+  title: string;
+  artist: string;
+  url: string;
+  note: string | null;
 };
-
-
-
-
 
 type MusicContextType = {
 
@@ -74,12 +63,13 @@ createContext<MusicContextType|null>(null);
 
 
 export function MusicProvider({
-  children,
-  initialSong,
-}: {
-  children: React.ReactNode;
-  initialSong?: Song | null;
-}): React.JSX.Element {
+
+children,
+
+}:{
+children:React.ReactNode;
+
+}):React.JSX.Element {
 
 
 
@@ -94,7 +84,7 @@ setSongs
 const [
 currentSong,
 setCurrentSong
-]=useState<Song|null>(initialSong ?? null);
+]=useState<Song|null>(null);
 
 
 
@@ -113,6 +103,10 @@ const playSong = useCallback(
 function(song: Song) {
 setCurrentSong(song);
 setPlaying(true);
+const videoId = extractYoutubeId(song.url);
+if (videoId) {
+loadAndPlay(videoId);
+}
 },
 []
 );
@@ -160,6 +154,10 @@ songs.length
 
 setCurrentSong(next);
 setPlaying(true);
+const videoId = extractYoutubeId(next.url);
+if (videoId) {
+loadAndPlay(videoId);
+}
 },
 [currentSong, songs]
 );
@@ -197,6 +195,10 @@ index - 1
 
 setCurrentSong(previous);
 setPlaying(true);
+const videoId = extractYoutubeId(previous.url);
+if (videoId) {
+loadAndPlay(videoId);
+}
 },
 [currentSong, songs]
 );
