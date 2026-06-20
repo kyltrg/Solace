@@ -537,7 +537,7 @@ export default function AuthFlow(): React.JSX.Element {
       <FloatingOrbs />
 
       <div className="w-full max-w-md mx-auto">
-        {(step === "welcome" || step === "choice" || step === "quiz" || step === "vault") && (
+        {(step === "choice" || step === "quiz" || (step === "vault" && level > 1)) && (
           <ProgressTracker level={level} />
         )}
 
@@ -642,7 +642,7 @@ export default function AuthFlow(): React.JSX.Element {
                 </FadeUp>
 
                 <FadeUp>
-                  <button onClick={() => setStep("choice")} className={`${btnBase} mt-8 border border-[var(--accent)]/30 bg-gradient-to-b from-[var(--accent)]/10 to-[var(--accent)]/5 text-[var(--accent)]/90 hover:from-[var(--accent)]/20 hover:to-[var(--accent)]/10`}>
+                  <button onClick={() => setStep("vault")} className={`${btnBase} mt-8 border border-[var(--accent)]/30 bg-gradient-to-b from-[var(--accent)]/10 to-[var(--accent)]/5 text-[var(--accent)]/90 hover:from-[var(--accent)]/20 hover:to-[var(--accent)]/10`}>
                     Enter
                   </button>
                 </FadeUp>
