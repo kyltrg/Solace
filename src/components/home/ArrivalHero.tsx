@@ -25,7 +25,7 @@ export default function ArrivalHero(): React.JSX.Element {
           className="inline-flex items-center gap-3 rounded-full border border-[var(--accent)]/20 bg-[var(--accent-soft)] px-5 py-2"
         >
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
-          <span className="text-xs uppercase tracking-[.4em] text-[var(--accent)]">Welcome Home</span>
+          <span className="text-xs uppercase tracking-[.4em] text-[var(--accent)]" style={{ textShadow: '0 0 20px rgba(168,141,114,0.4)' }}>Welcome Home</span>
         </motion.div>
 
         <motion.h1
@@ -41,7 +41,7 @@ export default function ArrivalHero(): React.JSX.Element {
               animate={{ opacity: 1, y: 0, rotateX: 0 }}
               transition={{ duration: 0.7, delay: 0.3 + i * 0.06, ease: [.22,1,.36,1] }}
               className="inline-block gradient-text"
-              style={{ perspective: "600px" }}
+              style={{ perspective: "600px", textShadow: '0 4px 40px rgba(168,141,114,0.3)' }}
             >
               {letter}
             </motion.span>
@@ -54,14 +54,14 @@ export default function ArrivalHero(): React.JSX.Element {
           transition={{ duration: .8, delay: .5 }}
           className="mt-8"
         >
-          <span className="text-lg text-[var(--muted)]">A quiet place for </span>
+          <span className="text-lg text-[var(--muted)]" style={{ textShadow: '0 2px 16px rgba(0,0,0,0.3)' }}>A quiet place for </span>
           <motion.span
             key={roles[roleIndex]}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: .4 }}
-            className="text-lg font-display italic text-[var(--accent)]"
+            className="text-lg font-display italic text-[var(--accent)]" style={{ textShadow: '0 2px 20px rgba(168,141,114,0.5)' }}
           >
             {roles[roleIndex]}
           </motion.span>
@@ -71,7 +71,7 @@ export default function ArrivalHero(): React.JSX.Element {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: .8, delay: .7 }}
-          className="mx-auto mt-6 max-w-xl leading-relaxed text-[var(--muted)]/70"
+          className="mx-auto mt-6 max-w-xl leading-relaxed text-[var(--muted)]/70" style={{ textShadow: '0 2px 16px rgba(0,0,0,0.3)' }}
         >
           Every memory we've made, every prayer we've shared, and the love that keeps choosing us every day.
         </motion.p>
@@ -91,7 +91,7 @@ export default function ArrivalHero(): React.JSX.Element {
               <path d="M6 9l6 6 6-6" />
             </svg>
           </motion.div>
-          <p className="text-[10px] sm:text-xs uppercase tracking-[.4em] text-[var(--accent)]/50">Explore</p>
+          <p className="text-[10px] sm:text-xs uppercase tracking-[.4em] text-[var(--accent)]/50" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.3)' }}>Explore</p>
         </motion.div>
       </div>
     </section>
