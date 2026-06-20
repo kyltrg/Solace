@@ -1,5 +1,3 @@
-"use client";
-
 import { BubbleBackground } from "@/components/animate-ui/components/backgrounds/bubble";
 import ArrivalHero from "@/components/home/ArrivalHero";
 import RelationshipTimer from "@/components/home/RelationshipTimer";
@@ -12,19 +10,21 @@ import RoomsGrid from "@/components/home/RoomsGrid";
 
 export default function HomePage(): React.JSX.Element {
   return (
-    <BubbleBackground
-      interactive
-      className="relative bg-gradient-to-br from-[var(--bg-elevated)] to-[var(--bg)]"
-      colors={{
-        first: '168,141,114',
-        second: '212,165,93',
-        third: '91,40,52',
-        fourth: '182,139,76',
-        fifth: '139,115,85',
-        sixth: '245,232,216',
-      }}
-    >
-      <ArrivalHero />
+    <main className="relative">
+      <BubbleBackground
+        interactive
+        className="min-h-screen bg-gradient-to-br from-[var(--bg-elevated)] to-[var(--bg)]"
+        colors={{
+          first: '168,141,114',
+          second: '212,165,93',
+          third: '91,40,52',
+          fourth: '182,139,76',
+          fifth: '139,115,85',
+          sixth: '245,232,216',
+        }}
+      >
+        <ArrivalHero />
+      </BubbleBackground>
       <div className="solace-divider" />
       <RelationshipTimer />
       <div className="solace-divider" />
@@ -39,6 +39,6 @@ export default function HomePage(): React.JSX.Element {
       <DailyVerse />
       <div className="solace-divider" />
       <RoomsGrid />
-    </BubbleBackground>
+    </main>
   );
 }
