@@ -78,15 +78,15 @@ Poppins({
 export const metadata: Metadata = {
   title: "SOLACE",
   description: "A digital home for Kyle & Angel",
-  manifest: "/manifest.json",
+  manifest: "/manifest.json?v=4",
   icons: {
     icon: [
-      { url: "/icon.svg?v=3", type: "image/svg+xml" },
-      { url: "/icon-512.png?v=3", sizes: "512x512", type: "image/png" },
+      { url: "/icon.svg?v=4", type: "image/svg+xml" },
+      { url: "/icon-512.png?v=4", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/apple-icon.svg?v=3", type: "image/svg+xml" },
-      { url: "/apple-icon.png?v=3", sizes: "180x180", type: "image/png" },
+      { url: "/apple-icon.svg?v=4", type: "image/svg+xml" },
+      { url: "/apple-icon.png?v=4", sizes: "180x180", type: "image/png" },
     ],
   },
   formatDetection: { telephone: false },
