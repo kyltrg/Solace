@@ -66,8 +66,8 @@ export default function StickyNotes() {
     if (!mounted || !identity) return;
     const interval = setInterval(() => {
       getStickyNotes().then((server) => {
-        if (server.angel && server.angel.updatedAt) setAngel(server.angel);
-        if (server.kyle && server.kyle.updatedAt) setKyle(server.kyle);
+        if (server.angel && server.angel.updatedAt && identity !== "angel") setAngel(server.angel);
+        if (server.kyle && server.kyle.updatedAt && identity !== "kyle") setKyle(server.kyle);
       }).catch(() => {});
     }, POLL_MS);
     return () => clearInterval(interval);
