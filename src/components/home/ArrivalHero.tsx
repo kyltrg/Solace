@@ -16,7 +16,7 @@ export default function ArrivalHero(): React.JSX.Element {
   }, []);
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6">
+    <section className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden px-6">
       <div className="relative z-10 text-center">
         <motion.div
           initial={{ opacity: 0, y: -15 }}

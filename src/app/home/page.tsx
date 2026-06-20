@@ -12,7 +12,7 @@ export default function HomePage(): React.JSX.Element {
   return (
     <main className="relative">
       <BubbleBackground
-        className="min-h-screen bg-gradient-to-br from-[var(--bg-elevated)] to-[var(--bg)]"
+        className="min-h-[100dvh] bg-gradient-to-br from-[var(--bg-elevated)] to-[var(--bg)]"
         colors={{
           first: '168,141,114',
           second: '212,165,93',
