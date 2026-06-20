@@ -4,6 +4,7 @@ import React, { useMemo, useState, useEffect, useRef, useCallback } from "react"
 import Cookies from "js-cookie";
 import { motion, AnimatePresence } from "framer-motion";
 import { sendPushToAuthor } from "@/actions/push";
+import { BubbleBackground } from "@/components/animate-ui/components/backgrounds/bubble";
 
 type Step = "gate" | "name" | "welcome" | "choice" | "quiz" | "vault" | "success" | "wrong-door";
 type Level = 1 | 2 | 3;
@@ -533,9 +534,18 @@ export default function AuthFlow(): React.JSX.Element {
   const btnBase = "w-full rounded-2xl px-8 py-4 text-sm font-medium tracking-wide transition-all duration-300 active:scale-[0.97] hover:shadow-lg";
 
   return (
-    <main className="relative min-h-screen flex items-center justify-center px-4 sm:px-5 py-8 sm:py-12 text-[var(--text)] overflow-x-hidden" style={{ background: "radial-gradient(ellipse at 50% 0%, var(--bg-elevated) 0%, var(--bg-soft) 50%, var(--bg) 100%)" }}>
-      <FloatingOrbs />
-
+    <BubbleBackground
+      interactive
+      className="min-h-screen flex items-center justify-center px-4 sm:px-5 py-8 sm:py-12 text-[var(--text)] overflow-x-hidden bg-gradient-to-br from-[var(--bg-elevated)] to-[var(--bg)]"
+      colors={{
+        first: '168,141,114',
+        second: '212,165,93',
+        third: '91,40,52',
+        fourth: '182,139,76',
+        fifth: '139,115,85',
+        sixth: '245,232,216',
+      }}
+    >
       <div className="w-full max-w-md mx-auto">
         {(step === "choice" || step === "quiz" || (step === "vault" && level > 1)) && (
           <ProgressTracker level={level} />
@@ -953,6 +963,6 @@ export default function AuthFlow(): React.JSX.Element {
           )}
         </AnimatePresence>
       </div>
-    </main>
+    </BubbleBackground>
   );
 }

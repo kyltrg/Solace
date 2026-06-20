@@ -21,7 +21,7 @@
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/assets/logo/icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
@@ -39,5 +39,5 @@
       "purpose": "maskable"
     }
   ],
-  "apple-touch-icon": "/apple-icon.png?t=2"
+  "apple-touch-icon": "/assets/logo/icon.png?t=3"
 }
