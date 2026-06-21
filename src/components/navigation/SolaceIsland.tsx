@@ -79,13 +79,14 @@ export default function SolaceIsland({
   const visibleLinks = expanded && isMobile && mobileLinks ? mobileLinks : expanded ? links : [];
 
   const updateHighlightPosition = useCallback((id?: string) => {
+    if (isMobile) return;
     if (!navRef.current || !pillRef.current) return;
     const el = navRef.current.querySelector(`#si-item-${id || activeRef.current}`);
     if (!el) return;
     const elRect = el.getBoundingClientRect();
     const pillRect = pillRef.current.getBoundingClientRect();
     setHlPos({ x: elRect.left - pillRect.left, width: elRect.width });
-  }, []);
+  }, [isMobile]);
 
   const handleLinkClick = (link: NavLink | MobileLink) => {
     if (link.onClick) link.onClick();
@@ -106,11 +107,10 @@ export default function SolaceIsland({
     }
   }, [pathname]);
 
-  // On expansion, wait for nav entry animation to settle before measuring highlight
+  // On expansion, measure highlight position after layout settles
   useEffect(() => {
     if (!expanded) return;
-    const timer = setTimeout(() => updateHighlightPosition(), 500);
-    return () => clearTimeout(timer);
+    requestAnimationFrame(() => updateHighlightPosition());
   }, [expanded]);
 
   // On active change or expand, measure highlight position
@@ -184,7 +184,13 @@ export default function SolaceIsland({
   const pillContent = (
     <div
       ref={pillRef}
-      className="relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)] before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
+        className={cn(
+          "relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)]",
+          isMobile
+            ? "backdrop-blur shadow-md"
+            : "backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)]",
+          "before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
+        )}
       style={{ transform: 'translateZ(0)' }}
     >
       {/* Sliding highlight (desktop only) */}
@@ -242,9 +248,9 @@ export default function SolaceIsland({
       {expanded && isMobile && (
         <motion.nav
           ref={navRef}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut", delay: 0.15 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15 }}
           className="absolute right-16 top-1/2 flex -translate-y-1/2 gap-0.5 z-10"
           onMouseLeave={() => updateHighlightPosition()}
         >
@@ -278,12 +284,18 @@ export default function SolaceIsland({
 
   return isMobile ? (
     <header
-      className={headerClasses}
+      className={cn(
+        "fixed left-1/2 top-5 z-[85]",
+        isSidebarOpen && "blur-sm transition-all duration-300"
+      )}
       style={{
-        width: expanded ? "calc(100vw - 32px)" : "220px",
-        transition: "width 0.18s cubic-bezier(0.22, 1, 0.36, 1)",
-        contain: "layout style paint",
-        willChange: "width",
+        width: "calc(100vw - 32px)",
+        transform: expanded
+          ? "translateX(-50%) scaleX(1)"
+          : "translateX(-50%) scaleX(0.45)",
+        transformOrigin: "center",
+        transition: "transform 0.16s cubic-bezier(0.22, 1, 0.36, 1)",
+        willChange: "transform",
       }}
     >
       {pillContent}

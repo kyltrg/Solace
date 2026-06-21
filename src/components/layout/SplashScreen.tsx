@@ -3,6 +3,16 @@
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+
+const particles = [...Array(12)].map((_, i) => ({
+  id: i,
+  w: 4 + Math.random() * 8,
+  h: 4 + Math.random() * 8,
+  l: `${Math.random() * 100}%`,
+  t: `${Math.random() * 100}%`,
+  d: 6 + Math.random() * 6,
+}));
+
 export default function SplashScreen({ onDone }: { onDone: () => void }) {
   const [visible, setVisible] = useState(true);
 
@@ -10,7 +20,7 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
     const t = setTimeout(() => {
       setVisible(false);
       setTimeout(onDone, 500);
-    }, 5000);
+    }, 2200);
     return () => clearTimeout(t);
   }, [onDone]);
 
@@ -23,27 +33,60 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,var(--accent-soft),transparent_35%)]" />
-            <div className="absolute left-1/2 top-1/2 h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--accent)]/10 blur-[120px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,var(--accent-soft),transparent_35%)]" />
+
+          {particles.map((p) => (
             <motion.div
-              animate={{ opacity: [0.25, 0.55, 0.25], scale: [1, 1.08, 1] }}
-              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-              className="absolute left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--accent)]/10"
+              key={p.id}
+              className="absolute rounded-full bg-[var(--accent)]/15"
+              style={{ width: p.w, height: p.h, left: p.l, top: p.t }}
+              animate={{
+                y: [-20, 20, -20],
+                opacity: [0.1, 0.5, 0.1],
+              }}
+              transition={{
+                duration: p.d,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
             />
-          </div>
+          ))}
 
           <div className="relative flex flex-col items-center">
-            <motion.div
-              initial={{ scale: 0.85 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              className="relative"
-            >
-              <div className="absolute inset-0 rounded-full bg-[var(--accent)]/20 blur-3xl" />
-              <div className="relative flex h-32 w-32 items-center justify-center">
-                <Image src="/assets/logo/icon-splashed.png" alt="Solace" width={128} height={128} className="h-full w-full object-contain" priority />
-              </div>
+            <motion.div className="relative">
+              <motion.div
+                animate={{
+                  scale: [1, 1.15, 1],
+                  opacity: [0.15, 0.35, 0.15],
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute inset-0 rounded-full bg-[var(--accent)] blur-[60px]"
+              />
+              <motion.div
+                animate={{ scale: [1, 1.03, 1] }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="relative flex h-32 w-32 items-center justify-center"
+              >
+                <Image
+                  src="/assets/logo/icon-splashed.webp"
+                  alt="Solace"
+                  width={128}
+                  height={128}
+                  priority
+                  loading="eager"
+                  fetchPriority="high"
+                  unoptimized
+                  className="h-full w-full object-contain"
+                />
+              </motion.div>
             </motion.div>
 
             <motion.h1
@@ -61,17 +104,20 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
               transition={{ delay: 0.8, duration: 0.8 }}
               className="mt-3 text-sm tracking-[0.12em] text-[var(--muted)]"
             >
-              A quiet home is opening...
+              Welcome home.
             </motion.p>
 
-            <div className="mt-10 h-px w-48 overflow-hidden rounded-full bg-[var(--border)]">
-              <motion.div
-                initial={{ x: "-100%" }}
-                animate={{ x: "100%" }}
-                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                className="h-full w-24 bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent"
-              />
-            </div>
+            <motion.div
+              animate={{ scale: [1, 1.08, 1] }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="mt-8 text-xs tracking-[0.3em] text-[var(--muted)] uppercase"
+            >
+              Entering Solace
+            </motion.div>
           </div>
         </motion.div>
       )}
