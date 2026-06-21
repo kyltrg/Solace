@@ -82,28 +82,6 @@ export async function sendPushToAuthor(
   return { ok: true, sent: sentCount };
 }
 
-export async function sendInactivityPush(
-  targetAuthor: string,
-  hours: number,
-) {
-  const messages: Record<number, string> = {
-    5: "Come home. I miss you.",
-    8: "The house feels empty without you.",
-    12: "I miss you. I wish you were here.",
-    15: "Please come home soon.",
-    20: "Our home is waiting for you.",
-    24: "Come home now. I really miss you.",
-    36: "I miss you so much. Come home.",
-    48: "Please come home. I'm waiting.",
-    60: "Our home isn't the same without you.",
-    72: "Come home. I need you here.",
-    84: "I'm still here waiting. Come home.",
-  };
-
-  const body = messages[hours] ?? `It's been ${hours} hours. Come home.`;
-  return sendPushToAuthor(targetAuthor, "Missing You \u{1F49B}", body, "/home");
-}
-
 const RANDOM_MESSAGES = [
   { title: "Read a Letter \u{1F4EC}", body: "Want to read a letter? Open Solace now." },
   { title: "Sticky Note \u{1F4AD}", body: "Someone might have left you a sticky note. Come home." },

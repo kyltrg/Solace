@@ -15,29 +15,15 @@ type NavLink = {
   sectionId?: string;
 };
 
-type MobileLink = {
-  id: string;
-  label?: string;
-  icon?: React.ReactNode;
-  onClick?: () => void;
-  sectionId?: string;
-};
-
 interface SolaceIslandProps {
   links: NavLink[];
-  mobileLinks?: MobileLink[];
   isSidebarOpen?: boolean;
-  onHamburgerClick?: () => void;
-  isHamburgerOpen?: boolean;
   onExpandedChange?: (expanded: boolean) => void;
 }
 
 export default function SolaceIsland({
   links,
-  mobileLinks,
   isSidebarOpen = false,
-  onHamburgerClick,
-  isHamburgerOpen = false,
   onExpandedChange,
 }: SolaceIslandProps): React.JSX.Element | null {
   const pathname = usePathname();
@@ -56,10 +42,7 @@ export default function SolaceIsland({
   const blockScrollRef = useRef(false);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+    setIsMobile(window.innerWidth < 768);
   }, []);
 
   useEffect(() => {
@@ -76,7 +59,7 @@ export default function SolaceIsland({
     return () => window.removeEventListener("scroll", onScroll);
   }, [onExpandedChange]);
 
-  const visibleLinks = expanded && isMobile && mobileLinks ? mobileLinks : expanded ? links : [];
+  const visibleLinks = expanded ? links : [];
 
   const updateHighlightPosition = useCallback((id?: string) => {
     if (isMobile) return;
@@ -88,9 +71,9 @@ export default function SolaceIsland({
     setHlPos({ x: elRect.left - pillRect.left, width: elRect.width });
   }, [isMobile]);
 
-  const handleLinkClick = (link: NavLink | MobileLink) => {
+  const handleLinkClick = (link: NavLink) => {
     if (link.onClick) link.onClick();
-    const newId = (link as NavLink).id || "";
+    const newId = link.id || "";
     if (newId !== active) setActive(newId);
     // Update highlight immediately so user sees it move before any scroll event interferes
     updateHighlightPosition(newId);
@@ -243,37 +226,6 @@ export default function SolaceIsland({
       )}
 
       {solace}
-
-      {/* Mobile nav */}
-      {expanded && isMobile && (
-        <motion.nav
-          ref={navRef}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.15 }}
-          className="absolute right-16 top-1/2 flex -translate-y-1/2 gap-0.5 z-10"
-          onMouseLeave={() => updateHighlightPosition()}
-        >
-          {visibleLinks.map((link: any) => {
-            const isActive = active === link.id;
-            return (
-              <button
-                key={link.id}
-                id={`si-item-${link.id}`}
-                onClick={() => handleLinkClick(link)}
-                onMouseEnter={() => updateHighlightPosition(link.id)}
-                className={cn(
-                  "relative text-[0.65rem] transition duration-300 px-1.5 py-0.5 rounded-full whitespace-nowrap",
-                  isActive ? "text-[var(--text)] font-semibold" : "text-[var(--muted)] hover:text-[var(--text)]"
-                )}
-              >
-                {link.icon && <span className="inline mr-0.5">{link.icon}</span>}
-                {link.label || ""}
-              </button>
-            );
-          })}
-        </motion.nav>
-      )}
     </div>
   );
 

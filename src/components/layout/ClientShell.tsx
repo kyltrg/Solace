@@ -43,10 +43,7 @@ export default function ClientShell() {
   const isAuth = pathname === "/" || pathname === "/welcome";
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+    setIsMobile(window.innerWidth < 768);
   }, []);
 
   useEffect(() => {
@@ -132,16 +129,23 @@ export default function ClientShell() {
 
       <SolaceIsland
         links={navLinks}
-        mobileLinks={mobileLinks}
         isSidebarOpen={sidebarOpen}
-        onHamburgerClick={() => setMobileMenuOpen((v) => !v)}
-        isHamburgerOpen={mobileMenuOpen}
         onExpandedChange={setIslandExpanded}
       />
 
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Mobile: overlay with built-in toggle button (visible only when island is expanded, hidden during loading) */}
+      {/* Mobile: floating hamburger */}
+      {isMobile && islandExpanded && !isLoading && (
+        <button
+          onClick={() => setMobileMenuOpen((v) => !v)}
+          className="fixed top-5 right-4 z-[90] flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur text-[var(--text)] shadow-lg"
+        >
+          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      )}
+
+      {/* Mobile: overlay */}
       {isMobile && islandExpanded && !isLoading && (
         <HamburgerMenuOverlay
           isOpen={mobileMenuOpen}

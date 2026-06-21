@@ -14,11 +14,7 @@ import ClientShell from "@/components/layout/ClientShell";
 import PageTransition
 from "@/components/navigation/PageTransition";
 
-import { InactivityTimer }
-from "@/components/auth/InactivityTimer";
 
-import { InactivityScheduler }
-from "@/components/cron/InactivityScheduler";
 
 import {
   PresenceProvider,
@@ -125,8 +121,7 @@ export default function RootLayout({
             <SmoothScroll>
             <PageTransition />
             <ClientShell />
-            <InactivityTimer />
-            <InactivityScheduler />
+
             {children}
             <Footer />
             </SmoothScroll>
