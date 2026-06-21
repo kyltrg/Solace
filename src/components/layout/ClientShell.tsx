@@ -135,7 +135,7 @@ export default function ClientShell() {
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Mobile: overlay */}
-      {isMobile && islandExpanded && !isLoading && (
+      {islandExpanded && !isLoading && (
         <div className="block md:hidden">
           {/* Mobile toggle button (upper right, level with SOLACE) */}
           <button
