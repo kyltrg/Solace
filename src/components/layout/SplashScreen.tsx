@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 export default function SplashScreen({ onDone }: { onDone: () => void }) {
   const [visible, setVisible] = useState(true);
@@ -41,7 +42,7 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
             >
               <div className="absolute inset-0 rounded-full bg-[var(--accent)]/20 blur-3xl" />
               <div className="relative flex h-32 w-32 items-center justify-center">
-                <img src="/assets/logo/icon-splashed.png" alt="Solace" className="h-full w-full object-contain" loading="eager" fetchPriority="high" />
+                <Image src="/assets/logo/icon-splashed.png" alt="Solace" width={128} height={128} className="h-full w-full object-contain" priority />
               </div>
             </motion.div>
 
