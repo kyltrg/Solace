@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { getDailyVerseConfig } from "@/actions/config";
 
 type Verse = {
   reference: string;
@@ -31,6 +32,12 @@ const VERSES: Verse[] = [
   { reference: "1 Corinthians 13:7", text: "Love bears all things, believes all things, hopes all things." },
 ];
 
+function parseCustomVerse(raw: string): Verse {
+  const sep = raw.lastIndexOf(" — ");
+  if (sep === -1) return { text: raw, reference: "" };
+  return { text: raw.slice(0, sep), reference: raw.slice(sep + 3) };
+}
+
 function getDateSeed(): number {
   const d = new Date();
   return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
@@ -45,17 +52,26 @@ export default function DailyVerse(): React.JSX.Element | null {
   const [verse, setVerse] = useState<Verse | null>(null);
 
   useEffect(() => {
-    let lastSeed = -1;
-    const update = () => {
-      const seed = getDateSeed();
-      if (seed !== lastSeed) {
-        lastSeed = seed;
-        setVerse(getTodaysVerse());
+    let interval: ReturnType<typeof setInterval> | null = null;
+    let cancelled = false;
+
+    (async () => {
+      const custom = await getDailyVerseConfig();
+      if (cancelled) return;
+      if (custom) {
+        setVerse(parseCustomVerse(custom));
+        return;
       }
-    };
-    update();
-    const interval = setInterval(update, 5000);
-    return () => clearInterval(interval);
+      let lastSeed = -1;
+      const update = () => {
+        const seed = getDateSeed();
+        if (seed !== lastSeed) { lastSeed = seed; setVerse(getTodaysVerse()); }
+      };
+      update();
+      interval = setInterval(update, 5000);
+    })();
+
+    return () => { cancelled = true; if (interval) clearInterval(interval); };
   }, []);
 
   if (!verse) return null;

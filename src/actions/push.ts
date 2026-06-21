@@ -90,7 +90,7 @@ const ACTIVE_THRESHOLD_MS = 180000;
 
 export async function notifyOnline(userName: string): Promise<{ notified: boolean }> {
   const normalized = userName.toLowerCase().trim();
-  if (!normalized) return { notified: false };
+  if (!normalized || normalized === "admin") return { notified: false };
 
   const record = await prisma.presence.findUnique({
     where: { userName: normalized },

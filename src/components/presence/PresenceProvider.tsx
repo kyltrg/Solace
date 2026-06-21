@@ -23,9 +23,10 @@ export function PresenceProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const userName = Cookies.get("solace-user") ?? null;
+    const isAdmin = Cookies.get("solace-admin") === "true";
     setMyName(userName);
 
-    if (!userName) return;
+    if (!userName || isAdmin) return;
 
     notifyOnline(userName).catch(() => {});
 

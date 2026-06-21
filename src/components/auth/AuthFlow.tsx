@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import Cookies from "js-cookie";
 import { motion, AnimatePresence } from "framer-motion";
+import { getPasscodes } from "@/actions/auth";
 
 
 type Step = "gate" | "name" | "welcome" | "choice" | "quiz" | "vault" | "success" | "wrong-door";
@@ -25,14 +26,17 @@ type Room = {
 };
 
 const VALID_NAMES: readonly string[] = [
-  "angel", "allison", "angel allison", "angel allison melano", "angel allison melaño", "kyle",
+  "angel", "allison", "angel allison", "angel allison melano", "angel allison melaño", "kyle", "admin",
 ] as const;
 
 function toDisplayName(raw: string): string {
   const n = raw.toLowerCase().trim();
   if (n === "kyle") return "Kyle";
+  if (n === "admin") return "Admin";
   return "Angel";
 }
+
+const IS_ADMIN = new Set(["admin"]);
 
 function HomeIcon({ className }: { className?: string }) {
   return (
@@ -403,6 +407,18 @@ export default function AuthFlow(): React.JSX.Element {
   const [errorKey, setErrorKey] = useState(0);
   const [codeError, setCodeError] = useState(false);
   const [inputAnswer, setInputAnswer] = useState<string>("");
+  const [userPasscode, setUserPasscode] = useState("022426");
+  const [adminPasscode, setAdminPasscode] = useState("111805");
+  const passcodesFetched = useRef(false);
+
+  useEffect(() => {
+    if (passcodesFetched.current) return;
+    passcodesFetched.current = true;
+    getPasscodes().then((p) => {
+      setUserPasscode(p.passcode);
+      setAdminPasscode(p.adminPasscode);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => { setInputAnswer(""); }, [questionIndex]);
 
@@ -471,11 +487,18 @@ export default function AuthFlow(): React.JSX.Element {
   }
 
   function verifyCode(): void {
-    if (code === "022426") {
+    const isAdminUser = name.trim().toLowerCase() === "admin";
+    const isValid = (!isAdminUser && code === userPasscode) || (isAdminUser && code === adminPasscode);
+    if (isValid) {
       Cookies.set("solace-access", String(Date.now()), { expires: 365 });
-      Cookies.set("solace-user", toDisplayName(name), { expires: 365 });
+      if (isAdminUser) {
+        Cookies.set("solace-user", "Admin", { expires: 365 });
+        Cookies.set("solace-admin", "true", { expires: 365 });
+      } else {
+        Cookies.set("solace-user", toDisplayName(name), { expires: 365 });
+      }
       setStep("success");
-      setTimeout(() => { window.location.href = "/home"; }, 4200);
+      setTimeout(() => { window.location.href = isAdminUser ? "/admin" : "/home"; }, 4200);
       return;
     }
     setCodeError(true);
@@ -492,11 +515,19 @@ export default function AuthFlow(): React.JSX.Element {
       const next = prev + digit;
       if (next.length === 6) {
         setTimeout(() => {
-          if (next === "022426") {
+          const currentName = nameRef.current.toLowerCase().trim();
+          const isAdminUser = currentName === "admin";
+          const isValid = (!isAdminUser && next === userPasscodeRef.current) || (isAdminUser && next === adminPasscodeRef.current);
+          if (isValid) {
             Cookies.set("solace-access", String(Date.now()), { expires: 365 });
-            Cookies.set("solace-user", toDisplayName(nameRef.current), { expires: 365 });
+            if (isAdminUser) {
+              Cookies.set("solace-user", "Admin", { expires: 365 });
+              Cookies.set("solace-admin", "true", { expires: 365 });
+            } else {
+              Cookies.set("solace-user", toDisplayName(nameRef.current), { expires: 365 });
+            }
             setStep("success");
-            setTimeout(() => { window.location.href = "/home"; }, 4200);
+            setTimeout(() => { window.location.href = isAdminUser ? "/admin" : "/home"; }, 4200);
           } else {
             setCodeError(true);
             setError("The door does not recognize that code.");
@@ -515,6 +546,11 @@ export default function AuthFlow(): React.JSX.Element {
 
   const nameRef = useRef(name);
   useEffect(() => { nameRef.current = name; }, [name]);
+
+  const userPasscodeRef = useRef(userPasscode);
+  useEffect(() => { userPasscodeRef.current = userPasscode; }, [userPasscode]);
+  const adminPasscodeRef = useRef(adminPasscode);
+  useEffect(() => { adminPasscodeRef.current = adminPasscode; }, [adminPasscode]);
 
   const handleBackspace = useCallback(() => {
     setCode((prev) => prev.slice(0, -1));

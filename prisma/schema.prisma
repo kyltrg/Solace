@@ -90,6 +90,19 @@ model Dream {
 }
 
 
+model AppConfig {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model Verse {
+  id        String   @id @default(cuid())
+  content   String
+  source    String?
+  createdAt DateTime @default(now())
+}
+
 enum DreamStatus {
   PRAYING
   ACHIEVED

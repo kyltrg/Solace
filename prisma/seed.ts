@@ -32,6 +32,25 @@ const songs = [
 ];
 
 async function main() {
+  console.log("Seeding AppConfig...");
+
+  const configDefaults = [
+    { key: "passcode", value: "022426" },
+    { key: "admin_passcode", value: "111805" },
+    { key: "daily_verse", value: "You are altogether beautiful, my darling; there is no flaw in you. — Song of Solomon 4:7" },
+  ];
+
+  for (const cfg of configDefaults) {
+    const existing = await prisma.appConfig.findUnique({ where: { key: cfg.key } });
+    if (existing) {
+      console.log(`  Skipped: ${cfg.key} (already exists)`);
+      continue;
+    }
+    await prisma.appConfig.create({ data: cfg });
+    console.log(`  Added config: ${cfg.key}`);
+  }
+
+  console.log("");
   console.log("Seeding songs...");
 
   for (const song of songs) {
