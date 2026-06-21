@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import Cookies from "js-cookie";
 import { updatePresence } from "@/actions/presence";
+import { notifyOnline } from "@/actions/push";
 
 const HEARTBEAT_MS = 15000;
 
@@ -25,6 +26,8 @@ export function PresenceProvider({ children }: { children: ReactNode }) {
     setMyName(userName);
 
     if (!userName) return;
+
+    notifyOnline(userName).catch(() => {});
 
     const beat = () => { updatePresence(userName).catch(() => {}); };
     beat();

@@ -82,6 +82,41 @@ export async function sendPushToAuthor(
   return { ok: true, sent: sentCount };
 }
 
+function getOtherName(userName: string): string {
+  return userName.toLowerCase().trim() === "kyle" ? "Angel" : "Kyle";
+}
+
+const ACTIVE_THRESHOLD_MS = 180000;
+
+export async function notifyOnline(userName: string): Promise<{ notified: boolean }> {
+  const normalized = userName.toLowerCase().trim();
+  if (!normalized) return { notified: false };
+
+  const record = await prisma.presence.findUnique({
+    where: { userName: normalized },
+  });
+
+  const now = Date.now();
+  const lastSeen = record?.lastSeen ? record.lastSeen.getTime() : 0;
+  const isNewSession = !record || (now - lastSeen) > ACTIVE_THRESHOLD_MS;
+
+  if (!isNewSession) return { notified: false };
+
+  const otherName = getOtherName(normalized);
+  const displayName = normalized === "kyle" ? "Kyle" : "Angel";
+  const lTitles = [`${displayName} is at home`, `${displayName} just arrived home`, `${displayName} is here`];
+  const lBodies = ["Come home now \u{1F60A}", "Join them at home \u{1F60A}", "See you at home \u{1F60A}"];
+
+  await sendPushToAuthor(
+    otherName,
+    lTitles[Math.floor(Math.random() * lTitles.length)],
+    lBodies[Math.floor(Math.random() * lBodies.length)],
+    "/home",
+  );
+
+  return { notified: true };
+}
+
 const RANDOM_MESSAGES = [
   { title: "Read a Letter \u{1F4EC}", body: "Want to read a letter? Open Solace now." },
   { title: "Sticky Note \u{1F4AD}", body: "Someone might have left you a sticky note. Come home." },

@@ -3,7 +3,6 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import Cookies from "js-cookie";
 import { motion, AnimatePresence } from "framer-motion";
-import { sendPushToAuthor } from "@/actions/push";
 
 
 type Step = "gate" | "name" | "welcome" | "choice" | "quiz" | "vault" | "success" | "wrong-door";
@@ -475,11 +474,6 @@ export default function AuthFlow(): React.JSX.Element {
     if (code === "022426") {
       Cookies.set("solace-access", String(Date.now()), { expires: 365 });
       Cookies.set("solace-user", toDisplayName(name), { expires: 365 });
-      const targetAuthor = name.toLowerCase().includes("kyle") ? "angel" : "kyle";
-      const displayName = toDisplayName(name);
-      const lTitles = [`${displayName} is at home`, `${displayName} just arrived home`, `${displayName} is here`];
-      const lBodies = ["Come home now \u{1F60A}", "Join them at home \u{1F60A}", "See you at home \u{1F60A}"];
-      sendPushToAuthor(targetAuthor, lTitles[Math.floor(Math.random() * lTitles.length)], lBodies[Math.floor(Math.random() * lBodies.length)], "/home").catch((e) => console.error("[push] login push failed", e));
       setStep("success");
       setTimeout(() => { window.location.href = "/home"; }, 4200);
       return;
@@ -501,11 +495,6 @@ export default function AuthFlow(): React.JSX.Element {
           if (next === "022426") {
             Cookies.set("solace-access", String(Date.now()), { expires: 365 });
             Cookies.set("solace-user", toDisplayName(nameRef.current), { expires: 365 });
-            const targetAuthor = nameRef.current.toLowerCase().includes("kyle") ? "angel" : "kyle";
-            const displayName = toDisplayName(nameRef.current);
-            const lTitles = [`${displayName} is at home`, `${displayName} just arrived home`, `${displayName} is here`];
-            const lBodies = ["Come home now \u{1F60A}", "Join them at home \u{1F60A}", "See you at home \u{1F60A}"];
-            sendPushToAuthor(targetAuthor, lTitles[Math.floor(Math.random() * lTitles.length)], lBodies[Math.floor(Math.random() * lBodies.length)], "/home").catch((e) => console.error("[push] login push failed", e));
             setStep("success");
             setTimeout(() => { window.location.href = "/home"; }, 4200);
           } else {
