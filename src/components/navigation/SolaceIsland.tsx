@@ -141,8 +141,7 @@ export default function SolaceIsland({
       >
         <div
           className={cn(
-            "relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)]/20 backdrop-blur-sm shadow-sm",
-            "before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
+            "relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)]/5 shadow-sm"
           )}
           style={{ transform: "translateZ(0)" }}
         >
@@ -168,7 +167,7 @@ export default function SolaceIsland({
       {/* ─── DESKTOP ─── */}
       <motion.header
         animate={{ width: expanded ? "740px" : "220px" }}
-        transition={{ type: "spring", stiffness: 170, damping: 24 }}
+        transition={{ type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
           "fixed left-1/2 top-5 z-[85] -translate-x-1/2 max-w-[calc(100vw-16px)] hidden md:block",
           isSidebarOpen && "blur-sm transition-all duration-300"
@@ -238,7 +237,7 @@ export default function SolaceIsland({
               x: expanded ? 0 : "-50%",
               y: "-50%",
             }}
-            transition={{ type: "spring", stiffness: 170, damping: 24 }}
+            transition={{ type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="absolute top-1/2 z-20 pointer-events-none"
           >
             <Link
