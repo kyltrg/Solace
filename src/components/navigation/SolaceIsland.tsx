@@ -34,7 +34,7 @@ export default function SolaceIsland({
   const navRef = useRef<HTMLElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(links.length > 0 ? links[0].id : "");
+  const [active, setActive] = useState("");
   const activeRef = useRef(active);
   activeRef.current = active;
   const [hlPos, setHlPos] = useState({ x: 0, width: 0 });
@@ -58,9 +58,10 @@ export default function SolaceIsland({
     if (!navRef.current || !pillRef.current) return;
     const el = navRef.current.querySelector(`#si-item-${id || activeRef.current}`);
     if (!el) return;
-    const elRect = el.getBoundingClientRect();
-    const pillRect = pillRef.current.getBoundingClientRect();
-    setHlPos({ x: elRect.left - pillRect.left, width: elRect.width });
+    const navLeft = navRef.current.offsetLeft;
+    const btnLeft = (el as HTMLElement).offsetLeft;
+    const btnWidth = (el as HTMLElement).offsetWidth;
+    setHlPos({ x: navLeft + btnLeft, width: btnWidth });
   }, []);
 
   const handleLinkClick = (link: NavLink) => {
@@ -106,6 +107,15 @@ export default function SolaceIsland({
     const handleScroll = () => {
       if (blockScrollRef.current) return;
       const scrollPos = window.scrollY + 90;
+
+      if (scrollPos < sectionOffsets[0].top) {
+        if (activeRef.current !== "") {
+          setActive("");
+          setHlPos({ x: 0, width: 0 });
+        }
+        return;
+      }
+
       let bestId = sectionOffsets[0].id;
       for (const s of sectionOffsets) {
         if (s.top <= scrollPos) {
@@ -142,7 +152,8 @@ export default function SolaceIsland({
         }}
       >
         <div
-          className="relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--bg)] shadow-[0_8px_32px_rgba(0,0,0,.5)]"
+          className="relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--bg-elevated)]/10 backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)] before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
+                    
           style={{ transform: "translateZ(0)" }}
         >
           {/* SOLACE logo */}
@@ -157,7 +168,7 @@ export default function SolaceIsland({
           >
             <Link
               href="/home"
-              className="font-display text-lg tracking-[.35em] text-[var(--text)] whitespace-nowrap pointer-events-auto block"
+              className="font-display text-lg tracking-[.65em] text-[var(--text)] whitespace-nowrap pointer-events-auto block"
             >
               SOLACE
             </Link>
@@ -169,7 +180,7 @@ export default function SolaceIsland({
               initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 22, delay: 0.15 }}
-              className="absolute right-4 top-1/2 flex -translate-y-1/2 gap-1 z-10"
+              className="absolute right-11 top-1/2 flex -translate-y-1/2 -space-x-3 z-10"
               style={{ willChange: "transform, opacity" }}
             >
               {links.filter((link) => link.id === "our-notes" || link.id === "our-rooms").map((link) => {
@@ -184,8 +195,8 @@ export default function SolaceIsland({
                       "transition-all duration-300 ease-out",
                       "hover:scale-105 active:scale-95",
                       isActive
-                        ? "text-[var(--text)] font-semibold bg-[var(--accent-soft)]"
-                        : "text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--accent-soft)]/50"
+                        ? "text-[var(--text)] font-semibold after:absolute after:bottom-1 after:left-2 after:right-2 after:h-[2px] after:bg-[var(--accent)] after:rounded-full"
+                        : "text-[var(--muted)] hover:text-[var(--text)]"
                     )}
                     style={{ willChange: "transform" }}
                   >
@@ -210,7 +221,7 @@ export default function SolaceIsland({
         <div
           ref={pillRef}
           className={cn(
-            "relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)]",
+            "relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--bg-elevated)]/10 backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)]",
             "before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
           )}
           style={{ transform: "translateZ(0)" }}
@@ -264,10 +275,10 @@ export default function SolaceIsland({
             </motion.nav>
           )}
 
-          {/* SOLACE logo */}
+          {/* SOLACE logo — pixel values only to avoid percentage interpolation jump during width animation */}
           <motion.div
             animate={{
-              left: expanded ? 36 : "50%",
+              left: expanded ? 36 : 110,
               x: expanded ? 0 : "-50%",
               y: "-50%",
             }}

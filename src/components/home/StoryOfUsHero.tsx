@@ -10,7 +10,7 @@ function scrollToStoryPreview() {
 
 export default function StoryOfUsHero(): React.JSX.Element {
   return (
-    <section id="story-of-us" className="relative overflow-hidden">
+    <section id="story-of-us" className="relative overflow-hidden scroll-mt-[90px]">
       <ImageTrailWrapper>
         <div className="relative flex min-h-screen items-center justify-center px-6">
           <div className="absolute inset-0">

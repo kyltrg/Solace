@@ -23,15 +23,15 @@ export default function HomePage() {
         <ArrivalHero />
       </BubbleBackground>
       <div className="solace-divider" />
-      <section id="relationship-timer"><RelationshipTimer /></section>
+      <section id="relationship-timer" className="scroll-mt-[90px]"><RelationshipTimer /></section>
       <div className="solace-divider" />
       <StoryOfUsHero />
       <div className="solace-divider" />
       <StoryPreview />
       <div className="solace-divider" />
-      <section id="memory-of-day"><MemoryOfDay /></section>
+      <section id="memory-of-day" className="scroll-mt-[90px]"><MemoryOfDay /></section>
       <div className="solace-divider" />
-      <section id="sticky-notes"><StickyNotes /></section>
+      <section id="sticky-notes" className="scroll-mt-[90px]"><StickyNotes /></section>
       <div className="solace-divider" />
       <DailyVerse />
       <div className="solace-divider" />

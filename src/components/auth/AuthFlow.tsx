@@ -473,8 +473,8 @@ export default function AuthFlow(): React.JSX.Element {
 
   function verifyCode(): void {
     if (code === "022426") {
-      Cookies.set("solace-access", String(Date.now()));
-      Cookies.set("solace-user", toDisplayName(name));
+      Cookies.set("solace-access", String(Date.now()), { expires: 365 });
+      Cookies.set("solace-user", toDisplayName(name), { expires: 365 });
       const targetAuthor = name.toLowerCase().includes("kyle") ? "angel" : "kyle";
       const displayName = toDisplayName(name);
       const lTitles = [`${displayName} is at home`, `${displayName} just arrived home`, `${displayName} is here`];
@@ -499,8 +499,8 @@ export default function AuthFlow(): React.JSX.Element {
       if (next.length === 6) {
         setTimeout(() => {
           if (next === "022426") {
-            Cookies.set("solace-access", String(Date.now()));
-            Cookies.set("solace-user", toDisplayName(nameRef.current));
+            Cookies.set("solace-access", String(Date.now()), { expires: 365 });
+            Cookies.set("solace-user", toDisplayName(nameRef.current), { expires: 365 });
             const targetAuthor = nameRef.current.toLowerCase().includes("kyle") ? "angel" : "kyle";
             const displayName = toDisplayName(nameRef.current);
             const lTitles = [`${displayName} is at home`, `${displayName} just arrived home`, `${displayName} is here`];

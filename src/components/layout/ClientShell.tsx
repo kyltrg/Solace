@@ -86,8 +86,8 @@ export default function ClientShell() {
     { id: "our-time", label: "Our Time", sectionId: "relationship-timer", onClick: () => navigateAndScroll(router, "/home", "relationship-timer") },
     { id: "our-story", label: "Our Story", sectionId: "story-of-us", onClick: () => navigateAndScroll(router, "/home", "story-of-us") },
     { id: "our-moments", label: "Our Moments", sectionId: "memory-of-day", onClick: () => navigateAndScroll(router, "/home", "memory-of-day") },
-    { id: "our-notes", label: "Our Notes", sectionId: "sticky-notes", onClick: () => navigateAndScroll(router, "/home", "sticky-notes") },
-    { id: "our-rooms", label: "Our Rooms", sectionId: "rooms", onClick: () => navigateAndScroll(router, "/home", "rooms") },
+    { id: "our-notes", label: "Notes", sectionId: "sticky-notes", onClick: () => navigateAndScroll(router, "/home", "sticky-notes") },
+    { id: "our-rooms", label: "Rooms", sectionId: "rooms", onClick: () => navigateAndScroll(router, "/home", "rooms") },
   ];
 
   const navigateRoom = (href: string) => () => {
