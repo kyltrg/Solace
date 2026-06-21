@@ -152,15 +152,16 @@ export default function SolaceIsland({
 
   return (
     <motion.header
-      animate={{
-        width: expanded
-          ? (isMobile ? "calc(100vw - 32px)" : "740px")
-          : (isMobile ? "220px" : "220px"),
-      }}
-      transition={isMobile
-        ? { type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }
-        : { type: "spring", stiffness: 170, damping: 24 }
-      }
+      animate={!isMobile ? {
+        width: expanded ? "740px" : "220px",
+      } : {}}
+      transition={!isMobile ? { type: "spring", stiffness: 170, damping: 24 } : {}}
+      style={isMobile ? {
+        width: expanded ? "calc(100vw - 32px)" : "220px",
+        transition: "width 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+        contain: "layout style paint",
+        willChange: "width",
+      } : {}}
       className={cn(
         "fixed left-1/2 top-5 z-[85] -translate-x-1/2 max-w-[calc(100vw-16px)]",
         isSidebarOpen && "blur-sm transition-all duration-300"
@@ -168,12 +169,7 @@ export default function SolaceIsland({
     >
       <div
         ref={pillRef}
-        className={cn(
-          "relative h-16 w-full rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] shadow-[0_20px_80px_rgba(0,0,0,.45)]",
-          isMobile
-            ? "bg-[var(--navbar-bg)]"
-            : "overflow-hidden backdrop-blur-2xl before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
-        )}
+        className="relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)] before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
         style={{ transform: 'translateZ(0)' }}
       >
         {/* Sliding highlight (desktop only) — tween on click, spring on scroll */}
