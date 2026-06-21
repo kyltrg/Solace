@@ -3,18 +3,11 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles, CheckCircle, Star, ArrowUp } from "lucide-react";
-import { toggleDreamStatus } from "@/actions/plans";
+import { toggleDreamStatus, getDreams, type DreamData } from "@/actions/plans";
 import GradualBlur from "./GradualBlur";
 import Particles from "./Particles";
 
-type Dream = {
-  id: string;
-  title: string;
-  description: string;
-  horizon: string;
-  status: "PRAYING" | "ACHIEVED";
-  createdAt: Date;
-};
+type Dream = DreamData;
 
 type StarData = {
   id: string;
@@ -62,7 +55,17 @@ function buildStars(dreams: Dream[]): StarData[] {
   });
 }
 
-export default function StarField({ dreams }: { dreams: Dream[] }) {
+export default function StarField({ initialDreams }: { initialDreams: Dream[] }) {
+  const [dreams, setDreams] = useState<Dream[]>(initialDreams);
+
+  useEffect(() => {
+    setDreams(initialDreams);
+  }, [initialDreams]);
+
+  useEffect(() => {
+    getDreams().then(setDreams).catch(() => {});
+  }, []);
+
   const stars = useMemo(() => buildStars(dreams), [dreams]);
   const [selected, setSelected] = useState<Dream | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);

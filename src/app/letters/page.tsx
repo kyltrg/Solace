@@ -1,16 +1,14 @@
 import { Suspense } from "react";
-import { prisma } from "@/lib/prisma";
 import RoomLayout from "@/components/layout/RoomLayout";
 import Link from "next/link";
 import { PenLine } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import LetterArchive from "@/components/letters/LetterArchive";
+import { getLetters } from "@/actions/letters";
 import ScrollToTop from "@/components/ui/ScrollToTop";
 
 export default async function LettersPage() {
-  const letters = await prisma.letter.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const initialLetters = await getLetters();
 
   return (
     <RoomLayout
@@ -92,21 +90,12 @@ export default async function LettersPage() {
           <GlassCard className="px-6 py-8 md:px-10 md:py-10">
             <div className="mb-8 flex items-center justify-between">
               <span className="text-xs uppercase tracking-[.3em] text-[var(--text)]/40">
-                {letters.length} {letters.length === 1 ? "letter" : "letters"} saved
+                {initialLetters.length} {initialLetters.length === 1 ? "letter" : "letters"} saved
               </span>
             </div>
 
             <Suspense fallback={<div className="py-16 text-center text-sm text-[var(--text)]/40">Loading letters...</div>}>
-              <LetterArchive
-                letters={letters.map((letter) => ({
-                  id: letter.id,
-                  title: letter.title,
-                  preview: letter.preview,
-                  category: letter.category,
-                  author: letter.author,
-                  createdAt: letter.createdAt.toISOString(),
-                }))}
-              />
+              <LetterArchive initialLetters={initialLetters} />
             </Suspense>
           </GlassCard>
         </div>

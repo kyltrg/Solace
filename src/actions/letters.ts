@@ -4,6 +4,29 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
+export type LetterData = {
+  id: string;
+  title: string;
+  preview: string;
+  category: string;
+  author: string | null;
+  createdAt: string;
+};
+
+export async function getLetters(): Promise<LetterData[]> {
+  const letters = await prisma.letter.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  return letters.map((l) => ({
+    id: l.id,
+    title: l.title,
+    preview: l.preview,
+    category: l.category,
+    author: l.author,
+    createdAt: l.createdAt.toISOString(),
+  }));
+}
+
 export async function createLetter(formData: FormData): Promise<{ ok: boolean; error?: string; id?: string }> {
   const title = formData.get("title")?.toString().trim();
   const content = formData.get("content")?.toString().trim();

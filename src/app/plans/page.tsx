@@ -1,12 +1,10 @@
 import RoomLayout from "@/components/layout/RoomLayout";
 import AddPlanForm from "@/components/plans/AddPlanForm";
 import StarField from "@/components/plans/StarField";
-import { prisma } from "@/lib/prisma";
+import { getDreams } from "@/actions/plans";
 
 export default async function PlansPage(): Promise<React.JSX.Element> {
-  const dreams = await prisma.dream.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const initialDreams = await getDreams();
 
   return (
     <RoomLayout
@@ -15,7 +13,7 @@ export default async function PlansPage(): Promise<React.JSX.Element> {
       description="Every star in the sky is a dream we're reaching for together."
     >
       <div className="space-y-24">
-        <StarField dreams={dreams} />
+        <StarField initialDreams={initialDreams} />
 
         <div className="relative flex items-center gap-6">
           <div className="h-px flex-1 bg-[var(--border)]" />

@@ -9,6 +9,29 @@ import {
 import { prisma } from "@/lib/prisma";
 
 
+export type DreamData = {
+  id: string;
+  title: string;
+  description: string;
+  horizon: string;
+  status: "PRAYING" | "ACHIEVED";
+  createdAt: Date;
+};
+
+export async function getDreams(): Promise<DreamData[]> {
+  const dreams = await prisma.dream.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  return dreams.map((d) => ({
+    id: d.id,
+    title: d.title,
+    description: d.description,
+    horizon: d.horizon,
+    status: d.status as "PRAYING" | "ACHIEVED",
+    createdAt: d.createdAt,
+  }));
+}
+
 export async function createDream(
   formData: FormData
 ): Promise<void> {

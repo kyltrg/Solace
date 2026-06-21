@@ -5,20 +5,17 @@ import { motion } from "framer-motion";
 import { Search, Pin, BookOpen, PenLine, User } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { getLetters, type LetterData } from "@/actions/letters";
 import LetterCard from "./LetterCard";
 
-export type Letter = {
-  id: string;
-  title: string;
-  preview: string;
-  category: string;
-  author: string | null;
-  createdAt: string;
-};
-
-export default function LetterArchive({ letters }: { letters: Letter[] }) {
+export default function LetterArchive({ initialLetters }: { initialLetters: LetterData[] }) {
   const searchParams = useSearchParams();
   const highlightId = searchParams.get("highlight");
+  const [letters, setLetters] = useState<LetterData[]>(initialLetters);
+
+  useEffect(() => {
+    getLetters().then(setLetters).catch(() => {});
+  }, [highlightId]);
   const [filter, setFilter] = useState("All");
   const [authorFilter, setAuthorFilter] = useState("all");
   const [search, setSearch] = useState("");
