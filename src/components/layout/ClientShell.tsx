@@ -129,31 +129,57 @@ export default function ClientShell() {
         links={navLinks}
         isSidebarOpen={sidebarOpen}
         onExpandedChange={setIslandExpanded}
-        mobileMenuOpen={mobileMenuOpen}
-        onToggleMobileMenu={() => setMobileMenuOpen((v) => !v)}
       />
 
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Mobile: hamburger overlay — button lives inside SolaceIsland */}
-      {islandExpanded && (
-        <div className="block md:hidden">
-          <HamburgerMenuOverlay
-            isOpen={mobileMenuOpen}
-            onToggle={() => setMobileMenuOpen((v) => !v)}
-            items={mobileMenuItems}
-            hideToggleButton
-            buttonTop="52px"
-            buttonLeft="calc(100% - 48px)"
-            buttonSize="sm"
-            fontSize="2xl"
-            enableBlur
-            zIndex={9999}
-            overlayBackground="var(--bg)"
-            textColor="var(--text)"
-            buttonClassName="border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-3xl text-[var(--muted)] shadow-lg"
-          />
-        </div>
+      {/* Mobile hamburger toggle — raw inline styles, zero Tailwind classes */}
+      {isMobile && (
+        <button
+          onClick={() => setMobileMenuOpen((v) => !v)}
+          style={{
+            position: "fixed",
+            top: "32px",
+            right: "20px",
+            zIndex: 999999,
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            border: "1px solid var(--border)",
+            background: "var(--navbar-bg)",
+            color: "var(--muted)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            boxShadow: "0 4px 20px rgba(0,0,0,.45)",
+          }}
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+        </button>
+      )}
+
+      {/* Mobile: hamburger overlay */}
+      {islandExpanded && isMobile && (
+        <HamburgerMenuOverlay
+          isOpen={mobileMenuOpen}
+          onToggle={() => setMobileMenuOpen((v) => !v)}
+          items={mobileMenuItems}
+          hideToggleButton
+          buttonTop="52px"
+          buttonLeft="calc(100% - 48px)"
+          buttonSize="sm"
+          fontSize="2xl"
+          enableBlur
+          zIndex={9999}
+          overlayBackground="var(--bg)"
+          textColor="var(--text)"
+          buttonClassName="border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-3xl text-[var(--muted)] shadow-lg"
+        />
       )}
     </>
   );
