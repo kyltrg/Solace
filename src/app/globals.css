@@ -255,7 +255,6 @@ body::after {
 ::-webkit-scrollbar-thumb {
   background: var(--accent);
   border-radius: var(--radius-full);
-  opacity: .3;
 }
 
 ::-webkit-scrollbar-thumb:hover {
