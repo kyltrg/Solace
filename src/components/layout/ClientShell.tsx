@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import Cookies from "js-cookie";
 import SolaceIsland from "@/components/navigation/SolaceIsland";
 import Sidebar from "@/components/layout/Sidebar";
+import HamburgerMenuOverlay from "@/components/lightswind/HamburgerMenuOverlay";
 import { ThemeContext } from "@/context/ThemeContext";
 
 function scrollTo(id: string) {
@@ -164,95 +165,24 @@ export default function ClientShell() {
         {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
       </button>
 
-      {/* Mobile: hamburger overlay — direct render */}
-      {isMobile && mobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          onClick={() => setMobileMenuOpen(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 99999,
-            background: "var(--bg)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "0.75rem",
-              padding: "2rem",
-              width: "100%",
-              maxWidth: "400px",
-            }}
-          >
-            {mobileMenuItems.map((item, i) =>
-              item.divider ? (
-                <hr key={`div-${i}`} style={{
-                  width: "60%",
-                  border: "none",
-                  height: "1px",
-                  background: "var(--border)",
-                  opacity: 0.3,
-                  margin: "0.5rem 0",
-                }} />
-              ) : (
-                <motion.button
-                  key={i}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.04, duration: 0.2 }}
-                  onClick={() => {
-                    item.onClick?.();
-                    if (item.label !== "Welcome home," + user) setMobileMenuOpen(false);
-                  }}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "0.75rem",
-                    width: "100%",
-                    padding: i === 0 ? "0.5rem 0" : "0.65rem 0",
-                    border: "none",
-                    background: "transparent",
-                    color: i === 0 ? "var(--text)" : "var(--text)",
-                    fontSize: i === 0 ? "1rem" : "1.625rem",
-                    fontFamily: i === 0 ? "inherit" : "var(--font-display, inherit)",
-                    fontWeight: i === 0 ? 400 : 500,
-                    cursor: i === 0 ? "default" : "pointer",
-                    letterSpacing: "0.02em",
-                    pointerEvents: i === 0 ? "none" : "auto",
-                  }}
-                >
-                  {item.icon && (
-                    <span style={{ opacity: 0.25, display: "flex" }}>{item.icon}</span>
-                  )}
-                  {i === 0 ? (
-                    <div style={{ textAlign: "center" }}>
-                      <div style={{ opacity: 0.6, fontSize: "0.85rem" }}>Welcome home,</div>
-                      <div style={{
-                        fontFamily: "var(--font-accent, Georgia, serif)",
-                        fontSize: "1.2rem",
-                        marginTop: "0.15rem",
-                      }}>{user}</div>
-                    </div>
-                  ) : (
-                    item.label
-                  )}
-                </motion.button>
-              )
-            )}
-          </div>
-        </motion.div>
+      {/* Mobile: hamburger overlay — circle clip-path animation from button */}
+      {isMobile && (
+        <HamburgerMenuOverlay
+          isOpen={mobileMenuOpen}
+          onToggle={() => setMobileMenuOpen((v) => !v)}
+          items={mobileMenuItems}
+          hideToggleButton
+          buttonTop="52px"
+          buttonLeft="calc(100% - 48px)"
+          buttonSize="sm"
+          fontSize="2xl"
+          enableBlur
+          zIndex={9999}
+          overlayBackground="var(--bg)"
+          textColor="var(--text)"
+          animationDuration={0.3}
+          staggerDelay={0.04}
+        />
       )}
     </>
   );
