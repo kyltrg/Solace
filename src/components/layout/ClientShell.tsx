@@ -2,32 +2,13 @@
 
 import { useState, useEffect, useContext } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, BookOpen, UtensilsCrossed, Star, Music, Moon, Sun, LogOut, Sofa, BedDouble } from "lucide-react";
+import { Menu, BookOpen, UtensilsCrossed, Star, Music, Moon, Sun, LogOut, Sofa, BedDouble } from "lucide-react";
 import { motion } from "framer-motion";
 import Cookies from "js-cookie";
 import SolaceIsland from "@/components/navigation/SolaceIsland";
 import Sidebar from "@/components/layout/Sidebar";
 import HamburgerMenuOverlay from "@/components/lightswind/HamburgerMenuOverlay";
 import { ThemeContext } from "@/context/ThemeContext";
-
-function scrollTo(id: string) {
-  const el = document.getElementById(id);
-  if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
-}
-
-function navigateAndScroll(router: ReturnType<typeof useRouter>, path: string, id: string) {
-  if (window.location.pathname !== path) {
-    window.dispatchEvent(new CustomEvent("solace-loading"));
-    setTimeout(() => router.push(path), 100);
-    const check = setInterval(() => {
-      const el = document.getElementById(id);
-      if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); clearInterval(check); }
-    }, 100);
-    setTimeout(() => clearInterval(check), 5000);
-  } else {
-    scrollTo(id);
-  }
-}
 
 export default function ClientShell() {
   const pathname = usePathname();
@@ -78,19 +59,6 @@ export default function ClientShell() {
     setTimeout(() => router.push("/"), 80);
   };
 
-  const navLinks = [
-    { id: "our-time", label: "Our Time", sectionId: "relationship-timer", onClick: () => navigateAndScroll(router, "/home", "relationship-timer") },
-    { id: "our-story", label: "Our Story", sectionId: "story-of-us", onClick: () => navigateAndScroll(router, "/home", "story-of-us") },
-    { id: "our-moments", label: "Our Moments", sectionId: "memory-of-day", onClick: () => navigateAndScroll(router, "/home", "memory-of-day") },
-    { id: "our-notes", label: "Our Notes", sectionId: "sticky-notes", onClick: () => navigateAndScroll(router, "/home", "sticky-notes") },
-    { id: "our-rooms", label: "Our Rooms", sectionId: "rooms", onClick: () => navigateAndScroll(router, "/home", "rooms") },
-  ];
-
-  const mobileLinks = [
-    { id: "our-notes", label: "Notes", sectionId: "sticky-notes", onClick: () => navigateAndScroll(router, "/home", "sticky-notes") },
-    { id: "our-rooms", label: "Rooms", sectionId: "rooms", onClick: () => navigateAndScroll(router, "/home", "rooms") },
-  ];
-
   const navigateRoom = (href: string) => () => {
     window.dispatchEvent(new CustomEvent("solace-loading"));
     setTimeout(() => router.push(href), 80);
@@ -128,22 +96,11 @@ export default function ClientShell() {
       )}
 
       <SolaceIsland
-        links={navLinks}
         isSidebarOpen={sidebarOpen}
         onExpandedChange={setIslandExpanded}
       />
 
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      {/* Mobile: floating hamburger */}
-      {isMobile && islandExpanded && !isLoading && (
-        <button
-          onClick={() => setMobileMenuOpen((v) => !v)}
-          className="fixed top-5 right-4 z-[90] flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur text-[var(--text)] shadow-lg"
-        >
-          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      )}
 
       {/* Mobile: overlay */}
       {isMobile && islandExpanded && !isLoading && (
