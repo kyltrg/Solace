@@ -135,8 +135,10 @@ export default function SolaceIsland({
           clipPath: expanded
             ? "inset(0 round 9999px)"
             : "inset(0 calc(50% - 110px) round 9999px)",
-          transition: "clip-path 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+          transition: "clip-path 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
           willChange: "clip-path",
+          backfaceVisibility: "hidden",
+          perspective: 1000,
         }}
       >
         <div
@@ -150,7 +152,7 @@ export default function SolaceIsland({
               x: expanded ? 0 : "-50%",
               y: "-50%",
             }}
-            transition={{ type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ type: "spring", stiffness: 180, damping: 24, mass: 0.8 }}
             className="absolute top-1/2 z-20 pointer-events-none"
           >
             <Link
@@ -164,10 +166,11 @@ export default function SolaceIsland({
           {/* Mobile nav items — shown when expanded */}
           {expanded && (
             <motion.nav
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.35, ease: "easeOut", delay: 0.12 }}
+              transition={{ type: "spring", stiffness: 200, damping: 22, delay: 0.15 }}
               className="absolute right-4 top-1/2 flex -translate-y-1/2 gap-1 z-10"
+              style={{ willChange: "transform, opacity" }}
             >
               {links.filter((link) => link.id === "our-notes" || link.id === "our-rooms").map((link) => {
                 const isActive = active === link.id;
@@ -177,11 +180,14 @@ export default function SolaceIsland({
                     id={`si-item-${link.id}`}
                     onClick={() => handleLinkClick(link)}
                     className={cn(
-                      "relative text-xs transition duration-300 px-3 py-1.5 rounded-full whitespace-nowrap",
+                      "relative text-xs tracking-wide px-3.5 py-1.5 rounded-full whitespace-nowrap",
+                      "transition-all duration-300 ease-out",
+                      "hover:scale-105 active:scale-95",
                       isActive
-                        ? "text-[var(--text)] font-semibold"
-                        : "text-[var(--muted)] hover:text-[var(--text)]"
+                        ? "text-[var(--text)] font-semibold bg-[var(--accent-soft)]"
+                        : "text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--accent-soft)]/50"
                     )}
+                    style={{ willChange: "transform" }}
                   >
                     {link.label || ""}
                   </button>
