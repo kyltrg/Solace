@@ -133,26 +133,28 @@ export default function SolaceIsland({
   return (
     <>
       {/* ─── MOBILE ─── */}
-      <motion.header
-        animate={{ width: expanded ? "100%" : "220px" }}
-        transition={{ type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      <header
         className="fixed left-1/2 top-5 z-[85] -translate-x-1/2 max-w-[calc(100vw-32px)] md:hidden"
+        style={{
+          width: expanded ? "100%" : "220px",
+          transition: "width 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+          willChange: "width",
+        }}
       >
         <div
           className={cn(
-            "relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)]",
+            "relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur shadow-[0_20px_80px_rgba(0,0,0,.45)]",
             "before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
           )}
           style={{ transform: "translateZ(0)" }}
         >
-          <motion.div
-            animate={{
-              left: expanded ? 16 : "50%",
-              x: expanded ? 0 : "-50%",
-              y: "-50%",
-            }}
-            transition={{ type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          <div
             className="absolute top-1/2 z-20 pointer-events-none"
+            style={{
+              left: expanded ? 16 : "50%",
+              transform: expanded ? "translateY(-50%)" : "translate(-50%, -50%)",
+              transition: "left 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+            }}
           >
             <Link
               href="/home"
@@ -160,12 +162,12 @@ export default function SolaceIsland({
             >
               SOLACE
             </Link>
-          </motion.div>
+          </div>
 
           {onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex h-9 w-9 items-center justify-center rounded-full text-[var(--muted)] transition-colors hover:text-[var(--text)]"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-30 flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] text-[var(--muted)] shadow-sm transition-colors hover:border-[var(--accent)]/30 hover:text-[var(--text)]"
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileMenuOpen}
             >
@@ -173,7 +175,7 @@ export default function SolaceIsland({
             </button>
           )}
         </div>
-      </motion.header>
+      </header>
 
       {/* ─── DESKTOP ─── */}
       <motion.header
