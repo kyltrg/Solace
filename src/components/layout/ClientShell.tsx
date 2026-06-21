@@ -10,6 +10,25 @@ import Sidebar from "@/components/layout/Sidebar";
 import HamburgerMenuOverlay from "@/components/lightswind/HamburgerMenuOverlay";
 import { ThemeContext } from "@/context/ThemeContext";
 
+function scrollTo(id: string) {
+  const el = document.getElementById(id);
+  if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+}
+
+function navigateAndScroll(router: ReturnType<typeof useRouter>, path: string, id: string) {
+  if (window.location.pathname !== path) {
+    window.dispatchEvent(new CustomEvent("solace-loading"));
+    setTimeout(() => router.push(path), 100);
+    const check = setInterval(() => {
+      const el = document.getElementById(id);
+      if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); clearInterval(check); }
+    }, 100);
+    setTimeout(() => clearInterval(check), 5000);
+  } else {
+    scrollTo(id);
+  }
+}
+
 export default function ClientShell() {
   const pathname = usePathname();
   const router = useRouter();
@@ -59,6 +78,14 @@ export default function ClientShell() {
     setTimeout(() => router.push("/"), 80);
   };
 
+  const navLinks = [
+    { id: "our-time", label: "Our Time", sectionId: "relationship-timer", onClick: () => navigateAndScroll(router, "/home", "relationship-timer") },
+    { id: "our-story", label: "Our Story", sectionId: "story-of-us", onClick: () => navigateAndScroll(router, "/home", "story-of-us") },
+    { id: "our-moments", label: "Our Moments", sectionId: "memory-of-day", onClick: () => navigateAndScroll(router, "/home", "memory-of-day") },
+    { id: "our-notes", label: "Our Notes", sectionId: "sticky-notes", onClick: () => navigateAndScroll(router, "/home", "sticky-notes") },
+    { id: "our-rooms", label: "Our Rooms", sectionId: "rooms", onClick: () => navigateAndScroll(router, "/home", "rooms") },
+  ];
+
   const navigateRoom = (href: string) => () => {
     window.dispatchEvent(new CustomEvent("solace-loading"));
     setTimeout(() => router.push(href), 80);
@@ -82,7 +109,7 @@ export default function ClientShell() {
 
   return (
     <>
-      {/* Desktop sidebar toggle — hidden on auth pages and loading screens */}
+      {/* Desktop sidebar toggle */}
       {!isMobile && !isLoading && (
         <motion.button
           initial={{ opacity: 0, x: -12 }}
@@ -96,6 +123,7 @@ export default function ClientShell() {
       )}
 
       <SolaceIsland
+        links={navLinks}
         isSidebarOpen={sidebarOpen}
         onExpandedChange={setIslandExpanded}
       />
