@@ -243,31 +243,35 @@ export const HamburgerMenuOverlay: React.FC<HamburgerMenuOverlayProps> = ({
           }
           
           .menu-icon {
-            opacity: 0.5;
+            opacity: 0.25;
             transition: opacity 0.25s ease;
           }
           
           .menu-item-${zIndex}:hover .menu-icon {
-            opacity: 0.8;
+            opacity: 0.5;
           }
 
           @media (max-width: 768px) {
             .menu-items-${zIndex} {
-              padding: 0.5rem 1rem;
+              padding: 1rem 1.5rem;
             }
             .menu-item-${zIndex} {
-              padding: 0.35rem 0;
-              font-size: 1.125rem !important;
+              padding: 0.6rem 0;
+              font-size: 1.625rem !important;
+              letter-spacing: 0.02em;
             }
             .menu-item-${zIndex} .welcome-greeting {
-              font-size: 0.65em;
+              font-size: 0.7em;
             }
             .menu-item-${zIndex} .username {
-              font-size: 1.1em;
+              font-size: 1.2em;
             }
             .menu-item-${zIndex} .menu-icon svg {
-              width: 18px;
-              height: 18px;
+              width: 22px;
+              height: 22px;
+            }
+            .menu-divider-${zIndex} {
+              padding: 0.15rem 0;
             }
           }
         `}

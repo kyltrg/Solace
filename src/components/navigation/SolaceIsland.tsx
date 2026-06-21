@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
@@ -19,12 +20,16 @@ interface SolaceIslandProps {
   links: NavLink[];
   isSidebarOpen?: boolean;
   onExpandedChange?: (expanded: boolean) => void;
+  mobileMenuOpen?: boolean;
+  onToggleMobileMenu?: () => void;
 }
 
 export default function SolaceIsland({
   links,
   isSidebarOpen = false,
   onExpandedChange,
+  mobileMenuOpen,
+  onToggleMobileMenu,
 }: SolaceIslandProps): React.JSX.Element | null {
   const pathname = usePathname();
   const hideIsland = pathname === "/" || pathname === "/welcome" || pathname.startsWith("/letters/");
@@ -156,6 +161,17 @@ export default function SolaceIsland({
               SOLACE
             </Link>
           </motion.div>
+
+          {onToggleMobileMenu && (
+            <button
+              onClick={onToggleMobileMenu}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex h-9 w-9 items-center justify-center rounded-full text-[var(--muted)] transition-colors hover:text-[var(--text)]"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          )}
         </div>
       </motion.header>
 

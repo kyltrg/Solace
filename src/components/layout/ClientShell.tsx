@@ -97,8 +97,7 @@ export default function ClientShell() {
   };
 
   const mobileMenuItems = [
-    { label: `Welcome home, 
-      ${user}` },
+    { label: "Welcome home," + user },
     { divider: true },
     { label: "Living Room", icon: <Sofa size={20} />, onClick: navigateRoom("/when-you-need-me") },
     { label: "Study Room", icon: <BookOpen size={20} />, onClick: navigateRoom("/letters") },
@@ -130,24 +129,15 @@ export default function ClientShell() {
         links={navLinks}
         isSidebarOpen={sidebarOpen}
         onExpandedChange={setIslandExpanded}
+        mobileMenuOpen={mobileMenuOpen}
+        onToggleMobileMenu={() => setMobileMenuOpen((v) => !v)}
       />
 
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Mobile: overlay */}
-      {islandExpanded && !isLoading && (
+      {/* Mobile: hamburger overlay — button lives inside SolaceIsland */}
+      {islandExpanded && (
         <div className="block md:hidden">
-          {/* Mobile toggle button (upper right, level with SOLACE) */}
-          <button
-            onClick={() => setMobileMenuOpen((v) => !v)}
-            className="fixed top-[32px] right-7 z-[10000] flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-3xl text-[var(--muted)] shadow-lg transition-all duration-300 hover:border-[var(--accent)]/30 hover:text-[var(--accent)]"
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-
-          {/* Overlay (menu items) */}
           <HamburgerMenuOverlay
             isOpen={mobileMenuOpen}
             onToggle={() => setMobileMenuOpen((v) => !v)}
@@ -156,7 +146,7 @@ export default function ClientShell() {
             buttonTop="52px"
             buttonLeft="calc(100% - 48px)"
             buttonSize="sm"
-            fontSize="xl"
+            fontSize="2xl"
             enableBlur
             zIndex={9999}
             overlayBackground="var(--bg)"
