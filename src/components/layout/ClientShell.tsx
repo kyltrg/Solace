@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useContext } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, BookOpen, UtensilsCrossed, Star, Music, Moon, Sun, LogOut, Sofa, BedDouble } from "lucide-react";
+import { Menu, X, BookOpen, UtensilsCrossed, Star, Music, Moon, Sun, LogOut, Sofa, BedDouble } from "lucide-react";
 import { motion } from "framer-motion";
 import Cookies from "js-cookie";
 import SolaceIsland from "@/components/navigation/SolaceIsland";
@@ -136,21 +136,34 @@ export default function ClientShell() {
 
       {/* Mobile: overlay */}
       {isMobile && islandExpanded && !isLoading && (
-        <HamburgerMenuOverlay
-          className="md:hidden"
-          isOpen={mobileMenuOpen}
-          onToggle={() => setMobileMenuOpen((v) => !v)}
-          items={mobileMenuItems}
-          buttonTop="52px"
-          buttonLeft="calc(100% - 48px)"
-          buttonSize="sm"
-          fontSize="xl"
-          enableBlur
-          zIndex={9999}
-          overlayBackground="var(--bg)"
-          textColor="var(--text)"
-          buttonClassName="border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-3xl text-[var(--muted)] shadow-lg"
-        />
+        <div className="block md:hidden">
+          {/* Mobile toggle button (upper right, level with SOLACE) */}
+          <button
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            className="fixed top-[32px] right-7 z-[10000] flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-3xl text-[var(--muted)] shadow-lg transition-all duration-300 hover:border-[var(--accent)]/30 hover:text-[var(--accent)]"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+
+          {/* Overlay (menu items) */}
+          <HamburgerMenuOverlay
+            isOpen={mobileMenuOpen}
+            onToggle={() => setMobileMenuOpen((v) => !v)}
+            items={mobileMenuItems}
+            hideToggleButton
+            buttonTop="52px"
+            buttonLeft="calc(100% - 48px)"
+            buttonSize="sm"
+            fontSize="xl"
+            enableBlur
+            zIndex={9999}
+            overlayBackground="var(--bg)"
+            textColor="var(--text)"
+            buttonClassName="border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-3xl text-[var(--muted)] shadow-lg"
+          />
+        </div>
       )}
     </>
   );
