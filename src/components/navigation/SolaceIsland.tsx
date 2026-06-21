@@ -129,7 +129,7 @@ export default function SolaceIsland({
     <>
       {/* ─── MOBILE ─── */}
       <header
-        className="fixed left-1/2 top-5 z-[85] md:hidden"
+        className="fixed left-1/2 top-5 z-[85] -translate-x-1/2 md:hidden"
         style={{
           width: "calc(100vw - 32px)",
           clipPath: expanded

@@ -47,6 +47,10 @@ export default function ClientShell() {
   }, []);
 
   useEffect(() => {
+    if (isMobile) setSidebarOpen(false);
+  }, [isMobile]);
+
+  useEffect(() => {
     if (isAuth) { setSidebarOpen(false); setMobileMenuOpen(false); }
   }, [isAuth]);
 
@@ -110,13 +114,13 @@ export default function ClientShell() {
   return (
     <>
       {/* Desktop sidebar toggle */}
-      {!isMobile && !isLoading && (
+      {!isLoading && (
         <motion.button
           initial={{ opacity: 0, x: -12 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, delay: 0.3 }}
           onClick={() => setSidebarOpen(true)}
-          className="fixed left-5 top-5 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-3xl text-[var(--muted)] shadow-[0_20px_80px_rgba(0,0,0,.45)] transition-all duration-300 hover:border-[var(--accent)]/30 hover:text-[var(--accent)]"
+          className="fixed left-5 top-5 z-[86] hidden md:flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-3xl text-[var(--muted)] shadow-[0_20px_80px_rgba(0,0,0,.45)] transition-all duration-300 hover:border-[var(--accent)]/30 hover:text-[var(--accent)]"
         >
           <Menu size={16} />
         </motion.button>
@@ -133,6 +137,7 @@ export default function ClientShell() {
       {/* Mobile: overlay */}
       {isMobile && islandExpanded && !isLoading && (
         <HamburgerMenuOverlay
+          className="md:hidden"
           isOpen={mobileMenuOpen}
           onToggle={() => setMobileMenuOpen((v) => !v)}
           items={mobileMenuItems}
