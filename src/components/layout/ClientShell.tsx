@@ -180,7 +180,7 @@ export default function ClientShell() {
           zIndex={9999}
           overlayBackground="var(--bg)"
           textColor="var(--text)"
-          animationDuration={0.3}
+          animationDuration={0.6}
           staggerDelay={0.04}
         />
       )}

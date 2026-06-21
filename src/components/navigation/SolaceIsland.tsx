@@ -140,9 +140,10 @@ export default function SolaceIsland({
         }}
       >
         <div
-          className="relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)]"
+          className="relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--bg)] shadow-[0_8px_32px_rgba(0,0,0,.5)]"
           style={{ transform: "translateZ(0)" }}
         >
+          {/* SOLACE logo */}
           <motion.div
             animate={{
               left: expanded ? 16 : "50%",
@@ -159,6 +160,35 @@ export default function SolaceIsland({
               SOLACE
             </Link>
           </motion.div>
+
+          {/* Mobile nav items — shown when expanded */}
+          {expanded && (
+            <motion.nav
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.35, ease: "easeOut", delay: 0.12 }}
+              className="absolute right-4 top-1/2 flex -translate-y-1/2 gap-1 z-10"
+            >
+              {links.filter((link) => link.id === "our-notes" || link.id === "our-rooms").map((link) => {
+                const isActive = active === link.id;
+                return (
+                  <button
+                    key={link.id}
+                    id={`si-item-${link.id}`}
+                    onClick={() => handleLinkClick(link)}
+                    className={cn(
+                      "relative text-xs transition duration-300 px-3 py-1.5 rounded-full whitespace-nowrap",
+                      isActive
+                        ? "text-[var(--text)] font-semibold"
+                        : "text-[var(--muted)] hover:text-[var(--text)]"
+                    )}
+                  >
+                    {link.label || ""}
+                  </button>
+                );
+              })}
+            </motion.nav>
+          )}
         </div>
       </header>
 
