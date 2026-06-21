@@ -152,28 +152,28 @@ export default function SolaceIsland({
 
   return (
     <motion.header
-      animate={!isMobile ? {
-        width: expanded ? "740px" : "220px",
-      } : {}}
-      transition={!isMobile ? { type: "spring", stiffness: 170, damping: 24 } : {}}
+      animate={{
+        width: expanded
+          ? (isMobile ? "calc(100vw - 32px)" : "740px")
+          : "220px",
+      }}
+      transition={isMobile
+        ? { type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+        : { type: "spring", stiffness: 170, damping: 24 }
+      }
       className={cn(
-        "fixed left-1/2 top-5 z-[85] -translate-x-1/2",
-        isMobile ? "w-[calc(100vw-32px)]" : "max-w-[calc(100vw-16px)]",
+        "fixed left-1/2 top-5 z-[85] -translate-x-1/2 max-w-[calc(100vw-16px)]",
         isSidebarOpen && "blur-sm transition-all duration-300"
       )}
+      style={isMobile ? {
+        contain: "layout style paint",
+        willChange: "width",
+      } : {}}
     >
       <div
         ref={pillRef}
         className="relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)] before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
-        style={{
-          transform: 'translateZ(0)',
-          ...(isMobile ? {
-            clipPath: expanded
-              ? "inset(0 0 round 9999px)"
-              : "inset(0 calc(50vw - 126px) round 9999px)",
-            transition: "clip-path 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
-          } : {}),
-        }}
+        style={{ transform: 'translateZ(0)' }}
       >
         {/* Sliding highlight (desktop only) — tween on click, spring on scroll */}
         {expanded && !isMobile && active && (
@@ -224,14 +224,17 @@ export default function SolaceIsland({
           </motion.nav>
         )}
 
-        {/* SOLACE logo — pixel left + x animation, no layout/parent-width dependency */}
+        {/* SOLACE logo */}
         <motion.div
           animate={{
-            left: expanded ? (isMobile ? 16 : 36) : 110,
+            left: expanded ? (isMobile ? 16 : 36) : (isMobile ? "50%" : 110),
             x: expanded ? 0 : "-50%",
             y: "-50%",
           }}
-          transition={{ type: "spring", stiffness: 170, damping: 24 }}
+          transition={isMobile
+            ? { type: "tween", duration: 0.25, ease: [0.22, 1, 0.36, 1] }
+            : { type: "spring", stiffness: 170, damping: 24 }
+          }
           className="absolute top-1/2 z-20 pointer-events-none"
         >
           <Link
@@ -248,7 +251,7 @@ export default function SolaceIsland({
             ref={navRef}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut", delay: 0.2 }}
+            transition={{ duration: 0.25, ease: "easeOut", delay: 0.25 }}
             className="absolute right-16 top-1/2 flex -translate-y-1/2 gap-0.5 z-10"
             onMouseLeave={() => updateHighlightPosition()}
           >
