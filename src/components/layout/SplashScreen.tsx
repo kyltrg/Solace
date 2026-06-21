@@ -35,9 +35,9 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
 
           <div className="relative flex flex-col items-center">
             <motion.div
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ scale: 0.85 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="relative"
             >
               <div className="absolute inset-0 rounded-full bg-[var(--accent)]/20 blur-3xl" />

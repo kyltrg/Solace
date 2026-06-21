@@ -118,6 +118,7 @@ export default function RootLayout({
           ${poppins.variable}
         `}
       >
+        <link rel="preload" href="/assets/logo/icon-splashed.png" as="image" />
         <ThemeProvider>
           <MusicProvider>
             <PresenceProvider>
