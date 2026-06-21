@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -42,8 +42,9 @@ export default function SolaceIsland({
 }: SolaceIslandProps): React.JSX.Element | null {
   const pathname = usePathname();
   const hideIsland = pathname === "/" || pathname === "/welcome" || pathname.startsWith("/letters/");
-  const { scrollY } = useScroll();
   const [expanded, setExpanded] = useState(false);
+  const expandedRef = useRef(expanded);
+  expandedRef.current = expanded;
   const [isMobile, setIsMobile] = useState(false);
   const highlightRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
@@ -61,13 +62,19 @@ export default function SolaceIsland({
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  useMotionValueEvent(scrollY, "change", (value) => {
-    const newExpanded = value > 80;
-    if (newExpanded !== expanded) {
-      setExpanded(newExpanded);
-      onExpandedChange?.(newExpanded);
-    }
-  });
+  useEffect(() => {
+    const onScroll = () => {
+      const newExpanded = window.scrollY > 80;
+      if (newExpanded !== expandedRef.current) {
+        expandedRef.current = newExpanded;
+        setExpanded(newExpanded);
+        onExpandedChange?.(newExpanded);
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [onExpandedChange]);
 
   const visibleLinks = expanded && isMobile && mobileLinks ? mobileLinks : expanded ? links : [];
 
@@ -150,132 +157,144 @@ export default function SolaceIsland({
 
   if (hideIsland) return null;
 
-  return (
-    <motion.header
-      animate={{
-        width: expanded
-          ? (isMobile ? "calc(100vw - 32px)" : "740px")
-          : "220px",
-      }}
-      transition={isMobile
-        ? { type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }
-        : { type: "spring", stiffness: 170, damping: 24 }
-      }
-      className={cn(
-        "fixed left-1/2 top-5 z-[85] -translate-x-1/2 max-w-[calc(100vw-16px)]",
-        isSidebarOpen && "blur-sm transition-all duration-300"
+  const solace = (
+    <>
+      <motion.div
+        animate={{
+          left: expanded ? (isMobile ? 16 : 36) : (isMobile ? "50%" : 110),
+          x: expanded ? 0 : "-50%",
+          y: "-50%",
+        }}
+        transition={isMobile
+          ? { type: "tween", duration: 0.12, ease: [0.22, 1, 0.36, 1] }
+          : { type: "spring", stiffness: 170, damping: 24 }
+        }
+        className="absolute top-1/2 z-20 pointer-events-none"
+      >
+        <Link
+          href="/home"
+          className="font-display text-lg tracking-[.35em] text-[var(--text)] whitespace-nowrap pointer-events-auto block"
+        >
+          SOLACE
+        </Link>
+      </motion.div>
+    </>
+  );
+
+  const pillContent = (
+    <div
+      ref={pillRef}
+      className="relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)] before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
+      style={{ transform: 'translateZ(0)' }}
+    >
+      {/* Sliding highlight (desktop only) */}
+      {expanded && !isMobile && active && (
+        <motion.div
+          ref={highlightRef}
+          className="absolute inset-y-0 rounded-full z-0"
+          animate={{ x: hlPos.x, width: hlPos.width }}
+          transition={blockScrollRef.current
+            ? { type: "tween", duration: 0.15, ease: "easeOut" }
+            : { type: "spring", stiffness: 250, damping: 28 }
+          }
+          style={{
+            left: 0,
+            background: "linear-gradient(to bottom, color-mix(in srgb, var(--text) 22%, transparent), color-mix(in srgb, var(--text) 8%, transparent))",
+            boxShadow: "inset 0 1px 0 color-mix(in srgb, var(--text) 12%, transparent)",
+          }}
+        />
       )}
-      style={isMobile ? {
+
+      {/* Desktop nav */}
+      {expanded && !isMobile && (
+        <motion.nav
+          ref={navRef}
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.35, ease: "easeOut", delay: 0.12 }}
+          className="absolute right-6 top-1/2 flex -translate-y-1/2 gap-1 whitespace-nowrap z-10"
+          onMouseLeave={() => updateHighlightPosition()}
+        >
+          {visibleLinks.map((link: any) => {
+            const isActive = active === link.id;
+            return (
+              <button
+                key={link.id}
+                id={`si-item-${link.id}`}
+                onClick={() => handleLinkClick(link)}
+                onMouseEnter={() => updateHighlightPosition(link.id)}
+                className={cn(
+                  "relative text-sm transition duration-300 px-3 py-1.5 rounded-full",
+                  isActive ? "text-[var(--text)] font-semibold" : "text-[var(--muted)] hover:text-[var(--text)]"
+                )}
+              >
+                {link.icon && <span className="inline mr-1">{link.icon}</span>}
+                {link.label || ""}
+              </button>
+            );
+          })}
+        </motion.nav>
+      )}
+
+      {solace}
+
+      {/* Mobile nav */}
+      {expanded && isMobile && (
+        <motion.nav
+          ref={navRef}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut", delay: 0.15 }}
+          className="absolute right-16 top-1/2 flex -translate-y-1/2 gap-0.5 z-10"
+          onMouseLeave={() => updateHighlightPosition()}
+        >
+          {visibleLinks.map((link: any) => {
+            const isActive = active === link.id;
+            return (
+              <button
+                key={link.id}
+                id={`si-item-${link.id}`}
+                onClick={() => handleLinkClick(link)}
+                onMouseEnter={() => updateHighlightPosition(link.id)}
+                className={cn(
+                  "relative text-[0.65rem] transition duration-300 px-1.5 py-0.5 rounded-full whitespace-nowrap",
+                  isActive ? "text-[var(--text)] font-semibold" : "text-[var(--muted)] hover:text-[var(--text)]"
+                )}
+              >
+                {link.icon && <span className="inline mr-0.5">{link.icon}</span>}
+                {link.label || ""}
+              </button>
+            );
+          })}
+        </motion.nav>
+      )}
+    </div>
+  );
+
+  const headerClasses = cn(
+    "fixed left-1/2 top-5 z-[85] -translate-x-1/2 max-w-[calc(100vw-16px)]",
+    isSidebarOpen && "blur-sm transition-all duration-300"
+  );
+
+  return isMobile ? (
+    <header
+      className={headerClasses}
+      style={{
+        width: expanded ? "calc(100vw - 32px)" : "220px",
+        transition: "width 0.18s cubic-bezier(0.22, 1, 0.36, 1)",
         contain: "layout style paint",
         willChange: "width",
-      } : {}}
+      }}
     >
-      <div
-        ref={pillRef}
-        className="relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)] before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
-        style={{ transform: 'translateZ(0)' }}
-      >
-        {/* Sliding highlight (desktop only) — tween on click, spring on scroll */}
-        {expanded && !isMobile && active && (
-          <motion.div
-            ref={highlightRef}
-            className="absolute inset-y-0 rounded-full z-0"
-            animate={{ x: hlPos.x, width: hlPos.width }}
-            transition={blockScrollRef.current
-              ? { type: "tween", duration: 0.15, ease: "easeOut" }
-              : { type: "spring", stiffness: 250, damping: 28 }
-            }
-            style={{
-              left: 0,
-              background: "linear-gradient(to bottom, color-mix(in srgb, var(--text) 22%, transparent), color-mix(in srgb, var(--text) 8%, transparent))",
-              boxShadow: "inset 0 1px 0 color-mix(in srgb, var(--text) 12%, transparent)",
-            }}
-          />
-        )}
-
-        {/* Nav links (desktop expanded) */}
-        {expanded && !isMobile && (
-          <motion.nav
-            ref={navRef}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.35, ease: "easeOut", delay: 0.12 }}
-            className="absolute right-6 top-1/2 flex -translate-y-1/2 gap-1 whitespace-nowrap z-10"
-            onMouseLeave={() => updateHighlightPosition()}
-          >
-            {visibleLinks.map((link: any) => {
-              const isActive = active === link.id;
-              return (
-                <button
-                  key={link.id}
-                  id={`si-item-${link.id}`}
-                  onClick={() => handleLinkClick(link)}
-                  onMouseEnter={() => updateHighlightPosition(link.id)}
-                  className={cn(
-                    "relative text-sm transition duration-300 px-3 py-1.5 rounded-full",
-                    isActive ? "text-[var(--text)] font-semibold" : "text-[var(--muted)] hover:text-[var(--text)]"
-                  )}
-                >
-                  {link.icon && <span className="inline mr-1">{link.icon}</span>}
-                  {link.label || ""}
-                </button>
-              );
-            })}
-          </motion.nav>
-        )}
-
-        {/* SOLACE logo */}
-        <motion.div
-          animate={{
-            left: expanded ? (isMobile ? 16 : 36) : (isMobile ? "50%" : 110),
-            x: expanded ? 0 : "-50%",
-            y: "-50%",
-          }}
-          transition={isMobile
-            ? { type: "tween", duration: 0.25, ease: [0.22, 1, 0.36, 1] }
-            : { type: "spring", stiffness: 170, damping: 24 }
-          }
-          className="absolute top-1/2 z-20 pointer-events-none"
-        >
-          <Link
-            href="/home"
-            className="font-display text-lg tracking-[.35em] text-[var(--text)] whitespace-nowrap pointer-events-auto block"
-          >
-            SOLACE
-          </Link>
-        </motion.div>
-
-        {/* Mobile expanded: nav links — delayed entry so SOLACE clears first */}
-        {expanded && isMobile && (
-          <motion.nav
-            ref={navRef}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.25, ease: "easeOut", delay: 0.25 }}
-            className="absolute right-16 top-1/2 flex -translate-y-1/2 gap-0.5 z-10"
-            onMouseLeave={() => updateHighlightPosition()}
-          >
-            {visibleLinks.map((link: any) => {
-              const isActive = active === link.id;
-              return (
-                <button
-                  key={link.id}
-                  id={`si-item-${link.id}`}
-                  onClick={() => handleLinkClick(link)}
-                  onMouseEnter={() => updateHighlightPosition(link.id)}
-                  className={cn(
-                    "relative text-[0.65rem] transition duration-300 px-1.5 py-0.5 rounded-full whitespace-nowrap",
-                    isActive ? "text-[var(--text)] font-semibold" : "text-[var(--muted)] hover:text-[var(--text)]"
-                  )}
-                >
-                  {link.icon && <span className="inline mr-0.5">{link.icon}</span>}
-                  {link.label || ""}
-                </button>
-              );
-            })}
-          </motion.nav>
-        )}
-      </div>
+      {pillContent}
+    </header>
+  ) : (
+    <motion.header
+      animate={{ width: expanded ? "740px" : "220px" }}
+      transition={{ type: "spring", stiffness: 170, damping: 24 }}
+      className={headerClasses}
+    >
+      {pillContent}
     </motion.header>
   );
 }
