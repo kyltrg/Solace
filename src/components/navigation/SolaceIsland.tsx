@@ -128,20 +128,15 @@ export default function SolaceIsland({
   return (
     <>
       {/* ─── MOBILE ─── */}
-      <header
-        className="fixed left-1/2 top-5 z-[85] -translate-x-1/2 md:hidden"
-        style={{
-          width: "calc(100vw - 32px)",
-          clipPath: expanded
-            ? "inset(0 round 9999px)"
-            : "inset(0 calc(50% - 110px) round 9999px)",
-          transition: "clip-path 0.16s cubic-bezier(0.22, 1, 0.36, 1)",
-          willChange: "clip-path",
-        }}
+      <motion.header
+        animate={{ width: expanded ? "100%" : "220px" }}
+        transition={{ type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed left-1/2 top-5 z-[85] -translate-x-1/2 max-w-[calc(100vw-32px)] md:hidden"
       >
         <div
           className={cn(
-            "relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)]/5 shadow-sm"
+            "relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)]",
+            "before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
           )}
           style={{ transform: "translateZ(0)" }}
         >
@@ -151,7 +146,7 @@ export default function SolaceIsland({
               x: expanded ? 0 : "-50%",
               y: "-50%",
             }}
-            transition={{ type: "tween", duration: 0.12, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ type: "tween", duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="absolute top-1/2 z-20 pointer-events-none"
           >
             <Link
@@ -162,7 +157,7 @@ export default function SolaceIsland({
             </Link>
           </motion.div>
         </div>
-      </header>
+      </motion.header>
 
       {/* ─── DESKTOP ─── */}
       <motion.header
@@ -233,7 +228,7 @@ export default function SolaceIsland({
           {/* SOLACE logo */}
           <motion.div
             animate={{
-              left: expanded ? 36 : 110,
+              left: expanded ? 36 : "50%",
               x: expanded ? 0 : "-50%",
               y: "-50%",
             }}
