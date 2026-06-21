@@ -1,6 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=Dancing+Script:wght@400;600;700&display=swap');
 
-@import "tailwindcss";
+@import 'tailwindcss';
+@plugin 'lightswind/plugin';
+
+@layer base {
+  .scrollbar-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+}
 
 :root {
   --bg: #0C0E0D;
@@ -10,7 +21,7 @@
   --muted: #C5B8A8;
   --accent: #A88D72;
   --accent-soft: rgba(168,141,114,.15);
-  --border: rgba(255,255,255,.06);
+  --border: rgba(255,255,255,.1);
   --glass: rgba(255,255,255,.03);
   --ink: oklch(0.3760 0.0225 64.3434);
   --sepia: oklch(0.6180 0.0778 65.5444);
@@ -20,7 +31,7 @@
   --reading-room: #0b0907;
   --card-bg: rgba(255,255,255,.03);
   --card-hover: rgba(255,255,255,.06);
-  --navbar-bg: rgba(12,14,13,.85);
+  --navbar-bg: rgba(12,14,13,.08);
   --star-bg: linear-gradient(180deg, #070714 0%, #0c0c24 30%, #151540 60%, #0a0a18 100%);
   --star-glow: rgba(168,147,123,.3);
   --success: #6BBF8A;
@@ -81,7 +92,7 @@
   --muted: #5E5548;
   --accent: #8B7355;
   --accent-soft: rgba(139,115,85,.12);
-  --border: rgba(0,0,0,.07);
+  --border: rgba(0,0,0,.1);
   --glass: rgba(0,0,0,.04);
   --ink: #2C2418;
   --sepia: #8B7355;
@@ -91,7 +102,7 @@
   --reading-room: #E8E0D6;
   --card-bg: rgba(0,0,0,.04);
   --card-hover: rgba(0,0,0,.08);
-  --navbar-bg: rgba(232,224,214,.85);
+  --navbar-bg: rgba(232,224,214,.06);
   --star-bg: linear-gradient(180deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #1a1a2e 100%);
   --star-glow: rgba(139,115,85,.25);
   --success: #4A9E6D;

@@ -8,7 +8,7 @@ import MemoryOfDay from "@/components/home/MemoryOfDay";
 import StoryPreview from "@/components/home/StoryPreview";
 import RoomsGrid from "@/components/home/RoomsGrid";
 
-export default function HomePage(): React.JSX.Element {
+export default function HomePage() {
   return (
     <main className="relative">
       <BubbleBackground
@@ -23,15 +23,15 @@ export default function HomePage(): React.JSX.Element {
         <ArrivalHero />
       </BubbleBackground>
       <div className="solace-divider" />
-      <RelationshipTimer />
+      <section id="relationship-timer"><RelationshipTimer /></section>
       <div className="solace-divider" />
       <StoryOfUsHero />
       <div className="solace-divider" />
       <StoryPreview />
       <div className="solace-divider" />
-      <MemoryOfDay />
+      <section id="memory-of-day"><MemoryOfDay /></section>
       <div className="solace-divider" />
-      <StickyNotes />
+      <section id="sticky-notes"><StickyNotes /></section>
       <div className="solace-divider" />
       <DailyVerse />
       <div className="solace-divider" />

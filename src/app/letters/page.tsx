@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import RoomLayout from "@/components/layout/RoomLayout";
 import Link from "next/link";
@@ -95,15 +96,18 @@ export default async function LettersPage() {
               </span>
             </div>
 
-            <LetterArchive
-              letters={letters.map((letter) => ({
-                id: letter.id,
-                title: letter.title,
-                preview: letter.preview,
-                category: letter.category,
-                createdAt: letter.createdAt.toISOString(),
-              }))}
-            />
+            <Suspense fallback={<div className="py-16 text-center text-sm text-[var(--text)]/40">Loading letters...</div>}>
+              <LetterArchive
+                letters={letters.map((letter) => ({
+                  id: letter.id,
+                  title: letter.title,
+                  preview: letter.preview,
+                  category: letter.category,
+                  author: letter.author,
+                  createdAt: letter.createdAt.toISOString(),
+                }))}
+              />
+            </Suspense>
           </GlassCard>
         </div>
       </div>

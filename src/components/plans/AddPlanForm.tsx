@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createDream } from "@/actions/plans";
 import { useRouter } from "next/navigation";
 import { Sparkles } from "lucide-react";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 const STAR_PARTICLES = Array.from({ length: 6 }, (_, i) => {
   const angle = (i / 6) * Math.PI * 2;
@@ -42,7 +43,9 @@ export default function AddPlanForm(): React.JSX.Element {
   };
 
   return (
-    <div className="relative">
+    <>
+      <LoadingOverlay phrase="Adding this to what we're building..." visible={isPending} />
+      <div className="relative">
       {/* Flying star particles */}
       <AnimatePresence>
         {isPending && (
@@ -164,5 +167,6 @@ export default function AddPlanForm(): React.JSX.Element {
         </div>
       </form>
     </div>
+    </>
   );
 }

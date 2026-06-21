@@ -5,3 +5,4 @@ export function truncateText(text: any, maxLength: any): any;
 export function formatDate(date: any, options: any): string;
 export function debounce(func: any, wait: any): (...args: any[]) => void;
 export function throttle(func: any, limit: any): (...args: any[]) => void;
+//# sourceMappingURL=utils.d.ts.map

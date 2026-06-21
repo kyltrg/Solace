@@ -9,8 +9,7 @@ import {
   Poppins,
 } from "next/font/google";
 
-import SolaceIsland
-from "@/components/navigation/SolaceIsland";
+import ClientShell from "@/components/layout/ClientShell";
 
 import PageTransition
 from "@/components/navigation/PageTransition";
@@ -43,8 +42,8 @@ import HiddenPlayer
 from "@/components/music/HiddenPlayer";
 
 import { ThemeProvider } from "@/context/ThemeContext";
-import ThemeToggle from "@/components/ui/ThemeToggle";
 import Footer from "@/components/layout/Footer";
+import SmoothScroll from "@/components/layout/SmoothScroll";
 
 const display =
 Playfair_Display({
@@ -122,19 +121,20 @@ export default function RootLayout({
         <ThemeProvider>
           <MusicProvider>
             <PresenceProvider>
+            <SmoothScroll>
             <PageTransition />
-            <SolaceIsland />
+            <ClientShell />
             <InactivityTimer />
             <InactivityScheduler />
             {children}
             <Footer />
+            </SmoothScroll>
             <PresenceNotification />
             <NotificationPrompt />
             <PushSetup />
             </PresenceProvider>
             <HiddenPlayer />
             <MusicPlayer />
-            <ThemeToggle />
           </MusicProvider>
         </ThemeProvider>
       </body>

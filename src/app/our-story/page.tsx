@@ -25,6 +25,7 @@ export default function OurStoryPage(): React.JSX.Element {
       eyebrow="Memory"
       title="Our Story"
       description="The story of how strangers became home."
+      backHref="/home#story-preview"
     >
       <div className="relative">
         <FloatingPolaroids />

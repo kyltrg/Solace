@@ -8,6 +8,7 @@ type RoomLayoutProps = {
   title: string;
   description?: string;
   children: React.ReactNode;
+  backHref?: string;
 };
 
 function ArrowLeftIcon() {
@@ -24,6 +25,7 @@ export default function RoomLayout({
   title,
   description,
   children,
+  backHref = "/home#rooms",
 }: RoomLayoutProps): React.JSX.Element {
   return (
     <main className="relative min-h-screen">
@@ -40,7 +42,7 @@ export default function RoomLayout({
             transition={{ duration: .4 }}
           >
             <TransitionLink
-              href="/home#rooms"
+              href={backHref}
               className="group inline-flex items-center gap-2 text-xs tracking-[.25em] text-[var(--muted)]/60 uppercase transition-colors hover:text-[var(--accent)]"
             >
               <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--border)] transition-all duration-300 group-hover:border-[var(--accent)]/40 group-hover:-translate-x-0.5">

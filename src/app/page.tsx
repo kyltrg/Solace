@@ -1,19 +1,35 @@
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+"use client";
+
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import SplashScreen from "@/components/layout/SplashScreen";
 import WelcomeContent from "@/components/WelcomeContent";
 
-function isSessionValid(cookieValue: string | undefined): boolean {
-  if (!cookieValue) return false;
-  return !isNaN(Number(cookieValue));
-}
+export default function Page(): React.JSX.Element {
+  const router = useRouter();
+  const [phase, setPhase] = useState<"splash" | "auth" | "redirecting">("splash");
+  const [mounted, setMounted] = useState(false);
 
-export default async function Page(): Promise<React.JSX.Element> {
-  const cookieStore = await cookies();
-  const access = cookieStore.get("solace-access");
+  useEffect(() => { setMounted(true); }, []);
 
-  if (isSessionValid(access?.value)) {
-    redirect("/home");
-  }
+  const handleSplashDone = useCallback(() => {
+    const access = Cookies.get("solace-access");
+    if (access && !isNaN(Number(access))) {
+      setPhase("redirecting");
+      router.replace("/home");
+    } else {
+      setPhase("auth");
+    }
+  }, [router]);
 
-  return <WelcomeContent />;
+  return (
+    <>
+      {!mounted ? null : phase === "splash" ? (
+        <SplashScreen onDone={handleSplashDone} />
+      ) : phase === "auth" ? (
+        <WelcomeContent />
+      ) : null}
+    </>
+  );
 }

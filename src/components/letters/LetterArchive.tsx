@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, Pin, LayoutGrid, List, BookOpen, PenLine } from "lucide-react";
+import { Search, Pin, BookOpen, PenLine, User } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import LetterCard from "./LetterCard";
 
 export type Letter = {
@@ -11,13 +12,16 @@ export type Letter = {
   title: string;
   preview: string;
   category: string;
+  author: string | null;
   createdAt: string;
 };
 
 export default function LetterArchive({ letters }: { letters: Letter[] }) {
+  const searchParams = useSearchParams();
+  const highlightId = searchParams.get("highlight");
   const [filter, setFilter] = useState("All");
+  const [authorFilter, setAuthorFilter] = useState("all");
   const [search, setSearch] = useState("");
-  const [view, setView] = useState<"grid" | "list">("list");
   const [pinned, setPinned] = useState<Set<string>>(() => {
     if (typeof window === "undefined") return new Set();
     try {
@@ -36,9 +40,17 @@ export default function LetterArchive({ letters }: { letters: Letter[] }) {
     [letters]
   );
 
+  const authors = useMemo(() => {
+    const set = new Set(letters.map((x) => x.author).filter(Boolean));
+    return ["all", ...Array.from(set)] as string[];
+  }, [letters]);
+
   const query = search.toLowerCase().trim();
   const filtered = useMemo(() => {
     let result = filter === "All" ? letters : letters.filter((x) => x.category === filter);
+    if (authorFilter !== "all") {
+      result = result.filter((x) => x.author === authorFilter);
+    }
     if (query) {
       result = result.filter(
         (x) =>
@@ -48,7 +60,7 @@ export default function LetterArchive({ letters }: { letters: Letter[] }) {
       );
     }
     return result;
-  }, [letters, filter, query]);
+  }, [letters, filter, authorFilter, query]);
 
   const pinnedLetters = useMemo(
     () => filtered.filter((l) => pinned.has(l.id)),
@@ -68,6 +80,19 @@ export default function LetterArchive({ letters }: { letters: Letter[] }) {
       return next;
     });
   };
+
+  useEffect(() => {
+    if (highlightId) {
+      const el = document.getElementById(`letter-${highlightId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("ring-2", "ring-amber-400/50", "bg-amber-400/5");
+        setTimeout(() => {
+          el.classList.remove("ring-2", "ring-amber-400/50", "bg-amber-400/5");
+        }, 3000);
+      }
+    }
+  }, [highlightId]);
 
   useEffect(() => {
     const el = archiveRef.current;
@@ -109,45 +134,51 @@ export default function LetterArchive({ letters }: { letters: Letter[] }) {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search letters…"
+                placeholder="Search letters..."
                 className="w-full rounded-xl border border-[var(--text)]/8 bg-[var(--text)]/[0.02] py-3 pl-11 pr-4 text-sm text-[var(--text)] placeholder-[var(--text)]/20 outline-none transition-colors focus:border-[var(--text)]/20"
               />
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex gap-1 rounded-xl border border-[var(--text)]/8 p-1">
-                <button
-                  onClick={() => setView("list")}
-                  className={`rounded-lg p-2 transition-colors ${
-                    view === "list" ? "bg-[var(--text)]/8 text-[var(--text)]" : "text-[var(--text)]/25 hover:text-[var(--text)]/50"
-                  }`}
-                >
-                  <List size={14} />
-                </button>
-                <button
-                  onClick={() => setView("grid")}
-                  className={`rounded-lg p-2 transition-colors ${
-                    view === "grid" ? "bg-[var(--text)]/8 text-[var(--text)]" : "text-[var(--text)]/25 hover:text-[var(--text)]/50"
-                  }`}
-                >
-                  <LayoutGrid size={14} />
-                </button>
+            <div className="flex flex-col gap-3">
+              <div className="relative">
+                <div className="absolute left-0 top-0 bottom-0 w-5 bg-gradient-to-r from-[var(--bg)] to-transparent z-10 pointer-events-none" />
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hidden">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setFilter(cat)}
+                      className={`rounded-xl border px-4 py-2 text-xs transition-all duration-300 whitespace-nowrap shrink-0 ${
+                        filter === cat
+                          ? "border-[var(--text)]/25 text-[var(--text)] bg-[var(--text)]/8"
+                          : "border-[var(--text)]/8 text-[var(--text)]/35 hover:border-[var(--text)]/15 hover:text-[var(--text)]/60"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+                <div className="absolute right-0 top-0 bottom-0 w-5 bg-gradient-to-l from-[var(--bg)] to-transparent z-10 pointer-events-none" />
               </div>
 
-              <div className="flex gap-2 overflow-x-auto">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setFilter(cat)}
-                    className={`rounded-xl border px-4 py-2 text-xs transition-all duration-300 whitespace-nowrap ${
-                      filter === cat
-                        ? "border-[var(--text)]/25 text-[var(--text)] bg-[var(--text)]/8"
-                        : "border-[var(--text)]/8 text-[var(--text)]/35 hover:border-[var(--text)]/15 hover:text-[var(--text)]/60"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
+              <div className="relative">
+                <div className="absolute left-0 top-0 bottom-0 w-5 bg-gradient-to-r from-[var(--bg)] to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-5 bg-gradient-to-l from-[var(--bg)] to-transparent z-10 pointer-events-none" />
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hidden">
+                  {authors.map((a) => (
+                    <button
+                      key={a}
+                      onClick={() => setAuthorFilter(a)}
+                      className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs transition-all duration-300 whitespace-nowrap shrink-0 ${
+                        authorFilter === a
+                          ? "border-[var(--text)]/25 text-[var(--text)] bg-[var(--text)]/8"
+                          : "border-[var(--text)]/8 text-[var(--text)]/35 hover:border-[var(--text)]/15 hover:text-[var(--text)]/60"
+                      }`}
+                    >
+                      <User size={12} />
+                      {a === "all" ? "All" : `From ${a}`}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -173,13 +204,14 @@ export default function LetterArchive({ letters }: { letters: Letter[] }) {
                       <span className="text-[10px] font-medium uppercase tracking-[.25em] text-[var(--text)]/25">Pinned</span>
                       <div className="h-px flex-1 bg-[var(--text)]/6" />
                     </div>
-                    <div className={view === "grid" ? "grid gap-3 md:grid-cols-2" : "space-y-3"}>
+                    <div className="space-y-3">
                       {pinnedLetters.map((l) => (
                         <LetterCard
                           key={l.id}
                           letter={l}
                           pinned={pinned.has(l.id)}
                           onTogglePin={() => togglePin(l.id)}
+                          highlight={l.id === highlightId}
                         />
                       ))}
                     </div>
@@ -197,13 +229,14 @@ export default function LetterArchive({ letters }: { letters: Letter[] }) {
                 )}
 
                 {unpinnedLetters.length > 0 && (
-                  <div className={view === "grid" ? "grid gap-3 md:grid-cols-2" : "space-y-3"}>
+                  <div className="space-y-3">
                     {unpinnedLetters.map((l) => (
                       <LetterCard
                         key={l.id}
                         letter={l}
                         pinned={pinned.has(l.id)}
                         onTogglePin={() => togglePin(l.id)}
+                        highlight={l.id === highlightId}
                       />
                     ))}
                   </div>

@@ -3,6 +3,11 @@
 import { motion } from "framer-motion";
 import { ImageTrailWrapper } from "./ImageTrailWrapper";
 
+function scrollToStoryPreview() {
+  const el = document.getElementById("story-preview");
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 export default function StoryOfUsHero(): React.JSX.Element {
   return (
     <section id="story-of-us" className="relative overflow-hidden">
@@ -51,31 +56,27 @@ export default function StoryOfUsHero(): React.JSX.Element {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: .5, delay: .4 }}
-              className="mt-10 flex items-center justify-center gap-3"
+              className="mt-10"
             >
-              <div className="h-px w-12 bg-[var(--accent)]/30" />
-              <span className="font-hand text-sm italic text-[var(--accent)]/70">
-                Scroll to explore
-              </span>
-              <div className="h-px w-12 bg-[var(--accent)]/30" />
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: .5, delay: .6 }}
-              className="mt-8 flex flex-col items-center gap-2"
-            >
-              <motion.div
-                animate={{ y: [0, 8, 0] }}
-                transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--accent)]/20 text-[var(--accent)]"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </motion.div>
+              <div className="flex items-center justify-center gap-3">
+                <div className="h-px w-12 bg-[var(--accent)]/30" />
+                <button
+                  onClick={scrollToStoryPreview}
+                  className="group flex flex-col items-center gap-3 text-sm tracking-wide text-[var(--accent)]/70 transition-colors hover:text-[var(--accent)]"
+                >
+                  <span className="font-display text-sm tracking-wide uppercase">Step into where it all began</span>
+                  <motion.div
+                    animate={{ y: [0, 6, 0] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--accent)]/20 transition-colors group-hover:border-[var(--accent)]/40"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </motion.div>
+                </button>
+                <div className="h-px w-12 bg-[var(--accent)]/30" />
+              </div>
             </motion.div>
           </div>
         </div>

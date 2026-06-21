@@ -1,7 +1,7 @@
 "use client"
 
 import React, { CSSProperties, ReactNode, useEffect, useState } from "react"
-import { stagger, useAnimate } from "motion/react"
+import { stagger, useAnimate } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 

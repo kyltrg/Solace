@@ -7,7 +7,7 @@ import { STORY_CHAPTERS } from "@/app/our-story/data";
 
 export default function StoryPreview(): React.JSX.Element {
   return (
-    <section className="relative overflow-hidden px-4 sm:px-6 py-20 sm:py-40">
+    <section id="story-preview" className="relative overflow-hidden px-4 sm:px-6 py-20 sm:py-40 scroll-mt-32">
       <div className="mx-auto max-w-6xl">
         <motion.p
           initial={{ opacity: 0 }}

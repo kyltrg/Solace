@@ -1,11 +1,20 @@
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.cn = cn;
+exports.formatCurrency = formatCurrency;
+exports.generateUniqueId = generateUniqueId;
+exports.truncateText = truncateText;
+exports.formatDate = formatDate;
+exports.debounce = debounce;
+exports.throttle = throttle;
+const clsx_1 = require("clsx");
+const tailwind_merge_1 = require("tailwind-merge");
 // Utility function to merge class names with Tailwind
-export function cn(...inputs) {
-    return twMerge(clsx(inputs));
+function cn(...inputs) {
+    return (0, tailwind_merge_1.twMerge)((0, clsx_1.clsx)(inputs));
 }
 // Utility function to format a number with currency
-export function formatCurrency(amount, currency = "USD", options) {
+function formatCurrency(amount, currency = "USD", options) {
     return new Intl.NumberFormat("en-US", {
         style: "currency",
         currency,
@@ -13,17 +22,17 @@ export function formatCurrency(amount, currency = "USD", options) {
     }).format(amount);
 }
 // Utility function to generate a unique ID
-export function generateUniqueId(prefix = "id") {
+function generateUniqueId(prefix = "id") {
     return `${prefix}-${Math.random().toString(36).substring(2, 9)}`;
 }
 // Utility function to truncate text
-export function truncateText(text, maxLength) {
+function truncateText(text, maxLength) {
     if (text.length <= maxLength)
         return text;
     return text.substring(0, maxLength) + "...";
 }
 // Utility function to format date
-export function formatDate(date, options) {
+function formatDate(date, options) {
     return new Intl.DateTimeFormat("en-US", {
         day: "numeric",
         month: "short",
@@ -32,7 +41,7 @@ export function formatDate(date, options) {
     }).format(date);
 }
 // Utility function to debounce function calls
-export function debounce(func, wait) {
+function debounce(func, wait) {
     let timeout = null;
     return function (...args) {
         const later = () => {
@@ -46,7 +55,7 @@ export function debounce(func, wait) {
     };
 }
 // Utility function to throttle function calls
-export function throttle(func, limit) {
+function throttle(func, limit) {
     let inThrottle = false;
     return function (...args) {
         if (!inThrottle) {
@@ -58,3 +67,4 @@ export function throttle(func, limit) {
         }
     };
 }
+//# sourceMappingURL=utils.js.map

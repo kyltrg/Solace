@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, CalendarDays, Clock, MapPin, Trash2, Plus } from "lucide-react";
-import { deleteDatePlan } from "@/actions/plans-date";
+import { deleteDatePlan, createDatePlan } from "@/actions/plans-date";
+import { useRouter } from "next/navigation";
+import LoadingOverlay from "@/components/ui/LoadingOverlay";
 
 type Plan = {
   id: string;
@@ -220,74 +222,102 @@ export default function DatesPlanner({ plans }: { plans: Plan[] }) {
           </motion.div>
         </AnimatePresence>
 
-        <AddPlanForm selected={selected} />
+        <AddPlanFormWithLoading selected={selected} />
       </div>
     </div>
   );
 }
 
-function AddPlanForm({ selected }: { selected: string | null }) {
-  const defaultDate = selected ? new Date(selected).toISOString().split("T")[0] : "";
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="mt-6 rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)] p-6 backdrop-blur-xl"
-    >
-      <div className="flex items-center gap-2 mb-5">
-        <Plus size={14} className="text-[var(--accent)]" />
-        <p className="text-xs uppercase tracking-[.25em] text-[var(--accent)]">Plan a Date</p>
-      </div>
-
-      <form action={createDatePlanThunk} className="space-y-3">
-        <input
-          required
-          name="title"
-          placeholder="What's the plan?"
-          className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50"
-        />
-
-        <input
-          name="description"
-          placeholder="Details..."
-          className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50"
-        />
-
-        <div className="grid grid-cols-2 gap-3">
-          <input
-            required
-            type="date"
-            name="planDate"
-            defaultValue={defaultDate}
-            className="rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50"
-          />
-          <input
-            type="time"
-            name="time"
-            className="rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50"
-          />
-        </div>
-
-        <input
-          name="location"
-          placeholder="Where?"
-          className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50"
-        />
-
-        <button
-          type="submit"
-          className="w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-sm font-medium text-[var(--bg)] transition-all duration-300 hover:opacity-90"
-        >
-          Add to Planner
-        </button>
-      </form>
-    </motion.div>
-  );
+function toLocalDateString(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
-import { createDatePlan } from "@/actions/plans-date";
+function AddPlanFormWithLoading({ selected }: { selected: string | null }) {
+  const defaultDate = selected ? toLocalDateString(new Date(selected)) : "";
+  const [isPending, setIsPending] = useState(false);
+  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
 
-function createDatePlanThunk(formData: FormData) {
-  return createDatePlan(formData);
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsPending(true);
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      await createDatePlan(formData);
+      formRef.current?.reset();
+      router.refresh();
+    } catch {}
+    setIsPending(false);
+  };
+
+  return (
+    <>
+      <LoadingOverlay phrase="Saving this day for us..." visible={isPending} />
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`mt-6 rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)] p-6 backdrop-blur-xl transition-all duration-500 ${
+          isPending ? "scale-[0.97] opacity-40 blur-[1px]" : ""
+        }`}
+      >
+        <div className="flex items-center gap-2 mb-5">
+          <Plus size={14} className="text-[var(--accent)]" />
+          <p className="text-xs uppercase tracking-[.25em] text-[var(--accent)]">Plan a Date</p>
+        </div>
+
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-3">
+          <input
+            required
+            name="title"
+            disabled={isPending}
+            placeholder="What's the plan?"
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+          />
+
+          <input
+            name="description"
+            disabled={isPending}
+            placeholder="Details..."
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              required
+              type="date"
+              name="planDate"
+              disabled={isPending}
+              defaultValue={defaultDate}
+              className="rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+            />
+            <input
+              type="time"
+              name="time"
+              disabled={isPending}
+              className="rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+            />
+          </div>
+
+          <input
+            name="location"
+            disabled={isPending}
+            placeholder="Where?"
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+          />
+
+          <button
+            type="submit"
+            disabled={isPending}
+            className="w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-sm font-medium text-[var(--bg)] transition-all duration-300 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isPending ? "Saving..." : "Add to Planner"}
+          </button>
+        </form>
+      </motion.div>
+    </>
+  );
 }

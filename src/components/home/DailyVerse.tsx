@@ -61,7 +61,7 @@ export default function DailyVerse(): React.JSX.Element | null {
   if (!verse) return null;
 
   return (
-    <section className="relative overflow-hidden px-4 sm:px-6 py-20 sm:py-40 min-h-screen md:min-h-0 flex items-center">
+    <section id="daily-verse" className="relative overflow-hidden px-4 sm:px-6 py-20 sm:py-40 min-h-screen md:min-h-0 flex items-center">
       <div className="absolute left-1/2 top-24 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-[var(--accent)]/10 blur-[140px]" />
       <div className="absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-[var(--border)]" />
 
