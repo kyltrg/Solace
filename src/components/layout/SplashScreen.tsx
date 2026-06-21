@@ -10,7 +10,7 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
     const t = setTimeout(() => {
       setVisible(false);
       setTimeout(onDone, 500);
-    }, 2200);
+    }, 5000);
     return () => clearTimeout(t);
   }, [onDone]);
 

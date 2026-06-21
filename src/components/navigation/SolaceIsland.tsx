@@ -157,15 +157,19 @@ export default function SolaceIsland({
           ? (isMobile ? "calc(100vw - 32px)" : "740px")
           : (isMobile ? "220px" : "220px"),
       }}
-      transition={{ type: "spring", stiffness: 170, damping: 24 }}
+      transition={isMobile
+        ? { type: "spring", stiffness: 260, damping: 32, mass: 0.5 }
+        : { type: "spring", stiffness: 170, damping: 24 }
+      }
       className={cn(
-        "fixed left-1/2 top-5 z-[85] -translate-x-1/2 max-w-[calc(100vw-16px)]",
+        "fixed left-1/2 top-5 z-[85] -translate-x-1/2 max-w-[calc(100vw-16px)] will-change-[width]",
         isSidebarOpen && "blur-sm transition-all duration-300"
       )}
     >
       <div
         ref={pillRef}
         className="relative h-16 w-full overflow-hidden rounded-full border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,.45)] before:absolute before:inset-0 before:rounded-full before:pointer-events-none before:bg-gradient-to-b before:from-white/[0.12] before:via-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-full after:pointer-events-none after:shadow-[inset_0_1px_0_rgba(255,255,255,.08),inset_0_-1px_0_rgba(0,0,0,.08)]"
+        style={{ transform: 'translateZ(0)' }}
       >
         {/* Sliding highlight (desktop only) — tween on click, spring on scroll */}
         {expanded && !isMobile && active && (

@@ -150,7 +150,7 @@ export default function ClientShell() {
           buttonTop="52px"
           buttonLeft="calc(100% - 48px)"
           buttonSize="sm"
-          fontSize="sm"
+          fontSize="xl"
           enableBlur
           zIndex={9999}
           overlayBackground="var(--bg)"
