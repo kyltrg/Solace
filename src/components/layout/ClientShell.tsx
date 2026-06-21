@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, BookOpen, UtensilsCrossed, Star, Music, Moon, Sun, LogOut, Sofa, BedDouble } from "lucide-react";
 import { motion } from "framer-motion";
@@ -44,11 +44,6 @@ export default function ClientShell() {
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
-    const style = document.createElement("style");
-    style.id = "mobile-hamburger-hide";
-    style.textContent = `@media (min-width: 768px) { #mobile-hamburger { display: none !important; } }`;
-    document.head.appendChild(style);
-    return () => { const el = document.getElementById("mobile-hamburger-hide"); if (el) el.remove(); };
   }, []);
 
   useEffect(() => {
@@ -138,7 +133,10 @@ export default function ClientShell() {
 
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Mobile hamburger toggle — always rendered, hidden on desktop via injected CSS */}
+      {/* Hide hamburger on desktop */}
+      <style>{`@media (min-width: 768px) { #mobile-hamburger { display: none !important; } }`}</style>
+
+      {/* Mobile hamburger toggle — floating, outside island */}
       <button
         id="mobile-hamburger"
         onClick={() => setMobileMenuOpen((v) => !v)}
@@ -167,8 +165,8 @@ export default function ClientShell() {
         {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
       </button>
 
-      {/* Mobile: hamburger overlay */}
-      {islandExpanded && isMobile && (
+      {/* Mobile: hamburger overlay — no islandExpanded gate, renders from start on mobile */}
+      {isMobile && (
         <HamburgerMenuOverlay
           isOpen={mobileMenuOpen}
           onToggle={() => setMobileMenuOpen((v) => !v)}
@@ -182,7 +180,8 @@ export default function ClientShell() {
           zIndex={9999}
           overlayBackground="var(--bg)"
           textColor="var(--text)"
-          buttonClassName="border border-[var(--border)] bg-[var(--navbar-bg)] backdrop-blur-3xl text-[var(--muted)] shadow-lg"
+          animationDuration={0.3}
+          staggerDelay={0.04}
         />
       )}
     </>
