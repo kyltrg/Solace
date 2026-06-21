@@ -125,11 +125,13 @@ export default function ClientShell() {
         </motion.button>
       )}
 
-      <SolaceIsland
-        links={navLinks}
-        isSidebarOpen={sidebarOpen}
-        onExpandedChange={setIslandExpanded}
-      />
+      {!isLoading && (
+        <SolaceIsland
+          links={navLinks}
+          isSidebarOpen={sidebarOpen}
+          onExpandedChange={setIslandExpanded}
+        />
+      )}
 
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
@@ -137,6 +139,7 @@ export default function ClientShell() {
       <style>{`@media (min-width: 768px) { #mobile-hamburger { display: none !important; } }`}</style>
 
       {/* Mobile hamburger toggle — floating, outside island */}
+      {!isLoading && (
       <button
         id="mobile-hamburger"
         onClick={() => setMobileMenuOpen((v) => !v)}
@@ -164,9 +167,10 @@ export default function ClientShell() {
       >
         {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
       </button>
+      )}
 
       {/* Mobile: hamburger overlay — circle clip-path animation from button */}
-      {isMobile && (
+      {!isLoading && isMobile && (
         <HamburgerMenuOverlay
           isOpen={mobileMenuOpen}
           onToggle={() => setMobileMenuOpen((v) => !v)}
