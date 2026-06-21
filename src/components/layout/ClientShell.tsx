@@ -44,6 +44,11 @@ export default function ClientShell() {
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
+    const style = document.createElement("style");
+    style.id = "mobile-hamburger-hide";
+    style.textContent = `@media (min-width: 768px) { #mobile-hamburger { display: none !important; } }`;
+    document.head.appendChild(style);
+    return () => { const el = document.getElementById("mobile-hamburger-hide"); if (el) el.remove(); };
   }, []);
 
   useEffect(() => {
@@ -133,35 +138,34 @@ export default function ClientShell() {
 
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Mobile hamburger toggle — raw inline styles, zero Tailwind classes */}
-      {isMobile && (
-        <button
-          onClick={() => setMobileMenuOpen((v) => !v)}
-          style={{
-            position: "fixed",
-            top: "32px",
-            right: "20px",
-            zIndex: 999999,
-            width: "36px",
-            height: "36px",
-            borderRadius: "50%",
-            border: "1px solid var(--border)",
-            background: "var(--navbar-bg)",
-            color: "var(--muted)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            boxShadow: "0 4px 20px rgba(0,0,0,.45)",
-          }}
-          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileMenuOpen}
-        >
-          {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-        </button>
-      )}
+      {/* Mobile hamburger toggle — always rendered, hidden on desktop via injected CSS */}
+      <button
+        id="mobile-hamburger"
+        onClick={() => setMobileMenuOpen((v) => !v)}
+        style={{
+          position: "fixed",
+          top: "32px",
+          right: "20px",
+          zIndex: 999999,
+          width: "36px",
+          height: "36px",
+          borderRadius: "50%",
+          border: "1px solid var(--border)",
+          background: "var(--navbar-bg)",
+          color: "var(--muted)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          boxShadow: "0 4px 20px rgba(0,0,0,.45)",
+        }}
+        aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+        aria-expanded={mobileMenuOpen}
+      >
+        {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+      </button>
 
       {/* Mobile: hamburger overlay */}
       {islandExpanded && isMobile && (
