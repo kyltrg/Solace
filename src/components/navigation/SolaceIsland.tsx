@@ -27,7 +27,7 @@ export default function SolaceIsland({
   onExpandedChange,
 }: SolaceIslandProps): React.JSX.Element | null {
   const pathname = usePathname();
-  const hideIsland = pathname === "/" || pathname === "/welcome" || pathname.startsWith("/letters/");
+  const hideIsland = pathname === "/" || pathname === "/welcome" || pathname.startsWith("/letters/") || pathname.startsWith("/admin");
   const [expanded, setExpanded] = useState(false);
   const expandedRef = useRef(expanded);
   expandedRef.current = expanded;

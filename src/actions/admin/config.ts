@@ -20,10 +20,18 @@ export async function setRandomDailyVerse(): Promise<{ ok: boolean; error?: stri
     const verse = await prisma.verse.findFirst({ skip, take: 1 });
     if (!verse) return { ok: false, error: "No verse found." };
 
+    const hasSource = verse.source && !verse.content.trim().endsWith(` — ${verse.source}`);
+    const val = hasSource ? `${verse.content} — ${verse.source}` : verse.content;
+    const today = new Date().toISOString().slice(0, 10);
     await prisma.appConfig.upsert({
       where: { key: "daily_verse" },
-      update: { value: verse.content },
-      create: { key: "daily_verse", value: verse.content },
+      update: { value: val },
+      create: { key: "daily_verse", value: val },
+    });
+    await prisma.appConfig.upsert({
+      where: { key: "daily_verse_date" },
+      update: { value: today },
+      create: { key: "daily_verse_date", value: today },
     });
 
     revalidatePath("/home");

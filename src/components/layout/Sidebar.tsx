@@ -4,10 +4,11 @@ import { useEffect, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import Cookies from "js-cookie";
-import { Home, BookOpen, UtensilsCrossed, Star, Music, Moon, Sun, LogOut, Sofa, BedDouble } from "lucide-react";
+import { Home, BookOpen, UtensilsCrossed, Star, Music, Moon, Sun, LogOut, Sofa, BedDouble, Shield } from "lucide-react";
 import { ThemeContext } from "@/context/ThemeContext";
 
 const ROOM_LINKS = [
+  { label: "Home", href: "/home", icon: <Home size={18} /> },
   { label: "Living Room", href: "/when-you-need-me", icon: <Sofa size={18} /> },
   { label: "Study Room", href: "/letters", icon: <BookOpen size={18} /> },
   { label: "Kitchen", href: "/dates", icon: <UtensilsCrossed size={18} /> },
@@ -23,6 +24,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const theme = ctx?.theme ?? "dark";
   const toggleTheme = ctx?.toggleTheme ?? (() => {});
   const user = typeof window !== "undefined" ? Cookies.get("solace-user") || "there" : "there";
+  const isAdminUser = typeof window !== "undefined" && Cookies.get("solace-admin") === "true";
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -93,6 +95,18 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                 );
               })}
             </nav>
+
+            {isAdminUser && (
+              <button
+                onClick={() => { window.dispatchEvent(new CustomEvent("solace-loading")); setTimeout(() => router.push("/admin"), 80); onClose(); }}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-[var(--accent)] transition-all duration-200 hover:bg-[var(--accent)]/10"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--accent)]/10">
+                  <Shield size={16} />
+                </span>
+                Admin
+              </button>
+            )}
 
             <div className="border-t border-[var(--border)] px-3 py-4 space-y-1">
               <button

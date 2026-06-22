@@ -47,7 +47,8 @@ export default function StickyNotes() {
 
   useEffect(() => {
     const cookieUser = Cookies.get("solace-user") ?? "";
-    const me = cookieUser.toLowerCase() === "kyle" ? "kyle" : "angel";
+    const isAdmin = Cookies.get("solace-admin") === "true";
+    const me = isAdmin ? "" : cookieUser.toLowerCase() === "kyle" ? "kyle" : "angel";
     setIdentity(me);
 
     const local = loadFromLocal();

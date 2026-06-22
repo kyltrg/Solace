@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useContext, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, BookOpen, UtensilsCrossed, Star, Music, Moon, Sun, LogOut, Sofa, BedDouble } from "lucide-react";
+import { Home, Menu, X, BookOpen, UtensilsCrossed, Star, Music, Moon, Sun, LogOut, Sofa, BedDouble, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import Cookies from "js-cookie";
 import SolaceIsland from "@/components/navigation/SolaceIsland";
@@ -41,6 +41,7 @@ export default function ClientShell() {
   const theme = ctx?.theme ?? "dark";
   const toggleTheme = ctx?.toggleTheme ?? (() => {});
   const isAuth = pathname === "/" || pathname === "/welcome";
+  const isAdminPage = pathname.startsWith("/admin");
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -96,15 +97,19 @@ export default function ClientShell() {
     setMobileMenuOpen(false);
   };
 
+  const isAdminUser = Cookies.get("solace-admin") === "true";
+
   const mobileMenuItems = [
     { label: "Welcome home," + user },
     { divider: true },
+    { label: "Home", icon: <Home size={20} />, onClick: navigateRoom("/home") },
     { label: "Living Room", icon: <Sofa size={20} />, onClick: navigateRoom("/when-you-need-me") },
     { label: "Study Room", icon: <BookOpen size={20} />, onClick: navigateRoom("/letters") },
     { label: "Kitchen", icon: <UtensilsCrossed size={20} />, onClick: navigateRoom("/dates") },
     { label: "Balcony", icon: <Star size={20} />, onClick: navigateRoom("/plans") },
     { label: "Music Room", icon: <Music size={20} />, onClick: navigateRoom("/songs") },
     { label: "Bedroom", icon: <BedDouble size={20} />, onClick: navigateRoom("/tonight") },
+    ...(isAdminUser ? [{ label: "Admin", icon: <Shield size={20} />, onClick: navigateRoom("/admin") }] : []),
     { divider: true },
     { label: theme === "dark" ? "Light Mode" : "Dark Mode", icon: theme === "dark" ? <Sun size={20} /> : <Moon size={20} />, onClick: () => { toggleTheme(); setMobileMenuOpen(false); } },
     { label: "Log out", icon: <LogOut size={20} />, onClick: handleLogout },
@@ -125,7 +130,7 @@ export default function ClientShell() {
         </motion.button>
       )}
 
-      {!isLoading && (
+      {!isLoading && !isAdminPage && (
         <SolaceIsland
           links={navLinks}
           isSidebarOpen={sidebarOpen}

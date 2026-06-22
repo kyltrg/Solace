@@ -27,6 +27,21 @@ export async function createVerse(content: string, source?: string): Promise<{ o
   }
 }
 
+export async function updateVerse(id: string, content: string, source?: string): Promise<{ ok: boolean; error?: string }> {
+  if (!(await isAdmin())) return { ok: false, error: "Unauthorized" };
+  if (!content.trim()) return { ok: false, error: "Verse content is required." };
+  try {
+    await prisma.verse.update({
+      where: { id },
+      data: { content: content.trim(), source: source?.trim() || null },
+    });
+    revalidatePath("/admin");
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Failed to update verse." };
+  }
+}
+
 export async function deleteVerse(id: string): Promise<{ ok: boolean; error?: string }> {
   if (!(await isAdmin())) return { ok: false, error: "Unauthorized" };
   try {

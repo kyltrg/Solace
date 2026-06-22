@@ -109,16 +109,17 @@ export default function DailyVerse(): React.JSX.Element | null {
           className="mx-auto mt-12 h-px w-24 bg-[var(--accent)]/30"
         />
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: .5, delay: .4 }}
-          className="mt-8 text-sm uppercase tracking-[.35em] text-[var(--muted)]"
-        >
-          {verse.reference}
-        </motion.p>
-
+        {verse.reference && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: .5, delay: .4 }}
+            className="mt-8 text-sm uppercase tracking-[.35em] text-[var(--muted)]"
+          >
+            {verse.reference}
+          </motion.p>
+        )}
 
       </div>
     </section>

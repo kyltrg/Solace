@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { getAppConfig, updatePasscodes, setRandomDailyVerse, getStorageStats, type StorageInfo } from "@/actions/admin/config";
+import AdminSkeleton from "../shared/AdminSkeleton";
 
 export default function ConfigSection() {
+  const [loaded, setLoaded] = useState(false);
   const [userPasscode, setUserPasscode] = useState("");
   const [adminPasscode, setAdminPasscode] = useState("");
   const [currentVerse, setCurrentVerse] = useState("");
@@ -15,6 +17,7 @@ export default function ConfigSection() {
   const [verseLoading, setVerseLoading] = useState(false);
 
   const load = async () => {
+    setLoaded(false);
     const cfg = await getAppConfig();
     setCurrentVerse(cfg.daily_verse ?? "");
     setCurrentUserPasscode(cfg.passcode ?? "");
@@ -23,6 +26,7 @@ export default function ConfigSection() {
     setAdminPasscode(cfg.admin_passcode ?? "");
     const stats = await getStorageStats();
     setStorage(stats);
+    setLoaded(true);
   };
 
   useEffect(() => { load(); }, []);
@@ -52,7 +56,10 @@ export default function ConfigSection() {
 
       {msg && <p className="text-sm text-emerald-400">{msg}</p>}
 
-      {/* Passcodes */}
+      {!loaded ? (
+        <AdminSkeleton rows={3} />
+      ) : (
+      <>{/* Passcodes */}
       <form onSubmit={handlePasscodes} className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-6">
         <h4 className="font-display text-lg">Change Passcodes</h4>
         {currentUserPasscode && (
@@ -173,6 +180,7 @@ export default function ConfigSection() {
 
         {!storage && <p className="text-sm text-[var(--muted)]">Loading...</p>}
       </div>
+      </>)}
     </div>
   );
 }

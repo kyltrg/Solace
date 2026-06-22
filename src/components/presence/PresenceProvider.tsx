@@ -28,14 +28,24 @@ export function PresenceProvider({ children }: { children: ReactNode }) {
 
     if (!userName || isAdmin) return;
 
-    notifyOnline(userName).catch(() => {});
+    const doNotify = () => { notifyOnline(userName).catch(() => {}); };
+    doNotify();
 
     const beat = () => { updatePresence(userName).catch(() => {}); };
     beat();
     intervalRef.current = setInterval(beat, HEARTBEAT_MS);
 
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        doNotify();
+        updatePresence(userName).catch(() => {});
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 

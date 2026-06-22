@@ -23,11 +23,11 @@ export async function getUserStatuses(): Promise<UserStatus[]> {
   });
 
   const now = Date.now();
-  const FIFTEEN_MIN = 15 * 60 * 1000;
+  const OFFLINE_THRESHOLD = 45 * 1000;
 
   return users.map((u) => {
     const lastSeen = u.lastSeen.getTime();
-    const isOnline = now - lastSeen < FIFTEEN_MIN;
+    const isOnline = now - lastSeen < OFFLINE_THRESHOLD;
     const offlineHours = Math.round((now - lastSeen) / (1000 * 60 * 60) * 10) / 10;
     return {
       userName: u.userName,
