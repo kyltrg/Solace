@@ -52,17 +52,24 @@ model Song {
 }
 
 model DateMemory {
-  id          String   @id @default(cuid())
-
+  id          String              @id @default(cuid())
   title       String
-
   description String
-
   location    String?
-
   memoryDate  DateTime
+  images      String?
+  likedBy     String              @default("[]")
+  createdAt   DateTime            @default(now())
+  comments    DateMemoryComment[]
+}
 
-  createdAt   DateTime @default(now())
+model DateMemoryComment {
+  id           String     @id @default(cuid())
+  content      String
+  author       String
+  dateMemoryId String
+  dateMemory   DateMemory @relation(fields: [dateMemoryId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
 }
 
 model DatePlan {

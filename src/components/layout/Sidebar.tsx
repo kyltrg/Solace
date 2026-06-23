@@ -43,6 +43,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const handleLogout = () => {
     Cookies.remove("solace-access");
     Cookies.remove("solace-user");
+    Cookies.remove("solace-admin");
     onClose();
     window.dispatchEvent(new CustomEvent("solace-loading"));
     setTimeout(() => router.push("/"), 80);

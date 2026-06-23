@@ -77,6 +77,7 @@ export default function ClientShell() {
   const handleLogout = () => {
     Cookies.remove("solace-access");
     Cookies.remove("solace-user");
+    Cookies.remove("solace-admin");
     setMobileMenuOpen(false);
     setSidebarOpen(false);
     window.dispatchEvent(new CustomEvent("solace-loading"));
