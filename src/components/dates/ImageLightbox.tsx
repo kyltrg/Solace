@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Home } from "lucide-react";
 import { imageTransformStyle, type ImageSet, type CropData } from "@/lib/images";
 
 type ImageLightboxProps = {
@@ -22,6 +23,7 @@ export default function ImageLightbox({
 }: ImageLightboxProps) {
   const crop = imageSet.crops?.[currentIndex] as CropData | undefined;
   const imgStyle = imageTransformStyle(crop ?? null);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -33,24 +35,32 @@ export default function ImageLightbox({
   );
 
   useEffect(() => {
+    const el = document.documentElement;
     document.addEventListener("keydown", handleKeyDown);
     document.body.style.overflow = "hidden";
+    document.body.style.overscrollBehavior = "contain";
+    el.style.overflow = "hidden";
+    el.style.overscrollBehavior = "contain";
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+      document.body.style.overscrollBehavior = "";
+      el.style.overflow = "";
+      el.style.overscrollBehavior = "";
     };
   }, [handleKeyDown]);
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-[999] flex items-center justify-center bg-black/95 px-4"
-        onClick={onClose}
-      >
+    typeof document !== "undefined" && createPortal(
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/95"
+          onClick={onClose}
+        >
         {/* Top bar */}
         <div className="fixed left-0 right-0 top-0 z-20 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent px-4 py-4">
           <div className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/60 backdrop-blur-sm">
@@ -81,6 +91,19 @@ export default function ImageLightbox({
           </>
         )}
 
+        {!imgLoaded && (
+          <div className="flex items-center justify-center">
+            <div className="relative flex h-16 w-16 items-center justify-center">
+              <div className="absolute inset-0 rounded-full border-2 border-white/20" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                className="absolute inset-0 rounded-full border-t-2 border-white"
+              />
+              <Home size={24} className="text-white/60" />
+            </div>
+          </div>
+        )}
         <motion.img
           key={currentIndex}
           src={imageSet.urls[currentIndex]}
@@ -89,11 +112,14 @@ export default function ImageLightbox({
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.92 }}
           transition={{ duration: 0.25 }}
-          className="max-h-[85dvh] max-w-full rounded-2xl object-contain shadow-2xl"
-          style={imgStyle as React.CSSProperties}
+          className="max-h-[90dvh] md:max-h-[95dvh] max-w-full md:max-w-[95vw] rounded-2xl object-contain shadow-2xl"
+          style={{ ...imgStyle, display: imgLoaded ? undefined : "none" } as React.CSSProperties}
           onClick={(e) => e.stopPropagation()}
+          onLoad={() => setImgLoaded(true)}
         />
       </motion.div>
-    </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+    )
   );
 }

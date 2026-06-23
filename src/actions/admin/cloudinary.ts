@@ -2,10 +2,11 @@
 
 export type CloudinaryUsage = {
   storageUsed: number;
-  storageLimit: number;
   bandwidthUsed: number;
-  bandwidthLimit: number;
+  creditsUsed: number;
+  creditsLimit: number;
   plan: string;
+  resources: number;
 };
 
 export async function getCloudinaryUsage(): Promise<CloudinaryUsage | null> {
@@ -26,11 +27,16 @@ export async function getCloudinaryUsage(): Promise<CloudinaryUsage | null> {
     if (!res.ok) return null;
 
     const data = await res.json();
+    const toNum = (v: unknown): number => {
+      const n = Number(v);
+      return Number.isFinite(n) ? Math.abs(n) : 0;
+    };
     return {
-      storageUsed: data.storage?.usage ?? 0,
-      storageLimit: data.storage?.limit ?? 0,
-      bandwidthUsed: data.bandwidth?.usage ?? 0,
-      bandwidthLimit: data.bandwidth?.limit ?? 0,
+      storageUsed: toNum(data.storage?.usage),
+      bandwidthUsed: toNum(data.bandwidth?.usage),
+      creditsUsed: toNum(data.credits?.usage),
+      creditsLimit: toNum(data.credits?.limit),
+      resources: toNum(data.resources),
       plan: data.plan ?? "Free",
     };
   } catch {

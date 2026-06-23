@@ -5,6 +5,7 @@ export type DateMemory = {
   location: string | null;
   memoryDate: Date;
   images: string | null;
+  author: string | null;
   likedBy: string;
   createdAt: Date;
   comments: DateMemoryComment[];

@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useState, useEffect, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 import { createDateMemory } from "@/actions/dates";
 import { useRouter } from "next/navigation";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import {
   ImagePlus, X, Heart, MapPin, Check,
-  ChevronLeft, ChevronRight, ZoomIn, Square, Maximize,
+  ChevronLeft, ChevronRight, Square,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageCropper, { type CropState, type AspectRatioOption } from "./ImageCropper";
@@ -21,7 +22,7 @@ type ImageItem = {
 
 const INITIAL_CROP: CropState = { scale: 1, offsetX: 0, offsetY: 0 };
 
-const ASPECTS: AspectRatioOption[] = ["1:1", "4:5", "free"];
+const ASPECTS: AspectRatioOption[] = ["1:1", "4:5"];
 
 function StepDot({ active, done }: { active: boolean; done: boolean }) {
   return (
@@ -41,19 +42,30 @@ export default function AddMemoryForm(): React.JSX.Element {
   const [aspectRatio, setAspectRatio] = useState<AspectRatioOption>("4:5");
   const [cropIdx, setCropIdx] = useState(0);
   const [error, setError] = useState("");
-  const [naturalRatios, setNaturalRatios] = useState<Record<number, number>>({});
   const [imgErrors, setImgErrors] = useState<Set<number>>(new Set());
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    const el = document.documentElement;
     if (open) {
       document.body.style.overflow = "hidden";
+      document.body.style.overscrollBehavior = "contain";
+      el.style.overflow = "hidden";
+      el.style.overscrollBehavior = "contain";
     } else {
       document.body.style.overflow = "";
+      document.body.style.overscrollBehavior = "";
+      el.style.overflow = "";
+      el.style.overscrollBehavior = "";
     }
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.overscrollBehavior = "";
+      el.style.overflow = "";
+      el.style.overscrollBehavior = "";
+    };
   }, [open]);
 
   // Reset everything
@@ -64,7 +76,6 @@ export default function AddMemoryForm(): React.JSX.Element {
     setError("");
     setCropIdx(0);
     setAspectRatio("4:5");
-    setNaturalRatios({});
     setImgErrors(new Set());
   };
 
@@ -79,8 +90,7 @@ export default function AddMemoryForm(): React.JSX.Element {
     const selected = Array.from(e.target.files ?? []);
     const remaining = 5 - images.length;
     const add = selected.slice(0, remaining);
-    add.forEach((file, fileIdx) => {
-      const globalIdx = images.length + fileIdx;
+    add.forEach((file) => {
       const reader = new FileReader();
       reader.onload = () => {
         const preview = reader.result as string;
@@ -88,11 +98,6 @@ export default function AddMemoryForm(): React.JSX.Element {
           ...prev,
           { file, preview, crop: { ...INITIAL_CROP } },
         ]);
-        const img = new Image();
-        img.onload = () => {
-          setNaturalRatios((r) => ({ ...r, [globalIdx]: img.naturalWidth / img.naturalHeight }));
-        };
-        img.src = preview;
       };
       reader.readAsDataURL(file);
     });
@@ -125,7 +130,7 @@ export default function AddMemoryForm(): React.JSX.Element {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (images.length === 0) { setError("Add at least one photo"); return; }
-    const form = e.currentTarget;
+    const formData = new FormData(e.currentTarget);
     setIsPending(true);
     setError("");
     try {
@@ -136,7 +141,6 @@ export default function AddMemoryForm(): React.JSX.Element {
         x: img.crop.offsetX,
         y: img.crop.offsetY,
       }));
-      const formData = new FormData(form);
       formData.set("images", JSON.stringify({ v: 2, urls, crops }));
       await createDateMemory(formData);
       reset();
@@ -150,44 +154,47 @@ export default function AddMemoryForm(): React.JSX.Element {
 
   return (
     <>
-      {/* Trigger */}
+      {/* Trigger — Instagram-style */}
       <button
         onClick={() => setOpen(true)}
-        className="group relative w-full overflow-hidden rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)] p-5 backdrop-blur-xl transition-all duration-300 hover:border-[var(--accent)]/40 hover:bg-[var(--card-hover)] hover:shadow-[0_0_40px_rgba(168,141,114,0.08)] text-left"
+        className="flex w-full items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card-bg)] px-4 py-3 text-left transition-all hover:bg-[var(--bg-soft)] active:scale-[0.99]"
       >
-        <div className="pointer-events-none absolute -inset-0.5 bg-gradient-to-r from-[var(--accent)]/0 via-[var(--accent)]/5 to-[var(--accent)]/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-        <div className="relative flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent-soft)] to-[var(--accent)]/5 ring-1 ring-[var(--accent)]/10">
-            <Heart size={18} className="text-[var(--accent)]" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-[var(--text)]">Write a memory</p>
-            <p className="mt-0.5 text-xs text-[var(--muted)]/40">Share a moment worth keeping</p>
-          </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] transition-all group-hover:border-[var(--accent)]/30 group-hover:bg-[var(--accent-soft)]">
-            <ImagePlus size={15} className="text-[var(--muted)]/50 transition-colors group-hover:text-[var(--accent)]" />
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent)]/70 text-[10px] font-bold text-white shadow-sm">
+          {(
+            typeof document !== "undefined"
+              ? document.cookie.match(/(?:^|;\s*)solace-user=([^;]*)/)?.[1]?.charAt(0)?.toUpperCase() ?? "A"
+              : "A"
+          )}
+        </div>
+        <div className="flex-1">
+          <p className="text-sm text-[var(--muted)]/40">What's on your mind?</p>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--muted)]/30 transition-colors hover:text-[var(--accent)]">
+            <ImagePlus size={18} />
           </div>
         </div>
       </button>
 
       {/* Modal */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md"
-            onClick={close}
-          >
+      {typeof document !== "undefined" && createPortal(
+        <AnimatePresence>
+          {open && (
             <motion.div
-              initial={{ opacity: 0, y: 40, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 40, scale: 0.97 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-lg md:max-w-2xl rounded-3xl border border-[var(--border)] bg-gradient-to-b from-[var(--bg)] to-[var(--bg-soft)] shadow-2xl shadow-black/40 px-6 pt-5 pb-4 max-h-[calc(100dvh-4rem)] overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/70 backdrop-blur-md"
+              onClick={close}
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 40, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 40, scale: 0.97 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative mx-4 w-full max-w-sm md:max-w-md rounded-3xl border border-[var(--border)] bg-gradient-to-b from-[var(--bg)] to-[var(--bg-soft)] shadow-2xl shadow-black/40 px-4 sm:px-6 pt-4 sm:pt-5 pb-4 max-h-[90dvh] md:max-h-[calc(100dvh-4rem)] overflow-y-auto md:overflow-hidden"
             >
               <button
                 onClick={close}
@@ -246,17 +253,16 @@ export default function AddMemoryForm(): React.JSX.Element {
                         </p>
                         <div className="flex flex-wrap gap-3">
                           {images.map((img, i) => (
-                            <div key={i} className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)]">
-                              <div className="flex h-full w-full items-center justify-center text-[var(--muted)]/20">
-                                <ImagePlus size={24} />
+                            <div key={i} className="group relative h-20 w-20 shrink-0 rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)]">
+                              <div className="h-full w-full overflow-hidden rounded-2xl">
+                                <img
+                                  src={img.preview}
+                                  alt=""
+                                  className="h-full w-full object-cover"
+                                  onError={() => setImgErrors((s) => new Set(s).add(i))}
+                                  style={imgErrors.has(i) ? { display: "none" } : undefined}
+                                />
                               </div>
-                              <img
-                                src={img.preview}
-                                alt=""
-                                className="absolute inset-0 h-full w-full object-cover"
-                                onError={() => setImgErrors((s) => new Set(s).add(i))}
-                                style={imgErrors.has(i) ? { display: "none" } : undefined}
-                              />
                               <button
                                 type="button"
                                 onClick={() => removeImage(i)}
@@ -297,7 +303,6 @@ export default function AddMemoryForm(): React.JSX.Element {
                             {aspectRatio === ar && <Check size={12} />}
                             {ar === "1:1" && <><Square size={14} /> Square</>}
                             {ar === "4:5" && <><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="shrink-0"><rect x="3" y="1" width="8" height="12" rx="1" /></svg> Portrait</>}
-                            {ar === "free" && <><Maximize size={14} /> Free</>}
                           </button>
                         ))}
                       </div>
@@ -313,10 +318,10 @@ export default function AddMemoryForm(): React.JSX.Element {
                       if (!img) return null;
                       if (imgErrors.has(cropIdx)) {
                         return (
-                          <div className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl bg-[var(--bg-soft)] text-center ring-1 ring-[var(--border)]" style={{ aspectRatio: aspectRatio === "1:1" ? "1/1" : aspectRatio === "4:5" ? "4/5" : naturalRatios[cropIdx] ? `${naturalRatios[cropIdx]}` : "4/5", maxHeight: "55dvh" }}>
+                          <div className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl bg-[var(--bg-soft)] text-center ring-1 ring-[var(--border)]" style={{ aspectRatio: aspectRatio === "1:1" ? "1/1" : "4/5", minHeight: 200 }}>
                             <ImagePlus size={28} className="text-[var(--muted)]/15" />
                             <p className="text-sm text-[var(--muted)]/25">Preview not available</p>
-                            <p className="text-xs text-[var(--muted)]/15">Auto-cropped to {aspectRatio === "1:1" ? "Square" : aspectRatio === "4:5" ? "Portrait" : "Free"}</p>
+                            <p className="text-xs text-[var(--muted)]/15">Auto-cropped to {aspectRatio === "1:1" ? "Square" : "Portrait"}</p>
                           </div>
                         );
                       }
@@ -325,15 +330,12 @@ export default function AddMemoryForm(): React.JSX.Element {
                           key={cropIdx}
                           src={img.preview}
                           aspectRatio={aspectRatio}
-                          naturalRatio={naturalRatios[cropIdx]}
                           crop={img.crop}
                           onChange={(c) => updateCrop(cropIdx, c)}
                         >
-                          {aspectRatio !== "free" && (
-                            <div className="pointer-events-none absolute inset-0 ring-1 ring-white/10">
-                              <div className="h-full w-full bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(0,0,0,0.15)_100%)]" />
-                            </div>
-                          )}
+                          <div className="pointer-events-none absolute inset-0 ring-1 ring-white/10">
+                            <div className="h-full w-full bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(0,0,0,0.15)_100%)]" />
+                          </div>
                         </ImageCropper>
                       );
                     })()}
@@ -369,13 +371,10 @@ export default function AddMemoryForm(): React.JSX.Element {
                             }`}
                             style={{ width: 48, height: 48 }}
                           >
-                            <div className="flex h-full w-full items-center justify-center text-[var(--muted)]/20">
-                              <ImagePlus size={16} />
-                            </div>
                             <img
                               src={img.preview}
                               alt=""
-                              className="absolute inset-0 h-full w-full object-cover"
+                              className="h-full w-full object-cover"
                               onError={() => setImgErrors((s) => new Set(s).add(i))}
                               style={imgErrors.has(i) ? { display: "none" } : undefined}
                             />
@@ -422,6 +421,7 @@ export default function AddMemoryForm(): React.JSX.Element {
                           required
                           type="date"
                           name="memoryDate"
+                          defaultValue={new Date().toISOString().slice(0, 10)}
                           disabled={isPending}
                           className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50 [color-scheme:dark]"
                         />
@@ -491,7 +491,9 @@ export default function AddMemoryForm(): React.JSX.Element {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Heart, Maximize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Maximize2, Home } from "lucide-react";
 import { imageTransformStyle, type ImageSet, type CropData } from "@/lib/images";
 
 type ImageCarouselProps = {
@@ -23,8 +24,11 @@ export default function ImageCarousel({
   const [burst, setBurst] = useState(false);
   const [naturalRatio, setNaturalRatio] = useState<number>(4 / 3);
   const [preview, setPreview] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState<Record<number, boolean>>({});
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
 
   if (images.length === 0) return null;
 
@@ -43,16 +47,29 @@ export default function ImageCarousel({
     onDoubleTap?.();
   }, [onDoubleTap]);
 
-  const handleTouchStart = () => {
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
     longPressTimer.current = setTimeout(() => setPreview(true), 400);
   };
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = undefined; }
     setPreview(false);
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx > 0) prev();
+      else next();
+    }
   };
-  const handleTouchMove = () => {
+  const handleTouchMove = (e: React.TouchEvent) => {
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = undefined; }
     setPreview(false);
+    const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
+    const dy = Math.abs(e.touches[0].clientY - touchStartY.current);
+    if (dx > 20 && dx > dy) {
+      e.preventDefault();
+    }
   };
   const handleMouseDown = () => {
     longPressTimer.current = setTimeout(() => setPreview(true), 400);
@@ -101,7 +118,6 @@ export default function ImageCarousel({
               transition={{ duration: 0.25 }}
               className="h-full w-full object-cover"
               draggable={false}
-              style={{ ...imgStyle, touchAction: "manipulation" } as React.CSSProperties}
               onDoubleClick={handleImageDoubleClick}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
@@ -111,12 +127,29 @@ export default function ImageCarousel({
               onMouseLeave={handleMouseLeave}
               onLoad={(e) => {
                 const img = e.currentTarget;
+                setImgLoaded((s) => ({ ...s, [current]: true }));
                 if (img.naturalWidth && img.naturalHeight) {
                   setNaturalRatio(img.naturalWidth / img.naturalHeight);
                 }
               }}
+              onError={() => setImgLoaded((s) => ({ ...s, [current]: false }))}
+              style={{ ...imgStyle, display: imgLoaded[current] ? undefined : "none", touchAction: "manipulation" } as React.CSSProperties}
             />
           </AnimatePresence>
+
+          {!imgLoaded[current] && (
+            <div className="absolute inset-0 flex items-center justify-center bg-[var(--bg-soft)]">
+              <div className="relative flex h-12 w-12 items-center justify-center">
+                <div className="absolute inset-0 rounded-full border-2 border-[var(--accent)]/20" />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                  className="absolute inset-0 rounded-full border-t-2 border-[var(--accent)]"
+                />
+                <Home size={20} className="text-[var(--accent)]/60" />
+              </div>
+            </div>
+          )}
 
           {/* Expand button */}
           <button
@@ -161,13 +194,13 @@ export default function ImageCarousel({
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); prev(); }}
-                className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-black/40 text-white/80 backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white opacity-0 group-hover:opacity-100"
+                className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-black/40 text-white/80 backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
               >
                 <ChevronLeft size={18} />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); next(); }}
-                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-black/40 text-white/80 backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white opacity-0 group-hover:opacity-100"
+                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-black/40 text-white/80 backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
               >
                 <ChevronRight size={18} />
               </button>
@@ -192,34 +225,37 @@ export default function ImageCarousel({
       </div>
 
       {/* Floating preview overlay — Instagram-style long press */}
-      <AnimatePresence>
-        {preview && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center"
-            onClick={() => setPreview(false)}
-          >
+      {typeof document !== "undefined" && createPortal(
+        <AnimatePresence>
+          {preview && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.92 }}
-              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="relative max-h-[70vh] max-w-[85vw] sm:max-w-[70vw] rounded-2xl overflow-hidden shadow-2xl shadow-black/50"
-              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="fixed inset-0 z-[9999999] flex items-center justify-center"
+              onClick={() => setPreview(false)}
             >
-              <img
-                src={images[current]}
-                alt=""
-                className="h-full w-full object-contain"
-                draggable={false}
-              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.92 }}
+                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                className="relative max-h-[70vh] max-w-[85vw] sm:max-w-[70vw] rounded-2xl overflow-hidden shadow-2xl shadow-black/50"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img
+                  src={images[current]}
+                  alt=""
+                  className="h-full w-full object-contain"
+                  draggable={false}
+                />
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }

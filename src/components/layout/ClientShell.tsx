@@ -58,7 +58,7 @@ export default function ClientShell() {
   useEffect(() => {
     const showLoading = () => {
       setIsLoading(true);
-      setTimeout(() => setIsLoading(false), 1200);
+      setTimeout(() => setIsLoading(false), 400);
     };
     window.addEventListener("solace-loading", showLoading);
     return () => window.removeEventListener("solace-loading", showLoading);

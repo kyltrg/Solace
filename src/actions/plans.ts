@@ -21,6 +21,7 @@ export type DreamData = {
 export async function getDreams(): Promise<DreamData[]> {
   const dreams = await prisma.dream.findMany({
     orderBy: { createdAt: "desc" },
+    take: 100,
   });
   return dreams.map((d) => ({
     id: d.id,

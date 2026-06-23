@@ -16,6 +16,7 @@ export type LetterData = {
 export async function getLetters(): Promise<LetterData[]> {
   const letters = await prisma.letter.findMany({
     orderBy: { createdAt: "desc" },
+    take: 100,
   });
   return letters.map((l) => ({
     id: l.id,

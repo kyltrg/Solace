@@ -31,6 +31,8 @@ Promise<React.JSX.Element> {
         createdAt: "desc",
       },
 
+      take: 100,
+
     });
 
 

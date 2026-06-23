@@ -34,7 +34,7 @@ export default function RoomLayout({
         <div className="absolute bottom-0 right-0 h-[30rem] w-[30rem] rounded-full bg-white/[0.02] blur-[160px] animate-pulse-glow" />
       </div>
 
-      <section className="relative px-4 sm:px-6 pt-24 sm:pt-36 pb-20 sm:pb-28">
+      <section className="relative z-10 px-4 sm:px-6 pt-20 sm:pt-28 pb-16 sm:pb-24">
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, x: -12 }}
@@ -52,7 +52,7 @@ export default function RoomLayout({
             </TransitionLink>
           </motion.div>
 
-          <div className="mt-16 border-l-2 border-[var(--accent)]/30 pl-6 md:pl-10">
+          <div className="mt-12 sm:mt-14 border-l-2 border-[var(--accent)]/30 pl-5 sm:pl-10">
             {eyebrow && (
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
@@ -78,7 +78,7 @@ export default function RoomLayout({
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: .5, delay: .15, ease: [.22,1,.36,1] }}
-                className="mt-1 font-display text-[clamp(2.8rem,8vw,6rem)] leading-[0.95] tracking-[-0.04em]"
+                className="mt-1 font-display text-[clamp(2.5rem,7vw,5rem)] leading-[0.95] tracking-[-0.04em]"
               >
                 {title}
               </motion.h1>
@@ -89,7 +89,7 @@ export default function RoomLayout({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: .4, delay: .25 }}
-                className="mt-5 max-w-xl text-sm leading-relaxed text-[var(--muted)]/80 italic"
+                className="mt-4 max-w-xl text-sm leading-relaxed text-[var(--muted)]/80 italic"
               >
                 {description}
               </motion.p>
@@ -98,7 +98,7 @@ export default function RoomLayout({
         </div>
       </section>
 
-      <section className="relative px-4 sm:px-6 pb-20 sm:pb-32">
+      <section className="relative z-10 px-4 sm:px-6 pb-20 sm:pb-32">
         <div className="mx-auto max-w-5xl">{children}</div>
       </section>
     </main>

@@ -58,6 +58,7 @@ model DateMemory {
   location    String?
   memoryDate  DateTime
   images      String?
+  author      String?
   likedBy     String              @default("[]")
   createdAt   DateTime            @default(now())
   comments    DateMemoryComment[]

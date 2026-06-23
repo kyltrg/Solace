@@ -48,7 +48,7 @@ export default function CommentSection({ memoryId, comments }: CommentSectionPro
     <div className="mx-4 sm:mx-6 border-t border-[var(--border)]">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center justify-between py-4 text-sm text-[var(--muted)]/50 transition-colors hover:text-[var(--accent)] group"
+        className="flex w-full items-center justify-between py-3 text-sm text-[var(--muted)]/50 transition-colors hover:text-[var(--accent)] group"
       >
         <span className="flex items-center gap-2">
           <MessageCircle size={14} />
@@ -67,35 +67,35 @@ export default function CommentSection({ memoryId, comments }: CommentSectionPro
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
-            <div className="pb-4 space-y-3">
+            <div className="pb-3 space-y-2">
               {comments.map((comment) => (
                 <div
                   key={comment.id}
-                  className="flex items-start justify-between gap-3 rounded-2xl bg-[var(--bg-soft)] px-4 py-3 ring-1 ring-[var(--border)]"
+                  className="flex items-start justify-between gap-3 rounded-xl bg-[var(--bg-soft)] px-4 py-2.5 ring-1 ring-[var(--border)]"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[10px] font-medium text-[var(--accent)]">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[9px] font-medium text-[var(--accent)]">
                         {comment.author.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-xs font-medium text-[var(--accent)]">
+                      <span className="text-[11px] font-medium text-[var(--accent)]">
                         {comment.author}
                       </span>
-                      <span className="text-[10px] text-[var(--muted)]/30">
+                      <span className="text-[9px] text-[var(--muted)]/30">
                         {new Date(comment.createdAt).toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
                         })}
                       </span>
                     </div>
-                    <p className="mt-1.5 text-sm leading-relaxed text-[var(--text)]/80">{comment.content}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-[var(--text)]/80">{comment.content}</p>
                   </div>
                   {comment.author === currentUser && (
                     <button
                       onClick={() => handleDelete(comment.id)}
-                      className="mt-1 shrink-0 text-[var(--muted)]/20 transition-colors hover:text-red-400"
+                      className="mt-0.5 shrink-0 text-[var(--muted)]/20 transition-colors hover:text-red-400"
                     >
-                      <Trash2 size={12} />
+                      <Trash2 size={11} />
                     </button>
                   )}
                 </div>
@@ -118,17 +118,17 @@ export default function CommentSection({ memoryId, comments }: CommentSectionPro
                   onChange={(e) => setText(e.target.value)}
                   placeholder="Write a comment..."
                   disabled={isPending}
-                  className="flex-1 min-w-0 rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] disabled:opacity-50"
+                  className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] disabled:opacity-50"
                 />
                 <button
                   type="submit"
                   disabled={!text.trim() || isPending}
-                  className="shrink-0 rounded-2xl bg-[var(--accent)] px-4 py-3 text-sm font-medium text-[var(--bg)] transition-all hover:opacity-90 hover:shadow-[0_0_15px_rgba(168,141,114,0.2)] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="shrink-0 rounded-xl bg-[var(--accent)] px-3.5 py-2.5 text-sm font-medium text-[var(--bg)] transition-all hover:opacity-90 hover:shadow-[0_0_15px_rgba(168,141,114,0.2)] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {isPending ? (
                     <span className="flex h-4 w-4 animate-spin rounded-full border-2 border-[var(--bg)] border-t-transparent" />
                   ) : (
-                    <Send size={15} />
+                    <Send size={14} />
                   )}
                 </button>
               </form>

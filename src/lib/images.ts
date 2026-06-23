@@ -1,5 +1,5 @@
 export type CropData = {
-  ar: "1:1" | "4:5" | "free";
+  ar: "1:1" | "4:5";
   s: number;
   x: number;
   y: number;
@@ -10,20 +10,25 @@ export type ImageSet = {
   crops: (CropData | null)[];
 };
 
+export function optimizeCloudinaryUrl(url: string): string {
+  if (url.includes("res.cloudinary.com") && url.includes("/upload/")) {
+    return url.replace("/upload/", "/upload/f_webp,q_auto/");
+  }
+  return url;
+}
+
 export function parseImages(images: string | null): ImageSet {
   if (!images) return { urls: [], crops: [] };
   try {
     const parsed = JSON.parse(images);
-    // New format: { v: 2, urls: string[], crops: [...] }
     if (parsed && typeof parsed === "object" && "urls" in parsed) {
       return {
-        urls: Array.isArray(parsed.urls) ? parsed.urls : [],
+        urls: Array.isArray(parsed.urls) ? parsed.urls.map(optimizeCloudinaryUrl) : [],
         crops: Array.isArray(parsed.crops) ? parsed.crops : [],
       };
     }
-    // Old format: string[]
     if (Array.isArray(parsed)) {
-      return { urls: parsed, crops: [] };
+      return { urls: parsed.map(optimizeCloudinaryUrl), crops: [] };
     }
   } catch {}
   return { urls: [], crops: [] };

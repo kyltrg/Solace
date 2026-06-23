@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { getUserStatuses, type UserStatus } from "@/actions/admin/presence";
 import { getCloudinaryUsage, type CloudinaryUsage } from "@/actions/admin/cloudinary";
 
-function formatBytes(bytes: number): string {
+function formatBytes(bytes: unknown): string {
+  if (typeof bytes !== "number" || !Number.isFinite(bytes) || bytes < 0) return "0 B";
   if (bytes === 0) return "0 B";
   const units = ["B", "KB", "MB", "GB"];
   const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
@@ -20,8 +21,7 @@ function CloudinaryStorage() {
 
   if (!usage) return null;
 
-  const storagePct = usage.storageLimit > 0 ? (usage.storageUsed / usage.storageLimit) * 100 : 0;
-  const bwPct = usage.bandwidthLimit > 0 ? (usage.bandwidthUsed / usage.bandwidthLimit) * 100 : 0;
+  const creditsPct = usage.creditsLimit > 0 ? (usage.creditsUsed / usage.creditsLimit) * 100 : 0;
 
   return (
     <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-5">
@@ -34,23 +34,29 @@ function CloudinaryStorage() {
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs text-[var(--muted)]">Storage</span>
-            <span className="text-xs text-[var(--muted)]/60">{formatBytes(usage.storageUsed)} / {formatBytes(usage.storageLimit)}</span>
+            <span className="text-xs text-[var(--muted)]/60">{formatBytes(usage.storageUsed)}</span>
           </div>
-          <div className="h-2 rounded-full bg-[var(--border)] overflow-hidden">
-            <div className="h-full rounded-full bg-[var(--accent)] transition-all" style={{ width: `${Math.min(storagePct, 100)}%` }} />
+          <div className="flex items-center gap-1 text-[11px] text-[var(--muted)]/40">
+            {usage.resources} {usage.resources === 1 ? "resource" : "resources"}
           </div>
-          <span className="text-[11px] text-[var(--muted)]/40 mt-0.5 block">{storagePct.toFixed(2)}% used</span>
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs text-[var(--muted)]">Bandwidth</span>
-            <span className="text-xs text-[var(--muted)]/60">{formatBytes(usage.bandwidthUsed)} / {formatBytes(usage.bandwidthLimit)}</span>
+            <span className="text-xs text-[var(--muted)]/60">{formatBytes(usage.bandwidthUsed)}</span>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs text-[var(--muted)]">Credits</span>
+            <span className="text-xs text-[var(--muted)]/60">{usage.creditsUsed.toFixed(2)} / {usage.creditsLimit.toFixed(2)}</span>
           </div>
           <div className="h-2 rounded-full bg-[var(--border)] overflow-hidden">
-            <div className="h-full rounded-full bg-emerald-400/70 transition-all" style={{ width: `${Math.min(bwPct, 100)}%` }} />
+            <div className="h-full rounded-full bg-[var(--accent)] transition-all" style={{ width: `${Math.min(creditsPct, 100)}%` }} />
           </div>
-          <span className="text-[11px] text-[var(--muted)]/40 mt-0.5 block">{bwPct.toFixed(3)}% used</span>
+          <span className="text-[11px] text-[var(--muted)]/40 mt-0.5 block">{creditsPct.toFixed(2)}% used</span>
         </div>
       </div>
     </div>

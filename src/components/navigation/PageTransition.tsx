@@ -1,156 +1,31 @@
 "use client";
 
-import {
-  AnimatePresence,
-  motion,
-} from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-import {
-  useEffect,
-  useState,
-} from "react";
+export default function PageTransition(): React.JSX.Element {
+  const [loading, setLoading] = useState(false);
 
-import {
-  DotLottieReact,
-} from "@lottiefiles/dotlottie-react";
-
-
-
-export default function PageTransition()
-:React.JSX.Element {
-
-
-  const [
-    visible,
-    setVisible,
-  ] = useState(false);
-
-
-
-  useEffect(()=>{
-
-
-    function showLoading(){
-
-
-      setVisible(true);
-
-
-      setTimeout(()=>{
-
-        setVisible(false);
-
-      },1200);
-
-    }
-
-
-    window.addEventListener(
-      "solace-loading",
-      showLoading
-    );
-
-
-    return ()=>{
-
-      window.removeEventListener(
-        "solace-loading",
-        showLoading
-      );
-
+  useEffect(() => {
+    const show = () => {
+      setLoading(true);
+      setTimeout(() => setLoading(false), 600);
     };
-
-
-  },[]);
-
-
+    window.addEventListener("solace-loading", show);
+    return () => window.removeEventListener("solace-loading", show);
+  }, []);
 
   return (
-
     <AnimatePresence>
-
-      {
-
-      visible && (
-
+      {loading && (
         <motion.div
-
-          initial={{
-            opacity:0,
-          }}
-
-          animate={{
-            opacity:1,
-          }}
-
-          exit={{
-            opacity:0,
-          }}
-
-          transition={{
-            duration:.25,
-          }}
-
-          className="
-          fixed
-          inset-0
-          z-[9999]
-          flex
-          items-center
-          justify-center
-          bg-[var(--bg)]
-          "
-
-        >
-
-          <div
-            className="
-            relative
-            flex
-            flex-col
-            items-center
-            "
-          >
-
-            <div
-              className="
-              h-[220px]
-              w-[220px]
-              "
-            >
-
-              <DotLottieReact
-                src="https://lottie.host/bd408a07-cfe7-4661-9025-0ee7b4fd3e46/xTiN7Tolp6.lottie"
-                autoplay
-                loop={false}
-              />
-
-            </div>
-
-            <p
-              className="
-              -mt-4
-              font-display
-              text-4xl
-              tracking-[0.35em]
-              text-[var(--text)]
-              "
-            >
-
-              SOLACE
-
-            </p>
-
-          </div>
-
-        </motion.div>
-
-      )
-
-      }
-
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          exit={{ scaleX: 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="fixed top-0 left-0 right-0 z-[9999] h-[2px] origin-left bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)]"
+        />
+      )}
     </AnimatePresence>
-
   );
-
 }

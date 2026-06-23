@@ -1,16 +1,16 @@
 import { Suspense } from "react";
-export const dynamic = "force-dynamic";
 import RoomLayout from "@/components/layout/RoomLayout";
 import DatesPlanner from "@/components/dates/DatesPlanner";
 import DatesTimeline from "@/components/dates/DatesTimeline";
 import AddMemoryForm from "@/components/dates/AddMemoryForm";
+import DatesTabs from "@/components/dates/DatesTabs";
 import { prisma } from "@/lib/prisma";
 import type { DateMemory } from "@/types/date-memory";
 
 async function PlannerSection() {
   let plans;
   try {
-    plans = await prisma.datePlan.findMany({ orderBy: { planDate: "asc" } });
+    plans = await prisma.datePlan.findMany({ orderBy: { planDate: "asc" }, take: 31 });
   } catch {
     return (
       <div className="rounded-[2.5rem] border border-[var(--border)] p-6 text-center text-sm text-[var(--muted)]/40">
@@ -41,6 +41,7 @@ async function TimelineSection() {
     memories = await prisma.dateMemory.findMany({
       orderBy: { memoryDate: "desc" },
       include: { comments: { orderBy: { createdAt: "asc" } } },
+      take: 50,
     });
   } catch {
     return (
@@ -72,8 +73,7 @@ async function TimelineSection() {
 
 function TimelineFallback() {
   return (
-    <div className="space-y-6">
-      <div className="h-72 w-full animate-pulse rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)]" />
+    <div className="space-y-5">
       <div className="h-72 w-full animate-pulse rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)]" />
     </div>
   );
@@ -81,7 +81,7 @@ function TimelineFallback() {
 
 function SectionHeader({ label }: { label: string }) {
   return (
-    <div className="relative flex items-center gap-4 mb-6 lg:mb-6">
+    <div className="relative flex items-center gap-4 mb-5 lg:mb-6">
       <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--border)] to-[var(--border)]" />
       <div className="flex items-center gap-2">
         <span className="h-2 w-2 rounded-full bg-[var(--accent)] shadow-[0_0_8px_rgba(168,141,114,0.4)]" />
@@ -102,29 +102,21 @@ export default function DatesPage(): React.JSX.Element {
       title="Kitchen"
       description="Every moment worth remembering, every plan worth looking forward to."
     >
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] lg:gap-10">
-        {/* Planner — first on mobile, right column on desktop */}
-        <div className="order-1 lg:order-2">
-          <SectionHeader label="Date planner" />
-
-          <Suspense fallback={<PlannerFallback />}>
-            <PlannerSection />
-          </Suspense>
-        </div>
-
-        {/* Timeline — second on mobile, left column on desktop */}
-        <div className="order-2 lg:order-1">
-          <SectionHeader label="Memory lane" />
-
-          <div className="space-y-6">
+      <DatesTabs
+        memoryLane={
+          <div className="mx-auto max-w-sm space-y-4 sm:space-y-5">
             <AddMemoryForm />
-
             <Suspense fallback={<TimelineFallback />}>
               <TimelineSection />
             </Suspense>
           </div>
-        </div>
-      </div>
+        }
+        datePlanner={
+          <Suspense fallback={<PlannerFallback />}>
+            <PlannerSection />
+          </Suspense>
+        }
+      />
     </RoomLayout>
   );
 }

@@ -8,16 +8,25 @@ export async function createDateMemory(formData: FormData): Promise<void> {
   const title = formData.get("title")?.toString() ?? "";
   const description = formData.get("description")?.toString() ?? "";
   const location = formData.get("location")?.toString() ?? "";
-  const memoryDate = formData.get("memoryDate")?.toString() ?? "";
+  const memoryDateRaw = formData.get("memoryDate")?.toString() ?? "";
   const images = formData.get("images")?.toString() ?? null;
+
+  if (!title) throw new Error("Title is required.");
+  if (!memoryDateRaw) throw new Error("Date is required.");
+  const memoryDate = new Date(memoryDateRaw);
+  if (Number.isNaN(memoryDate.getTime())) throw new Error("Invalid date.");
+
+  const cookieStore = await cookies();
+  const author = cookieStore.get("solace-user")?.value ?? null;
 
   await prisma.dateMemory.create({
     data: {
       title,
       description,
       location,
-      memoryDate: new Date(memoryDate),
+      memoryDate,
       images,
+      author,
     },
   });
 
