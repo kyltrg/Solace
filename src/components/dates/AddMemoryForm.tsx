@@ -187,7 +187,7 @@ export default function AddMemoryForm(): React.JSX.Element {
               exit={{ opacity: 0, y: 40, scale: 0.97 }}
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-lg rounded-3xl border border-[var(--border)] bg-gradient-to-b from-[var(--bg)] to-[var(--bg-soft)] shadow-2xl shadow-black/40 px-6 pt-5 pb-4 max-h-[calc(100dvh-4rem)] overflow-hidden"
+              className="relative w-full max-w-lg md:max-w-2xl rounded-3xl border border-[var(--border)] bg-gradient-to-b from-[var(--bg)] to-[var(--bg-soft)] shadow-2xl shadow-black/40 px-6 pt-5 pb-4 max-h-[calc(100dvh-4rem)] overflow-hidden"
             >
               <button
                 onClick={close}
@@ -390,43 +390,48 @@ export default function AddMemoryForm(): React.JSX.Element {
                 {/* ─── STEP 3: Form ─── */}
                 {step === 3 && (
                   <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3">
-                    <input
-                      required
-                      name="title"
-                      disabled={isPending}
-                      placeholder="Coffee date"
-                      className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50"
-                    />
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                      <div className="flex flex-col gap-3 md:col-span-2">
+                        <input
+                          required
+                          name="title"
+                          disabled={isPending}
+                          placeholder="Coffee date"
+                          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50"
+                        />
+                      </div>
 
-                    <textarea
-                      name="description"
-                      disabled={isPending}
-                      placeholder="What happened? Tell the story..."
-                      className="h-24 w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] resize-none disabled:opacity-50"
-                    />
-
-                    <div className="relative">
-                      <MapPin size={14} className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--muted)]/30" />
-                      <input
-                        name="location"
+                      <textarea
+                        name="description"
                         disabled={isPending}
-                        placeholder="Where was this?"
-                        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] pl-11 pr-5 py-3 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50"
+                        placeholder="What happened? Tell the story..."
+                        className="h-24 w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] resize-none disabled:opacity-50"
                       />
-                    </div>
 
-                    <input
-                      required
-                      type="date"
-                      name="memoryDate"
-                      disabled={isPending}
-                      className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50 [color-scheme:dark]"
-                    />
+                      <div className="flex flex-col gap-3">
+                        <div className="relative">
+                          <MapPin size={14} className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--muted)]/30" />
+                          <input
+                            name="location"
+                            disabled={isPending}
+                            placeholder="Where was this?"
+                            className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] pl-11 pr-5 py-3 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50"
+                          />
+                        </div>
 
-                    {/* Photo summary */}
-                    <div className="flex items-center gap-2.5 rounded-xl bg-[var(--bg-soft)]/50 px-4 py-3 text-xs text-[var(--muted)]/40">
-                      <ImagePlus size={13} />
-                      {images.length} photo{images.length > 1 ? "s" : ""} · {aspectRatio === "1:1" ? "Square" : aspectRatio === "4:5" ? "Portrait" : "Free"}
+                        <input
+                          required
+                          type="date"
+                          name="memoryDate"
+                          disabled={isPending}
+                          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50 [color-scheme:dark]"
+                        />
+
+                        <div className="flex items-center gap-2.5 rounded-xl bg-[var(--bg-soft)]/50 px-4 py-3 text-xs text-[var(--muted)]/40">
+                          <ImagePlus size={13} />
+                          {images.length} photo{images.length > 1 ? "s" : ""} · {aspectRatio === "1:1" ? "Square" : aspectRatio === "4:5" ? "Portrait" : "Free"}
+                        </div>
+                      </div>
                     </div>
 
                     {error && (
@@ -443,7 +448,7 @@ export default function AddMemoryForm(): React.JSX.Element {
                     <button
                       type="submit"
                       disabled={isPending}
-                      className="relative mt-2 w-full overflow-hidden rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/90 px-6 py-3.5 text-sm font-medium text-[var(--bg)] transition-all duration-300 hover:opacity-95 hover:shadow-[0_0_30px_rgba(168,141,114,0.3)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="relative w-full overflow-hidden rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/90 px-6 py-3.5 text-sm font-medium text-[var(--bg)] transition-all duration-300 hover:opacity-95 hover:shadow-[0_0_30px_rgba(168,141,114,0.3)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isPending ? (
                         <span className="flex items-center justify-center gap-2">
