@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import RoomLayout from "@/components/layout/RoomLayout";
 import DatesPlanner from "@/components/dates/DatesPlanner";
 import DatesTimeline from "@/components/dates/DatesTimeline";
@@ -5,15 +6,47 @@ import AddMemoryForm from "@/components/dates/AddMemoryForm";
 import { prisma } from "@/lib/prisma";
 import type { DateMemory } from "@/types/date-memory";
 
-export default async function DatesPage(): Promise<React.JSX.Element> {
-  const [memories, plans] = await Promise.all([
-    prisma.dateMemory.findMany({
-      orderBy: { memoryDate: "desc" },
-      include: { comments: { orderBy: { createdAt: "asc" } } },
-    }),
-    prisma.datePlan.findMany({ orderBy: { planDate: "asc" } }),
-  ]);
+async function PlannerSection() {
+  const plans = await prisma.datePlan.findMany({ orderBy: { planDate: "asc" } });
 
+  return (
+    <DatesPlanner plans={plans.map((p) => ({ ...p, planDate: p.planDate.toISOString() }))} />
+  );
+}
+
+function PlannerFallback() {
+  return (
+    <div className="h-96 w-full animate-pulse rounded-[2.5rem] bg-[var(--border)]" />
+  );
+}
+
+async function TimelineSection() {
+  const memories = await prisma.dateMemory.findMany({
+    orderBy: { memoryDate: "desc" },
+    include: { comments: { orderBy: { createdAt: "asc" } } },
+  });
+
+  if (memories.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="font-display text-2xl text-[var(--muted)]/40">No memories yet</p>
+        <p className="mt-2 text-sm text-[var(--muted)]/20">Start by adding one above.</p>
+      </div>
+    );
+  }
+
+  return <DatesTimeline memories={memories as unknown as DateMemory[]} />;
+}
+
+function TimelineFallback() {
+  return (
+    <div className="space-y-6">
+      <div className="h-64 w-full animate-pulse rounded-[2.5rem] bg-[var(--border)]" />
+    </div>
+  );
+}
+
+export default function DatesPage(): React.JSX.Element {
   return (
     <RoomLayout
       eyebrow="Dates"
@@ -35,7 +68,9 @@ export default async function DatesPage(): Promise<React.JSX.Element> {
             <div className="h-px flex-1 bg-[var(--border)]" />
           </div>
 
-          <DatesPlanner plans={plans.map((p) => ({ ...p, planDate: p.planDate.toISOString() }))} />
+          <Suspense fallback={<PlannerFallback />}>
+            <PlannerSection />
+          </Suspense>
         </div>
 
         {/* Memory lane — second on mobile, left column on desktop */}
@@ -55,14 +90,9 @@ export default async function DatesPage(): Promise<React.JSX.Element> {
           <div className="space-y-6">
             <AddMemoryForm />
 
-            {memories.length > 0 ? (
-              <DatesTimeline memories={memories as unknown as DateMemory[]} />
-            ) : (
-              <div className="text-center py-12">
-                <p className="font-display text-2xl text-[var(--muted)]/40">No memories yet</p>
-                <p className="mt-2 text-sm text-[var(--muted)]/20">Start by adding one above.</p>
-              </div>
-            )}
+            <Suspense fallback={<TimelineFallback />}>
+              <TimelineSection />
+            </Suspense>
           </div>
         </div>
       </div>

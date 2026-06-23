@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, type FormEvent } from "react";
+import { useState, useRef, useEffect, type FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, CalendarDays, Clock, MapPin, Trash2, Plus, X } from "lucide-react";
 import { deleteDatePlan, createDatePlan } from "@/actions/plans-date";
@@ -186,6 +186,15 @@ function AddPlanModal({
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
 
+  useEffect(() => {
+    if (selected) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [selected]);
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsPending(true);
@@ -222,7 +231,7 @@ function AddPlanModal({
             exit={{ opacity: 0, y: 40, scale: 0.97 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-lg rounded-t-3xl border border-[var(--border)] bg-[var(--bg)] p-6 shadow-2xl md:rounded-3xl"
+            className="relative w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-t-3xl border border-[var(--border)] bg-[var(--bg)] p-6 shadow-2xl md:rounded-3xl md:max-h-[85vh]"
           >
             <div className="mb-5 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -240,7 +249,7 @@ function AddPlanModal({
             </div>
 
             {selectedPlans.length > 0 && (
-              <div className="mb-5 max-h-52 space-y-3 overflow-y-auto">
+              <div className="mb-5 max-h-48 space-y-3 overflow-y-auto">
                 {selectedPlans.map((p) => (
                   <div key={p.id} className="group relative rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-5 transition-all hover:border-[var(--accent)]/30 hover:bg-[var(--card-hover)]">
                     <form action={deleteDatePlan.bind(null, p.id)} className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -287,19 +296,19 @@ function AddPlanModal({
               <p className="text-xs uppercase tracking-[.25em] text-[var(--accent)]">Plan a Date</p>
             </div>
 
-            <form ref={formRef} onSubmit={handleSubmit} className="space-y-3">
+            <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3">
               <input
                 required
                 name="title"
                 disabled={isPending}
                 placeholder="What's the plan?"
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
               />
               <input
                 name="description"
                 disabled={isPending}
                 placeholder="Details..."
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
               />
               <div className="grid grid-cols-2 gap-3">
                 <input
@@ -308,25 +317,25 @@ function AddPlanModal({
                   name="planDate"
                   disabled={isPending}
                   defaultValue={defaultDate}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
                 />
                 <input
                   type="time"
                   name="time"
                   disabled={isPending}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
                 />
               </div>
               <input
                 name="location"
                 disabled={isPending}
                 placeholder="Where?"
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
               />
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-sm font-medium text-[var(--bg)] transition-all duration-300 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-xl bg-[var(--accent)] px-5 py-3.5 text-sm font-medium text-[var(--bg)] transition-all duration-300 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isPending ? "Saving..." : "Add to Planner"}
               </button>

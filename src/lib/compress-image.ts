@@ -72,7 +72,6 @@ export async function compressImage(
   maxDim = 1080,
   maxSizeBytes = 1_048_576
 ): Promise<string> {
-  // Try createImageBitmap (faster), fall back to <img> for iOS HEIC
   let source: ImageBitmap | HTMLImageElement;
   let width: number, height: number;
 
@@ -88,7 +87,6 @@ export async function compressImage(
     source = img;
   }
 
-  // Center-crop to aspect ratio
   let cropW: number, cropH: number;
   if (aspectRatio === "1:1") {
     const size = Math.min(width, height);
@@ -107,7 +105,6 @@ export async function compressImage(
   const sx = Math.round((width - cropW) / 2);
   const sy = Math.round((height - cropH) / 2);
 
-  // Resize so longest side fits maxDim
   let finalW = cropW;
   let finalH = cropH;
   if (Math.max(cropW, cropH) > maxDim) {
@@ -120,39 +117,42 @@ export async function compressImage(
 
   if (source instanceof ImageBitmap) source.close();
 
-  // Detect best output format
   const fmt = supportsWebP() ? "image/webp" : "image/jpeg";
 
-  let quality = 0.85;
+  let quality = 0.8;
   let blob: Blob;
 
   try {
     blob = await toBlobPromise(canvas, fmt, quality);
   } catch {
-    // Final fallback to JPEG
     blob = await toBlobPromise(canvas, "image/jpeg", quality);
   }
 
-  if (blob.size > maxSizeBytes && quality > 0.5) {
-    quality = 0.7;
-    blob = await toBlobPromise(canvas, blob.type, quality);
-  }
-  if (blob.size > maxSizeBytes && quality > 0.3) {
-    quality = 0.5;
-    blob = await toBlobPromise(canvas, blob.type, quality);
-  }
-
-  // Shrink dimensions if still too big
-  while (blob.size > maxSizeBytes && finalW > 200 && finalH > 200) {
-    finalW = Math.round(finalW * 0.8);
-    finalH = Math.round(finalH * 0.8);
-    const img = await loadImageViaElement(new File([blob], "temp"));
-    const shrink = document.createElement("canvas");
-    shrink.width = finalW;
-    shrink.height = finalH;
-    const ctx = shrink.getContext("2d")!;
-    ctx.drawImage(img, 0, 0, finalW, finalH);
-    blob = await toBlobPromise(shrink, blob.type, 0.5);
+  let attempts = 0;
+  while (blob.size > maxSizeBytes && finalW > 300 && finalH > 300 && attempts < 5) {
+    attempts++;
+    if (attempts <= 2) {
+      quality = [0.7, 0.5][attempts - 1];
+      try {
+        blob = await toBlobPromise(canvas, blob.type, quality);
+      } catch {
+        break;
+      }
+    } else {
+      finalW = Math.round(finalW * 0.8);
+      finalH = Math.round(finalH * 0.8);
+      const img = await loadImageViaElement(new File([blob], "temp"));
+      const shrink = document.createElement("canvas");
+      shrink.width = finalW;
+      shrink.height = finalH;
+      const ctx = shrink.getContext("2d")!;
+      ctx.drawImage(img, 0, 0, finalW, finalH);
+      try {
+        blob = await toBlobPromise(shrink, blob.type, 0.5);
+      } catch {
+        break;
+      }
+    }
   }
 
   return blobToBase64(blob);

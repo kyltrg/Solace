@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState, useEffect, type FormEvent } from "react";
 import { createDateMemory } from "@/actions/dates";
 import { useRouter } from "next/navigation";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
@@ -61,6 +61,15 @@ export default function AddMemoryForm(): React.JSX.Element {
     setAspectRatio("1:1");
   };
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsPending(true);
@@ -68,9 +77,10 @@ export default function AddMemoryForm(): React.JSX.Element {
     const formData = new FormData(e.currentTarget);
     try {
       if (files.length > 0) {
-        const compressed = await Promise.all(
-          files.map((f) => compressImage(f, aspectRatio))
-        );
+        const compressed: string[] = [];
+        for (const f of files) {
+          compressed.push(await compressImage(f, aspectRatio));
+        }
         formData.set("images", JSON.stringify(compressed));
       }
       await createDateMemory(formData);
@@ -121,7 +131,7 @@ export default function AddMemoryForm(): React.JSX.Element {
               exit={{ opacity: 0, y: 40, scale: 0.97 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-t-3xl border border-[var(--border)] bg-[var(--bg)] p-6 shadow-2xl md:rounded-3xl"
+              className="relative w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-t-3xl border border-[var(--border)] bg-[var(--bg)] p-6 shadow-2xl md:rounded-3xl md:max-h-[85vh]"
             >
               <div className="mb-6 flex items-center justify-between">
                 <div>
@@ -137,27 +147,27 @@ export default function AddMemoryForm(): React.JSX.Element {
                 </button>
               </div>
 
-              <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+              <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <input
                   required
                   name="title"
                   disabled={isPending}
                   placeholder="Coffee date"
-                  className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] p-4 text-sm outline-none placeholder:text-[var(--muted)]/30 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                  className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-4 text-sm outline-none placeholder:text-[var(--muted)]/30 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
                 />
 
                 <textarea
                   name="description"
                   disabled={isPending}
                   placeholder="What happened?"
-                  className="h-28 w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] p-4 text-sm outline-none placeholder:text-[var(--muted)]/30 transition-all focus:border-[var(--accent)]/50 resize-none disabled:opacity-50"
+                  className="h-28 w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-4 text-sm outline-none placeholder:text-[var(--muted)]/30 transition-all focus:border-[var(--accent)]/50 resize-none disabled:opacity-50"
                 />
 
                 <input
                   name="location"
                   disabled={isPending}
                   placeholder="Location (optional)"
-                  className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] p-4 text-sm outline-none placeholder:text-[var(--muted)]/30 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                  className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-4 text-sm outline-none placeholder:text-[var(--muted)]/30 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
                 />
 
                 <input
@@ -165,7 +175,7 @@ export default function AddMemoryForm(): React.JSX.Element {
                   type="date"
                   name="memoryDate"
                   disabled={isPending}
-                  className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] p-4 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                  className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-4 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
                 />
 
                 {previews.length > 0 && (

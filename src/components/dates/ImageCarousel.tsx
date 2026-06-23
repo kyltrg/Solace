@@ -67,6 +67,7 @@ export default function ImageCarousel({
             draggable={false}
             onClick={handleImageClick}
             onDoubleClick={handleImageDoubleClick}
+            style={{ touchAction: "manipulation" }}
             onLoad={(e) => {
               const img = e.currentTarget;
               if (img.naturalWidth && img.naturalHeight) {
