@@ -61,66 +61,72 @@ export default function DatesPlanner({ plans }: { plans: Plan[] }) {
   };
 
   const selectedPlans = selected ? planMap.get(selected) || [] : [];
-
   const hasPlans = plans.length > 0;
 
   return (
     <>
-      {/* Mobile toggle button */}
+      {/* Mobile toggle */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="flex w-full items-center justify-between rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)] p-5 backdrop-blur-xl transition-all duration-300 hover:border-[var(--accent)]/30 hover:bg-[var(--card-hover)] lg:hidden text-left"
+        className="flex w-full items-center justify-between rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)] p-5 backdrop-blur-xl transition-all duration-300 hover:border-[var(--accent)]/30 hover:bg-[var(--card-hover)] hover:shadow-[0_0_30px_rgba(168,141,114,0.04)] lg:hidden text-left"
       >
         <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent-soft)]">
-            <CalendarDays size={16} className="text-[var(--accent)]" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent-soft)] to-[var(--accent)]/5 ring-1 ring-[var(--accent)]/10">
+            <CalendarDays size={18} className="text-[var(--accent)]" />
           </div>
           <div>
             <p className="text-sm font-medium text-[var(--text)]">
               {mobileOpen ? "Hide Calendar" : "Show Calendar"}
             </p>
-            <p className="text-xs text-[var(--muted)]/40">
+            <p className="mt-0.5 text-xs text-[var(--muted)]/40">
               {hasPlans
                 ? `${plans.length} plan${plans.length > 1 ? "s" : ""} coming up`
-                : "Add a date"}
+                : "No plans yet"}
             </p>
           </div>
         </div>
-        <ChevronRight
-          size={18}
-          className={`text-[var(--muted)]/50 transition-transform duration-300 ${
-            mobileOpen ? "rotate-90" : ""
-          }`}
-        />
+        <motion.div
+          animate={{ rotate: mobileOpen ? 90 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronRight size={18} className="text-[var(--muted)]/40" />
+        </motion.div>
       </button>
 
-      {/* Calendar — always visible on desktop, collapsible on mobile */}
+      {/* Calendar */}
       <div className={mobileOpen ? "block" : "hidden lg:block"}>
-        <div className="overflow-hidden rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)] backdrop-blur-xl">
-          <div className="border-b border-[var(--border)] bg-[var(--accent-soft)]/30 p-6">
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="overflow-hidden rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)] backdrop-blur-xl"
+        >
+          {/* Calendar header */}
+          <div className="border-b border-[var(--border)] bg-gradient-to-b from-[var(--accent-soft)]/20 to-transparent p-5 sm:p-6">
             <div className="flex items-center justify-between">
-              <button onClick={prevMonth} className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] text-[var(--muted)] transition-all hover:bg-[var(--glass)] hover:text-[var(--text)]">
+              <button onClick={prevMonth} className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] text-[var(--muted)] transition-all hover:bg-[var(--glass)] hover:text-[var(--text)] hover:border-[var(--accent)]/20">
                 <ChevronLeft size={18} />
               </button>
 
               <button onClick={goToday} className="group text-center">
-                <p className="font-display text-xl">{MONTHS[month]}</p>
-                <p className="text-xs text-[var(--muted)]/50 group-hover:text-[var(--accent)]">{year}</p>
+                <p className="font-display text-lg sm:text-xl">{MONTHS[month]}</p>
+                <p className="text-[11px] text-[var(--muted)]/40 group-hover:text-[var(--accent)] transition-colors">{year}</p>
               </button>
 
-              <button onClick={nextMonth} className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] text-[var(--muted)] transition-all hover:bg-[var(--glass)] hover:text-[var(--text)]">
+              <button onClick={nextMonth} className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] text-[var(--muted)] transition-all hover:bg-[var(--glass)] hover:text-[var(--text)] hover:border-[var(--accent)]/20">
                 <ChevronRight size={18} />
               </button>
             </div>
 
-            <div className="mt-6 grid grid-cols-7 gap-1">
+            <div className="mt-5 grid grid-cols-7 gap-1">
               {DAYS.map((d) => (
-                <div key={d} className="py-2 text-center text-[10px] uppercase tracking-[.1em] text-[var(--muted)]/40">{d}</div>
+                <div key={d} className="py-1.5 text-center text-[10px] font-medium uppercase tracking-[.1em] text-[var(--muted)]/30">{d}</div>
               ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 p-4">
+          {/* Calendar grid */}
+          <div className="grid grid-cols-7 gap-1 p-3 sm:p-4">
             {Array.from({ length: firstDay }).map((_, i) => (
               <div key={`empty-${i}`} />
             ))}
@@ -138,21 +144,21 @@ export default function DatesPlanner({ plans }: { plans: Plan[] }) {
                 <button
                   key={day}
                   onClick={() => setSelected(key)}
-                  className={`relative flex flex-col items-center justify-center rounded-xl text-sm transition-all duration-200 h-14 ${
+                  className={`relative flex flex-col items-center justify-center rounded-xl text-sm transition-all duration-200 h-12 sm:h-14 ${
                     hasPlan
-                      ? "text-[var(--text)] hover:bg-[var(--accent-soft)]"
+                      ? "text-[var(--text)] bg-[var(--accent-soft)]/30 hover:bg-[var(--accent-soft)]"
                       : today
-                        ? "border border-[var(--accent)]/30 text-[var(--text)]"
+                        ? "ring-1 ring-[var(--accent)]/40 bg-[var(--accent)]/5 text-[var(--text)]"
                         : past
-                          ? "text-[var(--muted)]/30"
-                          : "text-[var(--muted)]/50 hover:bg-[var(--glass)]"
+                          ? "text-[var(--muted)]/20"
+                          : "text-[var(--muted)]/50 hover:bg-[var(--glass)] hover:text-[var(--text)]"
                   }`}
                 >
-                  <span>{day}</span>
+                  <span className={`text-sm ${today ? "font-bold" : ""}`}>{day}</span>
                   {hasPlan && (
                     <span className="mt-0.5 flex gap-0.5">
-                      {dayPlans.slice(0, 3).map((_, i) => (
-                        <span key={i} className="h-1 w-1 rounded-full bg-[var(--accent)]" />
+                      {dayPlans.slice(0, 3).map((_, pi) => (
+                        <span key={pi} className="h-1 w-1 rounded-full bg-[var(--accent)]" />
                       ))}
                     </span>
                   )}
@@ -160,7 +166,7 @@ export default function DatesPlanner({ plans }: { plans: Plan[] }) {
               );
             })}
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <AddPlanModal
@@ -222,36 +228,38 @@ function AddPlanModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 backdrop-blur-sm md:items-center"
+          className="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 backdrop-blur-md md:items-center"
           onClick={onClose}
         >
           <motion.div
             initial={{ opacity: 0, y: 40, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.97 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-t-3xl border border-[var(--border)] bg-[var(--bg)] p-6 shadow-2xl md:rounded-3xl md:max-h-[85vh]"
+            className="relative w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-t-3xl border border-[var(--border)] bg-gradient-to-b from-[var(--bg)] to-[var(--bg-soft)] p-6 shadow-2xl shadow-black/40 md:rounded-3xl md:max-h-[85vh]"
           >
-            <div className="mb-5 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CalendarDays size={14} className="text-[var(--accent)]" />
-                <p className="text-xs uppercase tracking-[.25em] text-[var(--accent)]">
-                  {new Date(selected).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-                </p>
+            {/* Header */}
+            <div className="mb-5 text-center md:text-left">
+              <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent-soft)] to-[var(--accent)]/5 ring-1 ring-[var(--accent)]/10 md:mx-0">
+                <CalendarDays size={16} className="text-[var(--accent)]" />
               </div>
+              <p className="text-xs uppercase tracking-[.25em] text-[var(--accent)] font-medium">
+                {new Date(selected).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+              </p>
               <button
                 onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] text-[var(--muted)] transition-all hover:bg-[var(--bg-soft)] hover:text-[var(--text)]"
+                className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] text-[var(--muted)] transition-all hover:bg-[var(--bg-soft)] hover:text-[var(--text)]"
               >
                 <X size={16} />
               </button>
             </div>
 
+            {/* Existing plans */}
             {selectedPlans.length > 0 && (
               <div className="mb-5 max-h-48 space-y-3 overflow-y-auto">
                 {selectedPlans.map((p) => (
-                  <div key={p.id} className="group relative rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-5 transition-all hover:border-[var(--accent)]/30 hover:bg-[var(--card-hover)]">
+                  <div key={p.id} className="group relative rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-4 sm:p-5 transition-all hover:border-[var(--accent)]/25 hover:bg-[var(--card-hover)] hover:shadow-[0_0_20px_rgba(168,141,114,0.04)]">
                     <form action={deleteDatePlan.bind(null, p.id)} className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button type="submit" className="flex h-7 w-7 items-center justify-center rounded-full border border-red-400/20 text-red-400/50 hover:bg-red-400/10 hover:text-red-400 transition-all">
                         <Trash2 size={12} />
@@ -259,11 +267,11 @@ function AddPlanModal({
                     </form>
 
                     <div className="flex items-start gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)]">
-                        <CalendarDays size={14} className="text-[var(--accent)]" />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--accent-soft)]">
+                        <CalendarDays size={15} className="text-[var(--accent)]" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-display text-lg font-medium">{p.title}</h4>
+                        <h4 className="font-display text-base font-medium sm:text-lg">{p.title}</h4>
                         {p.description && (
                           <p className="mt-1.5 text-sm leading-relaxed text-[var(--muted)]">{p.description}</p>
                         )}
@@ -281,7 +289,7 @@ function AddPlanModal({
                             </span>
                           )}
                           {isPast(p.planDate) && (
-                            <span className="text-[10px] uppercase tracking-[.15em] text-[var(--muted)]/30">Done</span>
+                            <span className="text-[10px] uppercase tracking-[.15em] font-medium text-emerald-400/60">Done</span>
                           )}
                         </div>
                       </div>
@@ -291,9 +299,12 @@ function AddPlanModal({
               </div>
             )}
 
+            {/* Add new plan */}
             <div className="flex items-center gap-2 mb-4">
-              <Plus size={14} className="text-[var(--accent)]" />
-              <p className="text-xs uppercase tracking-[.25em] text-[var(--accent)]">Plan a Date</p>
+              <div className="h-px flex-1 bg-[var(--border)]" />
+              <Plus size={14} className="text-[var(--accent)] shrink-0" />
+              <span className="text-xs uppercase tracking-[.25em] text-[var(--accent)] font-medium">Plan a Date</span>
+              <div className="h-px flex-1 bg-[var(--border)]" />
             </div>
 
             <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -302,13 +313,13 @@ function AddPlanModal({
                 name="title"
                 disabled={isPending}
                 placeholder="What's the plan?"
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_15px_rgba(168,141,114,0.04)] disabled:opacity-50"
               />
               <input
                 name="description"
                 disabled={isPending}
                 placeholder="Details..."
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_15px_rgba(168,141,114,0.04)] disabled:opacity-50"
               />
               <div className="grid grid-cols-2 gap-3">
                 <input
@@ -317,27 +328,32 @@ function AddPlanModal({
                   name="planDate"
                   disabled={isPending}
                   defaultValue={defaultDate}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_15px_rgba(168,141,114,0.04)] disabled:opacity-50 [color-scheme:dark]"
                 />
                 <input
                   type="time"
                   name="time"
                   disabled={isPending}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_15px_rgba(168,141,114,0.04)] disabled:opacity-50 [color-scheme:dark]"
                 />
               </div>
               <input
                 name="location"
                 disabled={isPending}
                 placeholder="Where?"
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3.5 text-sm outline-none placeholder:text-[var(--muted)]/20 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_15px_rgba(168,141,114,0.04)] disabled:opacity-50"
               />
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full rounded-xl bg-[var(--accent)] px-5 py-3.5 text-sm font-medium text-[var(--bg)] transition-all duration-300 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/90 px-5 py-3.5 text-sm font-medium text-[var(--bg)] transition-all duration-300 hover:opacity-95 hover:shadow-[0_0_20px_rgba(168,141,114,0.25)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isPending ? "Saving..." : "Add to Planner"}
+                {isPending ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--bg)] border-t-transparent" />
+                    Saving...
+                  </span>
+                ) : "Add to Planner"}
               </button>
             </form>
 

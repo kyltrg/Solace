@@ -4,7 +4,8 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { createDateMemoryComment, deleteDateMemoryComment } from "@/actions/dates";
-import { MessageCircle, Trash2, AlertCircle } from "lucide-react";
+import { MessageCircle, Trash2, AlertCircle, Send } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { DateMemoryComment } from "@/types/date-memory";
 
 type CommentSectionProps = {
@@ -44,74 +45,97 @@ export default function CommentSection({ memoryId, comments }: CommentSectionPro
   };
 
   return (
-    <div className="mt-5 border-t border-[var(--border)] pt-4">
+    <div className="mx-4 sm:mx-6 border-t border-[var(--border)]">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-2 text-sm text-[var(--muted)]/60 transition-colors hover:text-[var(--accent)]"
+        className="flex w-full items-center justify-between py-4 text-sm text-[var(--muted)]/50 transition-colors hover:text-[var(--accent)] group"
       >
-        <MessageCircle size={14} />
-        {comments.length > 0
-          ? `View comments (${comments.length})`
-          : "No comments yet"}
+        <span className="flex items-center gap-2">
+          <MessageCircle size={14} />
+          {comments.length > 0
+            ? `${comments.length} comment${comments.length > 1 ? "s" : ""}`
+            : "Leave a comment"}
+        </span>
       </button>
 
-      {expanded && (
-        <div className="mt-4 space-y-3">
-          {comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="flex items-start justify-between gap-2 rounded-xl bg-[var(--bg-soft)] px-4 py-3"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-[var(--accent)]">
-                    {comment.author}
-                  </span>
-                  <span className="text-[10px] text-[var(--muted)]/30">
-                    {new Date(comment.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                </div>
-                <p className="mt-1 text-sm text-[var(--text)]/80">{comment.content}</p>
-              </div>
-              {comment.author === currentUser && (
-                <button
-                  onClick={() => handleDelete(comment.id)}
-                  className="mt-0.5 shrink-0 text-[var(--muted)]/30 transition-colors hover:text-red-400"
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="pb-4 space-y-3">
+              {comments.map((comment) => (
+                <div
+                  key={comment.id}
+                  className="flex items-start justify-between gap-3 rounded-2xl bg-[var(--bg-soft)] px-4 py-3 ring-1 ring-[var(--border)]"
                 >
-                  <Trash2 size={12} />
-                </button>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[10px] font-medium text-[var(--accent)]">
+                        {comment.author.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-xs font-medium text-[var(--accent)]">
+                        {comment.author}
+                      </span>
+                      <span className="text-[10px] text-[var(--muted)]/30">
+                        {new Date(comment.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-sm leading-relaxed text-[var(--text)]/80">{comment.content}</p>
+                  </div>
+                  {comment.author === currentUser && (
+                    <button
+                      onClick={() => handleDelete(comment.id)}
+                      className="mt-1 shrink-0 text-[var(--muted)]/20 transition-colors hover:text-red-400"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  )}
+                </div>
+              ))}
+
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 rounded-2xl bg-red-500/10 px-4 py-2.5 text-xs text-red-400 ring-1 ring-red-500/20"
+                >
+                  <AlertCircle size={12} />
+                  {error}
+                </motion.div>
               )}
-            </div>
-          ))}
 
-          {error && (
-            <div className="flex items-center gap-2 rounded-xl bg-red-500/10 px-4 py-2.5 text-xs text-red-400">
-              <AlertCircle size={12} />
-              {error}
+              <form onSubmit={handleSubmit} className="flex gap-2">
+                <input
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Write a comment..."
+                  disabled={isPending}
+                  className="flex-1 min-w-0 rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={!text.trim() || isPending}
+                  className="shrink-0 rounded-2xl bg-[var(--accent)] px-4 py-3 text-sm font-medium text-[var(--bg)] transition-all hover:opacity-90 hover:shadow-[0_0_15px_rgba(168,141,114,0.2)] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {isPending ? (
+                    <span className="flex h-4 w-4 animate-spin rounded-full border-2 border-[var(--bg)] border-t-transparent" />
+                  ) : (
+                    <Send size={15} />
+                  )}
+                </button>
+              </form>
             </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <input
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Write a comment..."
-              disabled={isPending}
-              className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={!text.trim() || isPending}
-              className="shrink-0 rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--bg)] transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Post
-            </button>
-          </form>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

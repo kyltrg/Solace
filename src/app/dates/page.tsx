@@ -17,7 +17,12 @@ async function PlannerSection() {
 
 function PlannerFallback() {
   return (
-    <div className="h-96 w-full animate-pulse rounded-[2.5rem] bg-[var(--border)]" />
+    <div className="rounded-[2.5rem] border border-[var(--border)] p-6">
+      <div className="space-y-4">
+        <div className="h-12 w-full animate-pulse rounded-xl bg-[var(--border)]" />
+        <div className="h-64 w-full animate-pulse rounded-xl bg-[var(--border)]" />
+      </div>
+    </div>
   );
 }
 
@@ -29,9 +34,16 @@ async function TimelineSection() {
 
   if (memories.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="font-display text-2xl text-[var(--muted)]/40">No memories yet</p>
-        <p className="mt-2 text-sm text-[var(--muted)]/20">Start by adding one above.</p>
+      <div className="flex flex-col items-center justify-center py-16 sm:py-20 text-center">
+        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--accent-soft)] ring-1 ring-[var(--accent)]/10">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--accent)]">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+          </svg>
+        </div>
+        <p className="font-display text-2xl text-[var(--muted)]/50">No memories yet</p>
+        <p className="mt-2 text-sm text-[var(--muted)]/25 max-w-xs">
+          Start by adding a memory above. Every moment is worth keeping.
+        </p>
       </div>
     );
   }
@@ -42,7 +54,24 @@ async function TimelineSection() {
 function TimelineFallback() {
   return (
     <div className="space-y-6">
-      <div className="h-64 w-full animate-pulse rounded-[2.5rem] bg-[var(--border)]" />
+      <div className="h-72 w-full animate-pulse rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)]" />
+      <div className="h-72 w-full animate-pulse rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)]" />
+    </div>
+  );
+}
+
+function SectionHeader({ label }: { label: string }) {
+  return (
+    <div className="relative flex items-center gap-4 mb-6 lg:mb-6">
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--border)] to-[var(--border)]" />
+      <div className="flex items-center gap-2">
+        <span className="h-2 w-2 rounded-full bg-[var(--accent)] shadow-[0_0_8px_rgba(168,141,114,0.4)]" />
+        <span className="text-[10px] font-medium uppercase tracking-[.25em] text-[var(--muted)]/50">
+          {label}
+        </span>
+        <span className="h-2 w-2 rounded-full bg-[var(--accent)] shadow-[0_0_8px_rgba(168,141,114,0.4)]" />
+      </div>
+      <div className="h-px flex-1 bg-gradient-to-r from-[var(--border)] via-[var(--border)] to-transparent" />
     </div>
   );
 }
@@ -54,39 +83,19 @@ export default function DatesPage(): React.JSX.Element {
       title="Kitchen"
       description="Every moment worth remembering, every plan worth looking forward to."
     >
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
-        {/* Date planner — first on mobile, right column on desktop */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] lg:gap-10">
+        {/* Planner — first on mobile, right column on desktop */}
         <div className="order-1 lg:order-2">
-          <div className="relative flex items-center gap-4 mb-6 lg:mb-6">
-            <div className="h-px flex-1 bg-[var(--border)]" />
-            <div className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-              <span className="text-[10px] uppercase tracking-[.25em] text-[var(--muted)]/50">
-                Date planner
-              </span>
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-            </div>
-            <div className="h-px flex-1 bg-[var(--border)]" />
-          </div>
+          <SectionHeader label="Date planner" />
 
           <Suspense fallback={<PlannerFallback />}>
             <PlannerSection />
           </Suspense>
         </div>
 
-        {/* Memory lane — second on mobile, left column on desktop */}
+        {/* Timeline — second on mobile, left column on desktop */}
         <div className="order-2 lg:order-1">
-          <div className="relative flex items-center gap-4 mb-6">
-            <div className="h-px flex-1 bg-[var(--border)]" />
-            <div className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-              <span className="text-[10px] uppercase tracking-[.25em] text-[var(--muted)]/50">
-                Memory lane
-              </span>
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-            </div>
-            <div className="h-px flex-1 bg-[var(--border)]" />
-          </div>
+          <SectionHeader label="Memory lane" />
 
           <div className="space-y-6">
             <AddMemoryForm />

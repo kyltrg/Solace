@@ -21,7 +21,6 @@ export default function ImageCarousel({
   const [burst, setBurst] = useState(false);
   const [naturalRatio, setNaturalRatio] = useState<number>(4 / 3);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const isLongPress = useRef(false);
   const touchMoved = useRef(false);
 
   if (images.length === 0) return null;
@@ -37,9 +36,7 @@ export default function ImageCarousel({
 
   const handleTouchStart = () => {
     touchMoved.current = false;
-    isLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
-      isLongPress.current = true;
       onImageClick(current);
     }, 500);
   };
@@ -65,7 +62,7 @@ export default function ImageCarousel({
   };
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl bg-[var(--bg-soft)]">
+    <div className="group relative overflow-hidden rounded-2xl bg-[var(--bg-soft)] ring-1 ring-[var(--border)]">
       <div className="relative w-full select-none" style={{ aspectRatio: naturalRatio }}>
         <AnimatePresence mode="wait">
           <motion.img
@@ -92,27 +89,56 @@ export default function ImageCarousel({
           />
         </AnimatePresence>
 
-        {/* Expand button — always visible on mobile, hover on desktop */}
+        {/* Expand button */}
         <button
           onClick={(e) => { e.stopPropagation(); onImageClick(current); }}
-          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white/90 backdrop-blur-sm transition-all hover:bg-black/70 hover:text-white active:scale-90 md:opacity-0 md:group-hover:opacity-100"
+          className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-xl bg-black/50 text-white/90 backdrop-blur-sm transition-all hover:bg-black/70 hover:text-white active:scale-90 md:opacity-0 md:group-hover:opacity-100 shadow-lg"
         >
           <Maximize2 size={14} />
         </button>
 
         {/* Heart burst */}
+        <AnimatePresence>
+          {burst && (
+            <motion.div
+              key="burst"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.5 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            >
+              <motion.div
+                initial={{ scale: 0.5, rotate: -15 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 12 }}
+              >
+                <Heart
+                  size={80}
+                  className={liked ? "fill-red-500 text-red-500" : "fill-white text-white"}
+                  style={{
+                    filter: liked
+                      ? "drop-shadow(0 0 30px rgba(239,68,68,0.6))"
+                      : "drop-shadow(0 0 24px rgba(255,255,255,0.3))",
+                  }}
+                />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
+        {/* Navigation arrows */}
         {images.length > 1 && (
           <>
             <button
               onClick={(e) => { e.stopPropagation(); prev(); }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white/80 backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white"
+              className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-black/40 text-white/80 backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100"
             >
               <ChevronLeft size={18} />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); next(); }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white/80 backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white"
+              className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-black/40 text-white/80 backdrop-blur-sm transition-all hover:bg-black/60 hover:text-white opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100"
             >
               <ChevronRight size={18} />
             </button>
@@ -120,14 +146,15 @@ export default function ImageCarousel({
         )}
       </div>
 
+      {/* Dots */}
       {images.length > 1 && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
           {images.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
               className={`h-1.5 rounded-full transition-all ${
-                i === current ? "w-5 bg-white" : "w-1.5 bg-white/40"
+                i === current ? "w-6 bg-white shadow-[0_0_6px_rgba(255,255,255,0.3)]" : "w-1.5 bg-white/40 hover:bg-white/60"
               }`}
             />
           ))}

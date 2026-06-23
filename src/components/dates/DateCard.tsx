@@ -4,7 +4,7 @@ import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { DateMemory } from "@/types/date-memory";
 import { motion } from "framer-motion";
-import { Heart, MapPin, Clock } from "lucide-react";
+import { Heart, MapPin, Clock, CalendarDays } from "lucide-react";
 import { toggleDateMemoryLike } from "@/actions/dates";
 import ImageCarousel from "./ImageCarousel";
 import ImageLightbox from "./ImageLightbox";
@@ -60,19 +60,22 @@ export default function DateCard({ memory }: { memory: DateMemory }) {
     likeRef.current.pending = false;
   }, [likedBy, currentUser, memory.id]);
 
+  const memoryDate = new Date(memory.memoryDate);
+
   return (
     <motion.article
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative overflow-hidden rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)] p-6 backdrop-blur-xl transition-all duration-500 hover:border-[var(--accent)]/30 hover:bg-[var(--card-hover)]"
+      className="group relative overflow-hidden rounded-[2.5rem] border border-[var(--border)] bg-[var(--card-bg)] backdrop-blur-xl transition-all duration-500 hover:border-[var(--accent)]/25 hover:bg-[var(--card-hover)] hover:shadow-[0_0_60px_rgba(168,141,114,0.06)]"
     >
-      <div className="pointer-events-none absolute -right-16 -top-16 h-36 w-36 rounded-full bg-[var(--accent)]/10 blur-3xl transition-all duration-500 group-hover:bg-[var(--accent)]/20" />
+      {/* Warm glow */}
+      <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-[var(--accent)]/8 blur-3xl transition-all duration-700 group-hover:bg-[var(--accent)]/15" />
 
       <div className="relative">
         {images.length > 0 && (
-          <div className="mb-5">
+          <div className="p-4 pb-0 sm:p-6 sm:pb-0">
             <ImageCarousel
               images={images}
               onImageClick={(i) => setLightboxIndex(i)}
@@ -82,44 +85,43 @@ export default function DateCard({ memory }: { memory: DateMemory }) {
           </div>
         )}
 
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-soft)]">
-                <Heart size={12} className="text-[var(--accent)]" />
-              </div>
-              <p className="text-xs uppercase tracking-[.25em] text-[var(--accent)]">
-                {new Date(memory.memoryDate).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-            </div>
-
-            <h3 className="mt-5 font-display text-3xl leading-tight md:text-4xl">
-              {memory.title}
-            </h3>
-
-            {memory.description && (
-              <p className="mt-3 leading-relaxed text-[var(--muted)]">
-                {memory.description}
-              </p>
-            )}
-
-            {memory.location && (
-              <p className="mt-4 flex items-center gap-1.5 text-xs text-[var(--muted)]/50">
-                <MapPin size={12} />
-                {memory.location}
-              </p>
-            )}
+        <div className="px-4 sm:px-6 pt-5 sm:pt-5">
+          {/* Date badge */}
+          <div className="inline-flex items-center gap-2 rounded-full bg-[var(--accent-soft)] px-3.5 py-1.5 ring-1 ring-[var(--accent)]/10">
+            <CalendarDays size={11} className="text-[var(--accent)]" />
+            <span className="text-[11px] font-medium text-[var(--accent)]">
+              {memoryDate.toLocaleDateString("en-US", {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
           </div>
+
+          <h3 className="mt-4 font-display text-2xl leading-tight tracking-tight md:text-3xl">
+            {memory.title}
+          </h3>
+
+          {memory.description && (
+            <p className="mt-3 leading-relaxed text-[var(--muted)] text-sm md:text-base">
+              {memory.description}
+            </p>
+          )}
+
+          {memory.location && (
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-[var(--muted)]/50">
+              <MapPin size={12} />
+              <span>{memory.location}</span>
+            </div>
+          )}
         </div>
 
-        <div className="mt-5 flex items-center gap-4 border-t border-[var(--border)] pt-4">
+        {/* Actions bar */}
+        <div className="mx-4 sm:mx-6 mt-5 mb-1 flex items-center gap-5 border-t border-[var(--border)] pt-4 pb-2">
           <button
             onClick={handleLike}
-            className="flex items-center gap-1.5 text-sm transition-all active:scale-90"
+            className="flex items-center gap-2 text-sm transition-all active:scale-90 group/like"
           >
             <motion.div
               key={isLiked ? "liked" : "unliked"}
@@ -128,32 +130,30 @@ export default function DateCard({ memory }: { memory: DateMemory }) {
               transition={{ type: "spring", stiffness: 400, damping: 15 }}
             >
               <Heart
-                size={16}
+                size={17}
                 className={
                   isLiked
-                    ? "fill-red-500 text-red-500"
-                    : "text-[var(--muted)]/50 hover:text-red-400"
+                    ? "fill-red-500 text-red-500 drop-shadow-[0_0_6px_rgba(239,68,68,0.4)]"
+                    : "text-[var(--muted)]/40 transition-colors group-hover/like:text-red-400"
                 }
               />
             </motion.div>
-            <span
-              className={isLiked ? "text-red-500 text-sm" : "text-[var(--muted)]/50 text-sm"}
-            >
-              {likedBy.length || ""}
+            <span className={isLiked ? "text-red-500 text-sm font-medium" : "text-[var(--muted)]/40 text-sm"}>
+              {likedBy.length > 0 ? likedBy.length : ""}
+              <span className="ml-1 hidden sm:inline">{likedBy.length === 1 ? "like" : likedBy.length > 1 ? "likes" : "Like"}</span>
             </span>
           </button>
 
-          <div className="flex items-center gap-1.5 text-xs text-[var(--muted)]/40">
+          <div className="flex items-center gap-1.5 text-xs text-[var(--muted)]/30">
             <Clock size={11} />
-            <p className="text-[11px]">
+            <span>
               {new Date(memory.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
                 month: "short",
                 day: "numeric",
                 hour: "2-digit",
                 minute: "2-digit",
               })}
-            </p>
+            </span>
           </div>
         </div>
 
