@@ -184,56 +184,42 @@ export default function AddMemoryForm(): React.JSX.Element {
               exit={{ opacity: 0, y: 40, scale: 0.97 }}
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="relative flex w-full max-w-lg flex-col rounded-3xl border border-[var(--border)] bg-gradient-to-b from-[var(--bg)] to-[var(--bg-soft)] shadow-2xl shadow-black/40"
-              style={{ maxHeight: "80dvh" }}
+              className="relative w-full max-w-lg rounded-3xl border border-[var(--border)] bg-gradient-to-b from-[var(--bg)] to-[var(--bg-soft)] shadow-2xl shadow-black/40 px-6 pt-5 pb-4"
             >
-              {/* Fixed header */}
-              <div className="relative shrink-0 px-6 pt-6 pb-4">
-                <button
-                  onClick={close}
-                  disabled={isPending}
-                  className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border)] text-[var(--muted)] transition-all hover:bg-[var(--bg-soft)] hover:text-[var(--text)] disabled:opacity-50"
-                >
-                  <X size={16} />
-                </button>
+              <button
+                onClick={close}
+                disabled={isPending}
+                className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full border border-[var(--border)] text-[var(--muted)] transition-all hover:bg-[var(--bg-soft)] hover:text-[var(--text)] disabled:opacity-50"
+              >
+                <X size={14} />
+              </button>
 
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent-soft)] to-[var(--accent)]/5 ring-1 ring-[var(--accent)]/10">
-                  {step === 1 && <ImagePlus size={18} className="text-[var(--accent)]" />}
-                  {step === 2 && <ZoomIn size={18} className="text-[var(--accent)]" />}
-                  {step === 3 && <Heart size={18} className="text-[var(--accent)]" />}
-                </div>
-                <h2 className="text-center font-display text-xl font-medium">
-                  {step === 1 && "Add photos"}
-                  {step === 2 && "Adjust each photo"}
-                  {step === 3 && "Tell the story"}
-                </h2>
-                <p className="mt-1 text-center text-sm text-[var(--muted)]">
-                  {step === 1 && "Up to 5 photos. Pick your favorites."}
-                  {step === 2 && `Photo ${cropIdx + 1} of ${images.length}`}
-                  {step === 3 && "Describe this memory before we save it."}
-                </p>
-
-                {/* Stepper */}
-                <div className="mt-4 flex items-center justify-center gap-2">
-                  {([1, 2, 3] as Step[]).map((s) => (
-                    <StepDot key={s} active={step === s} done={step > s} />
-                  ))}
-                </div>
+              {/* Title row */}
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <span className="h-2 w-2 rounded-full bg-[var(--accent)] shadow-[0_0_6px_rgba(168,141,114,0.3)]" />
+                <span className="text-xs font-medium uppercase tracking-[.2em] text-[var(--muted)]/40">
+                  {step === 1 && "Photos"}
+                  {step === 2 && "Crop"}
+                  {step === 3 && "Details"}
+                </span>
+                <span className="h-2 w-2 rounded-full bg-[var(--accent)] shadow-[0_0_6px_rgba(168,141,114,0.3)]" />
               </div>
-
-              {/* Scrollable content area (only this scrolls, not the whole modal) */}
-              <div className="flex-1 overflow-y-auto px-6 pb-6">
+              <div className="flex items-center justify-center gap-1.5 mb-4">
+                {([1, 2, 3] as Step[]).map((s) => (
+                  <StepDot key={s} active={step === s} done={step > s} />
+                ))}
+              </div>
                 {/* ─── STEP 1: Upload ─── */}
                 {step === 1 && (
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-3">
                     {/* Upload area */}
                     <button
                       type="button"
                       onClick={() => fileRef.current?.click()}
-                      className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--bg-soft)]/20 p-10 text-[var(--muted)]/40 transition-all hover:border-[var(--accent)]/30 hover:bg-[var(--accent-soft)]/10 hover:text-[var(--accent)]/60"
+                      className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--bg-soft)]/20 p-8 text-[var(--muted)]/40 transition-all hover:border-[var(--accent)]/30 hover:bg-[var(--accent-soft)]/10 hover:text-[var(--accent)]/60"
                     >
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-soft)]/20 ring-1 ring-[var(--accent)]/10">
-                        <ImagePlus size={24} />
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--accent-soft)]/20 ring-1 ring-[var(--accent)]/10">
+                        <ImagePlus size={20} />
                       </div>
                       <div className="text-center">
                         <p className="text-sm font-medium text-[var(--muted)]/60">Tap to choose photos</p>
@@ -314,7 +300,7 @@ export default function AddMemoryForm(): React.JSX.Element {
 
                 {/* ─── STEP 2: Crop ─── */}
                 {step === 2 && images.length > 0 && (
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-3">
                     {(() => {
                       const img = images[cropIdx];
                       if (!img) return null;
@@ -377,20 +363,20 @@ export default function AddMemoryForm(): React.JSX.Element {
 
                 {/* ─── STEP 3: Form ─── */}
                 {step === 3 && (
-                  <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
+                  <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3">
                     <input
                       required
                       name="title"
                       disabled={isPending}
                       placeholder="Coffee date"
-                      className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-4 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50"
+                      className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50"
                     />
 
                     <textarea
                       name="description"
                       disabled={isPending}
                       placeholder="What happened? Tell the story..."
-                      className="h-32 w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-4 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] resize-none disabled:opacity-50"
+                      className="h-24 w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] resize-none disabled:opacity-50"
                     />
 
                     <div className="relative">
@@ -399,7 +385,7 @@ export default function AddMemoryForm(): React.JSX.Element {
                         name="location"
                         disabled={isPending}
                         placeholder="Where was this?"
-                        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] pl-11 pr-5 py-4 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50"
+                        className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] pl-11 pr-5 py-3 text-sm outline-none placeholder:text-[var(--muted)]/25 transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50"
                       />
                     </div>
 
@@ -408,7 +394,7 @@ export default function AddMemoryForm(): React.JSX.Element {
                       type="date"
                       name="memoryDate"
                       disabled={isPending}
-                      className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-4 text-sm outline-none transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50 [color-scheme:dark]"
+                      className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-soft)] px-5 py-3 text-sm outline-none transition-all focus:border-[var(--accent)]/50 focus:bg-[var(--bg)] focus:shadow-[0_0_20px_rgba(168,141,114,0.06)] disabled:opacity-50 [color-scheme:dark]"
                     />
 
                     {/* Photo summary */}
@@ -431,7 +417,7 @@ export default function AddMemoryForm(): React.JSX.Element {
                     <button
                       type="submit"
                       disabled={isPending}
-                      className="relative mt-2 w-full overflow-hidden rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/90 px-7 py-4 text-sm font-medium text-[var(--bg)] transition-all duration-300 hover:opacity-95 hover:scale-[1.01] hover:shadow-[0_0_30px_rgba(168,141,114,0.3)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="relative mt-2 w-full overflow-hidden rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent)]/90 px-6 py-3.5 text-sm font-medium text-[var(--bg)] transition-all duration-300 hover:opacity-95 hover:shadow-[0_0_30px_rgba(168,141,114,0.3)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isPending ? (
                         <span className="flex items-center justify-center gap-2">
@@ -442,10 +428,8 @@ export default function AddMemoryForm(): React.JSX.Element {
                     </button>
                   </form>
                 )}
-              </div>
 
-              {/* Fixed bottom bar */}
-              <div className="flex shrink-0 items-center justify-between gap-3 border-t border-[var(--border)] px-6 py-4">
+              <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] mt-4 pt-3">
                 {step > 1 ? (
                   <button
                     type="button"
