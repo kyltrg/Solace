@@ -3,9 +3,10 @@
 import { useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { imageTransformStyle, type ImageSet, type CropData } from "@/lib/images";
 
 type ImageLightboxProps = {
-  images: string[];
+  imageSet: ImageSet;
   currentIndex: number;
   onClose: () => void;
   onPrev: () => void;
@@ -13,12 +14,15 @@ type ImageLightboxProps = {
 };
 
 export default function ImageLightbox({
-  images,
+  imageSet,
   currentIndex,
   onClose,
   onPrev,
   onNext,
 }: ImageLightboxProps) {
+  const crop = imageSet.crops?.[currentIndex] as CropData | undefined;
+  const imgStyle = imageTransformStyle(crop ?? null);
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -50,7 +54,7 @@ export default function ImageLightbox({
         {/* Top bar */}
         <div className="fixed left-0 right-0 top-0 z-20 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent px-4 py-4">
           <div className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/60 backdrop-blur-sm">
-            {currentIndex + 1} / {images.length}
+            {currentIndex + 1} / {imageSet.urls.length}
           </div>
           <button
             onClick={onClose}
@@ -60,7 +64,7 @@ export default function ImageLightbox({
           </button>
         </div>
 
-        {images.length > 1 && (
+        {imageSet.urls.length > 1 && (
           <>
             <button
               onClick={(e) => { e.stopPropagation(); onPrev(); }}
@@ -79,13 +83,14 @@ export default function ImageLightbox({
 
         <motion.img
           key={currentIndex}
-          src={images[currentIndex]}
+          src={imageSet.urls[currentIndex]}
           alt=""
           initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.92 }}
           transition={{ duration: 0.25 }}
           className="max-h-[85dvh] max-w-full rounded-2xl object-contain shadow-2xl"
+          style={imgStyle as React.CSSProperties}
           onClick={(e) => e.stopPropagation()}
         />
       </motion.div>

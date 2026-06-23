@@ -6,6 +6,7 @@ import type { DateMemory } from "@/types/date-memory";
 import { motion } from "framer-motion";
 import { Heart, MapPin, Clock, CalendarDays } from "lucide-react";
 import { toggleDateMemoryLike } from "@/actions/dates";
+import { parseImages, type ImageSet } from "@/lib/images";
 import ImageCarousel from "./ImageCarousel";
 import ImageLightbox from "./ImageLightbox";
 import CommentSection from "./CommentSection";
@@ -16,14 +17,9 @@ export default function DateCard({ memory }: { memory: DateMemory }) {
   const router = useRouter();
   const currentUser = Cookies.get("solace-user")?.toLowerCase() ?? "";
 
-  const images: string[] = (() => {
-    try {
-      const parsed = JSON.parse(memory.images ?? "[]");
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  })();
+  const parsed: ImageSet = parseImages(memory.images);
+  const images = parsed.urls;
+  const crops = parsed.crops;
 
   const initialLikedBy: string[] = (() => {
     try {
@@ -77,7 +73,7 @@ export default function DateCard({ memory }: { memory: DateMemory }) {
         {images.length > 0 && (
           <div className="p-4 pb-0 sm:p-6 sm:pb-0">
             <ImageCarousel
-              images={images}
+              imageSet={{ urls: images, crops }}
               onImageClick={(i) => setLightboxIndex(i)}
               onDoubleTap={handleLike}
               liked={isLiked}
@@ -162,7 +158,7 @@ export default function DateCard({ memory }: { memory: DateMemory }) {
 
       {lightboxIndex !== null && (
         <ImageLightbox
-          images={images}
+          imageSet={{ urls: images, crops }}
           currentIndex={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
           onPrev={() =>

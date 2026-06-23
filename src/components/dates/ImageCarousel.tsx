@@ -3,20 +3,22 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Heart, Maximize2 } from "lucide-react";
+import { imageTransformStyle, type ImageSet, type CropData } from "@/lib/images";
 
 type ImageCarouselProps = {
-  images: string[];
+  imageSet: ImageSet;
   onImageClick: (index: number) => void;
   onDoubleTap?: () => void;
   liked?: boolean;
 };
 
 export default function ImageCarousel({
-  images,
+  imageSet,
   onImageClick,
   onDoubleTap,
   liked,
 }: ImageCarouselProps) {
+  const { urls: images, crops } = imageSet;
   const [current, setCurrent] = useState(0);
   const [burst, setBurst] = useState(false);
   const [naturalRatio, setNaturalRatio] = useState<number>(4 / 3);
@@ -25,6 +27,12 @@ export default function ImageCarousel({
   const containerRef = useRef<HTMLDivElement>(null);
 
   if (images.length === 0) return null;
+
+  const crop = crops?.[current] as CropData | undefined;
+
+  // Compute display aspect ratio from crop or natural
+  const displayAspectRatio =
+    crop?.ar === "1:1" ? 1 : crop?.ar === "4:5" ? 4 / 5 : naturalRatio;
 
   const prev = () => setCurrent((c) => (c === 0 ? images.length - 1 : c - 1));
   const next = () => setCurrent((c) => (c === images.length - 1 ? 0 : c + 1));
@@ -36,55 +44,31 @@ export default function ImageCarousel({
   }, [onDoubleTap]);
 
   const handleTouchStart = () => {
-    longPressTimer.current = setTimeout(() => {
-      setPreview(true);
-    }, 400);
+    longPressTimer.current = setTimeout(() => setPreview(true), 400);
   };
-
   const handleTouchEnd = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = undefined;
-    }
+    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = undefined; }
     setPreview(false);
   };
-
   const handleTouchMove = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = undefined;
-    }
+    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = undefined; }
     setPreview(false);
   };
-
   const handleMouseDown = () => {
-    longPressTimer.current = setTimeout(() => {
-      setPreview(true);
-    }, 400);
+    longPressTimer.current = setTimeout(() => setPreview(true), 400);
   };
-
   const handleMouseUp = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = undefined;
-    }
+    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = undefined; }
     setPreview(false);
   };
-
   const handleMouseLeave = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = undefined;
-    }
+    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = undefined; }
     setPreview(false);
   };
 
   const handleImageDoubleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = undefined;
-    }
+    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = undefined; }
     setPreview(false);
     triggerBurst();
   };
@@ -100,10 +84,12 @@ export default function ImageCarousel({
     };
   }, [preview]);
 
+  const imgStyle = imageTransformStyle(crop ?? null);
+
   return (
     <>
       <div ref={containerRef} className="group relative overflow-hidden rounded-2xl bg-[var(--bg-soft)] ring-1 ring-[var(--border)]">
-        <div className="relative w-full select-none" style={{ aspectRatio: naturalRatio }}>
+        <div className="relative w-full select-none" style={{ aspectRatio: displayAspectRatio }}>
           <AnimatePresence mode="wait">
             <motion.img
               key={current}
@@ -115,6 +101,7 @@ export default function ImageCarousel({
               transition={{ duration: 0.25 }}
               className="h-full w-full object-cover"
               draggable={false}
+              style={{ ...imgStyle, touchAction: "manipulation" } as React.CSSProperties}
               onDoubleClick={handleImageDoubleClick}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
@@ -122,7 +109,6 @@ export default function ImageCarousel({
               onMouseDown={handleMouseDown}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseLeave}
-              style={{ touchAction: "manipulation" }}
               onLoad={(e) => {
                 const img = e.currentTarget;
                 if (img.naturalWidth && img.naturalHeight) {
