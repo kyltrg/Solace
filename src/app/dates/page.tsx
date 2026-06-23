@@ -8,7 +8,16 @@ import { prisma } from "@/lib/prisma";
 import type { DateMemory } from "@/types/date-memory";
 
 async function PlannerSection() {
-  const plans = await prisma.datePlan.findMany({ orderBy: { planDate: "asc" } });
+  let plans;
+  try {
+    plans = await prisma.datePlan.findMany({ orderBy: { planDate: "asc" } });
+  } catch {
+    return (
+      <div className="rounded-[2.5rem] border border-[var(--border)] p-6 text-center text-sm text-[var(--muted)]/40">
+        Could not load plans right now.
+      </div>
+    );
+  }
 
   return (
     <DatesPlanner plans={plans.map((p) => ({ ...p, planDate: p.planDate.toISOString() }))} />
@@ -27,10 +36,20 @@ function PlannerFallback() {
 }
 
 async function TimelineSection() {
-  const memories = await prisma.dateMemory.findMany({
-    orderBy: { memoryDate: "desc" },
-    include: { comments: { orderBy: { createdAt: "asc" } } },
-  });
+  let memories;
+  try {
+    memories = await prisma.dateMemory.findMany({
+      orderBy: { memoryDate: "desc" },
+      include: { comments: { orderBy: { createdAt: "asc" } } },
+    });
+  } catch {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 sm:py-20 text-center">
+        <p className="font-display text-2xl text-[var(--muted)]/50">Could not load memories</p>
+        <p className="mt-2 text-sm text-[var(--muted)]/25">Try again in a moment.</p>
+      </div>
+    );
+  }
 
   if (memories.length === 0) {
     return (
