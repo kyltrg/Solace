@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { createDateMemoryComment, deleteDateMemoryComment } from "@/actions/dates";
-import { MessageCircle, Trash2 } from "lucide-react";
+import { MessageCircle, Trash2, AlertCircle } from "lucide-react";
 import type { DateMemoryComment } from "@/types/date-memory";
 
 type CommentSectionProps = {
@@ -16,19 +16,26 @@ export default function CommentSection({ memoryId, comments }: CommentSectionPro
   const [expanded, setExpanded] = useState(false);
   const [text, setText] = useState("");
   const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
   const currentUser = Cookies.get("solace-user") ?? "";
+  const pendingRef = useRef(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim() || isPending) return;
+    if (!text.trim() || isPending || pendingRef.current) return;
+    setError("");
+    pendingRef.current = true;
     setIsPending(true);
     try {
       await createDateMemoryComment(memoryId, text.trim());
       setText("");
       router.refresh();
-    } catch {}
+    } catch {
+      setError("Failed to post comment");
+    }
     setIsPending(false);
+    pendingRef.current = false;
   };
 
   const handleDelete = async (commentId: string) => {
@@ -80,18 +87,25 @@ export default function CommentSection({ memoryId, comments }: CommentSectionPro
             </div>
           ))}
 
+          {error && (
+            <div className="flex items-center gap-2 rounded-xl bg-red-500/10 px-4 py-2.5 text-xs text-red-400">
+              <AlertCircle size={12} />
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="flex gap-2">
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Write a comment..."
               disabled={isPending}
-              className="flex-1 rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
+              className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-2.5 text-sm outline-none transition-all focus:border-[var(--accent)]/50 disabled:opacity-50"
             />
             <button
               type="submit"
               disabled={!text.trim() || isPending}
-              className="rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--bg)] transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              className="shrink-0 rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--bg)] transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Post
             </button>

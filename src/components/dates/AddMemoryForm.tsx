@@ -5,7 +5,7 @@ import { createDateMemory } from "@/actions/dates";
 import { useRouter } from "next/navigation";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
 import { compressImage, type AspectRatio } from "@/lib/compress-image";
-import { ImagePlus, X, GripVertical, Image as ImageIcon, Square, Crop } from "lucide-react";
+import { ImagePlus, X, GripVertical, Image as ImageIcon, Square, Crop, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function AddMemoryForm(): React.JSX.Element {
@@ -15,6 +15,7 @@ export default function AddMemoryForm(): React.JSX.Element {
   const [previews, setPreviews] = useState<string[]>([]);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>("1:1");
+  const [error, setError] = useState("");
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -63,19 +64,22 @@ export default function AddMemoryForm(): React.JSX.Element {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsPending(true);
+    setError("");
     const formData = new FormData(e.currentTarget);
-    if (files.length > 0) {
-      const compressed = await Promise.all(
-        files.map((f) => compressImage(f, aspectRatio))
-      );
-      formData.set("images", JSON.stringify(compressed));
-    }
     try {
+      if (files.length > 0) {
+        const compressed = await Promise.all(
+          files.map((f) => compressImage(f, aspectRatio))
+        );
+        formData.set("images", JSON.stringify(compressed));
+      }
       await createDateMemory(formData);
       reset();
       setOpen(false);
       router.refresh();
-    } catch {}
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
+    }
     setIsPending(false);
   };
 
@@ -117,7 +121,7 @@ export default function AddMemoryForm(): React.JSX.Element {
               exit={{ opacity: 0, y: 40, scale: 0.97 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-lg rounded-t-3xl border border-[var(--border)] bg-[var(--bg)] p-6 shadow-2xl md:rounded-3xl"
+              className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-t-3xl border border-[var(--border)] bg-[var(--bg)] p-6 shadow-2xl md:rounded-3xl"
             >
               <div className="mb-6 flex items-center justify-between">
                 <div>
@@ -241,11 +245,18 @@ export default function AddMemoryForm(): React.JSX.Element {
                 <input
                   ref={fileRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/*,.heic,.heif"
                   multiple
                   onChange={handleFileChange}
                   className="hidden"
                 />
+
+                {error && (
+                  <div className="flex items-center gap-2 rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                    <AlertCircle size={14} className="shrink-0" />
+                    {error}
+                  </div>
+                )}
 
                 <button
                   type="submit"

@@ -54,12 +54,11 @@ export default function DateCard({ memory }: { memory: DateMemory }) {
 
     try {
       await toggleDateMemoryLike(memory.id);
-      router.refresh();
     } catch {
       setLikedBy(likedBy);
     }
     likeRef.current.pending = false;
-  }, [likedBy, currentUser, memory.id, router]);
+  }, [likedBy, currentUser, memory.id]);
 
   return (
     <motion.article
