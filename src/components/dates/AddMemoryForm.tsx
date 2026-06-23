@@ -175,7 +175,7 @@ export default function AddMemoryForm(): React.JSX.Element {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 backdrop-blur-md md:items-center"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md"
             onClick={close}
           >
             <motion.div
@@ -184,7 +184,7 @@ export default function AddMemoryForm(): React.JSX.Element {
               exit={{ opacity: 0, y: 40, scale: 0.97 }}
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="relative flex w-full max-w-lg flex-col rounded-t-3xl border border-[var(--border)] bg-gradient-to-b from-[var(--bg)] to-[var(--bg-soft)] shadow-2xl shadow-black/40 md:rounded-3xl"
+              className="relative flex w-full max-w-lg flex-col rounded-3xl border border-[var(--border)] bg-gradient-to-b from-[var(--bg)] to-[var(--bg-soft)] shadow-2xl shadow-black/40"
               style={{ maxHeight: "80dvh" }}
             >
               {/* Fixed header */}
