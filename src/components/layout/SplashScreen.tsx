@@ -104,7 +104,7 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
               transition={{ delay: 0.8, duration: 0.8 }}
               className="mt-3 text-sm tracking-[0.12em] text-[var(--muted)]"
             >
-              Welcome home.
+              Your home, you're home!
             </motion.p>
 
             <motion.div

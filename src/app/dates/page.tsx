@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+export const dynamic = "force-dynamic";
 import RoomLayout from "@/components/layout/RoomLayout";
 import DatesPlanner from "@/components/dates/DatesPlanner";
 import DatesTimeline from "@/components/dates/DatesTimeline";
