@@ -117,17 +117,17 @@ export default function ImageCropper({
   // --- Container aspect ratio ---
   const containerStyle: React.CSSProperties =
     aspectRatio === "1:1"
-      ? { aspectRatio: "1 / 1" }
+      ? { aspectRatio: "1 / 1", maxHeight: "55dvh" }
       : aspectRatio === "4:5"
-        ? { aspectRatio: "4 / 5" }
+        ? { aspectRatio: "4 / 5", maxHeight: "60dvh" }
         : naturalRatio
-          ? { aspectRatio: `${naturalRatio}` }
-          : { aspectRatio: "4 / 3" };
+          ? { aspectRatio: `${naturalRatio}`, maxHeight: "60dvh" }
+          : { aspectRatio: "4 / 3", maxHeight: "55dvh" };
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full overflow-hidden rounded-2xl bg-[var(--bg-soft)] ring-1 ring-[var(--border)] select-none"
+      className="relative w-full overflow-hidden rounded-2xl bg-[var(--bg-soft)] ring-1 ring-[var(--border)] select-none self-center"
       style={containerStyle}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}

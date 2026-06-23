@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import {
   ImagePlus, X, Heart, MapPin, Check,
-  ChevronLeft, ChevronRight, ZoomIn,
+  ChevronLeft, ChevronRight, ZoomIn, Square, Maximize,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageCropper, { type CropState, type AspectRatioOption } from "./ImageCropper";
@@ -295,9 +295,9 @@ export default function AddMemoryForm(): React.JSX.Element {
                             }`}
                           >
                             {aspectRatio === ar && <Check size={12} />}
-                            {ar === "1:1" && "Square"}
-                            {ar === "4:5" && "Portrait"}
-                            {ar === "free" && "Free"}
+                            {ar === "1:1" && <><Square size={14} /> Square</>}
+                            {ar === "4:5" && <><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="shrink-0"><rect x="3" y="1" width="8" height="12" rx="1" /></svg> Portrait</>}
+                            {ar === "free" && <><Maximize size={14} /> Free</>}
                           </button>
                         ))}
                       </div>
@@ -313,10 +313,10 @@ export default function AddMemoryForm(): React.JSX.Element {
                       if (!img) return null;
                       if (imgErrors.has(cropIdx)) {
                         return (
-                          <div className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl bg-[var(--bg-soft)] py-16 text-center ring-1 ring-[var(--border)]" style={{ aspectRatio: "4/5" }}>
-                            <ImagePlus size={36} className="text-[var(--muted)]/15" />
-                            <p className="text-sm text-[var(--muted)]/30">Preview not available</p>
-                            <p className="text-xs text-[var(--muted)]/20">This file type cannot be previewed.</p>
+                          <div className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl bg-[var(--bg-soft)] text-center ring-1 ring-[var(--border)]" style={{ aspectRatio: aspectRatio === "1:1" ? "1/1" : aspectRatio === "4:5" ? "4/5" : naturalRatios[cropIdx] ? `${naturalRatios[cropIdx]}` : "4/5", maxHeight: "55dvh" }}>
+                            <ImagePlus size={28} className="text-[var(--muted)]/15" />
+                            <p className="text-sm text-[var(--muted)]/25">Preview not available</p>
+                            <p className="text-xs text-[var(--muted)]/15">Auto-cropped to {aspectRatio === "1:1" ? "Square" : aspectRatio === "4:5" ? "Portrait" : "Free"}</p>
                           </div>
                         );
                       }
@@ -338,7 +338,6 @@ export default function AddMemoryForm(): React.JSX.Element {
                       );
                     })()}
 
-                    {/* Zoom slider — hide when preview unavailable */}
                     {!imgErrors.has(cropIdx) && (
                     <div className="flex items-center gap-3 px-1">
                       <span className="text-xs text-[var(--muted)]/40">-</span>
