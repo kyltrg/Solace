@@ -4,8 +4,8 @@ import { useRef, useState, useEffect, type FormEvent } from "react";
 import { createDateMemory } from "@/actions/dates";
 import { useRouter } from "next/navigation";
 import LoadingOverlay from "@/components/ui/LoadingOverlay";
-import { compressImage, type AspectRatio } from "@/lib/compress-image";
-import { ImagePlus, X, GripVertical, Image as ImageIcon, Square, Crop, AlertCircle } from "lucide-react";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+import { ImagePlus, X, GripVertical, Image as ImageIcon, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function AddMemoryForm(): React.JSX.Element {
@@ -14,7 +14,6 @@ export default function AddMemoryForm(): React.JSX.Element {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
-  const [aspectRatio, setAspectRatio] = useState<AspectRatio>("1:1");
   const [error, setError] = useState("");
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
@@ -58,7 +57,6 @@ export default function AddMemoryForm(): React.JSX.Element {
     formRef.current?.reset();
     setFiles([]);
     setPreviews([]);
-    setAspectRatio("1:1");
   };
 
   useEffect(() => {
@@ -77,11 +75,8 @@ export default function AddMemoryForm(): React.JSX.Element {
     const formData = new FormData(e.currentTarget);
     try {
       if (files.length > 0) {
-        const compressed: string[] = [];
-        for (const f of files) {
-          compressed.push(await compressImage(f, aspectRatio));
-        }
-        formData.set("images", JSON.stringify(compressed));
+        const urls = await Promise.all(files.map((f) => uploadToCloudinary(f)));
+        formData.set("images", JSON.stringify(urls));
       }
       await createDateMemory(formData);
       reset();
@@ -188,9 +183,7 @@ export default function AddMemoryForm(): React.JSX.Element {
                           onDragStart={() => handleDragStart(i)}
                           onDragOver={(e) => handleDragOver(e, i)}
                           onDragEnd={handleDragEnd}
-                          className={`group relative cursor-grab overflow-hidden rounded-xl border border-[var(--border)] transition-all ${
-                            aspectRatio === "1:1" ? "h-20 w-20" : "h-20 w-16"
-                          } ${dragIdx === i ? "opacity-50 scale-95" : ""}`}
+                          className={`group relative cursor-grab overflow-hidden rounded-xl border border-[var(--border)] transition-all h-20 w-20 ${dragIdx === i ? "opacity-50 scale-95" : ""}`}
                         >
                           <img src={src} alt="" className="h-full w-full object-cover" />
                           <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/30">
@@ -205,38 +198,6 @@ export default function AddMemoryForm(): React.JSX.Element {
                           </button>
                         </div>
                       ))}
-                    </div>
-
-                    <div className="mt-3 flex items-center gap-2">
-                      <span className="text-[10px] uppercase tracking-[.15em] text-[var(--muted)]/40">Crop</span>
-                      <div className="flex rounded-lg border border-[var(--border)] p-0.5">
-                        <button
-                          type="button"
-                          onClick={() => setAspectRatio("1:1")}
-                          disabled={isPending}
-                          className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-medium transition-all ${
-                            aspectRatio === "1:1"
-                              ? "bg-[var(--accent)] text-[var(--bg)]"
-                              : "text-[var(--muted)]/50 hover:text-[var(--text)]"
-                          }`}
-                        >
-                          <Square size={12} />
-                          1:1
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setAspectRatio("4:5")}
-                          disabled={isPending}
-                          className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-medium transition-all ${
-                            aspectRatio === "4:5"
-                              ? "bg-[var(--accent)] text-[var(--bg)]"
-                              : "text-[var(--muted)]/50 hover:text-[var(--text)]"
-                          }`}
-                        >
-                          <Crop size={12} />
-                          4:5
-                        </button>
-                      </div>
                     </div>
                   </div>
                 )}
