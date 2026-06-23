@@ -123,6 +123,7 @@ export default function AddMemoryForm(): React.JSX.Element {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (images.length === 0) { setError("Add at least one photo"); return; }
+    const form = e.currentTarget;
     setIsPending(true);
     setError("");
     try {
@@ -133,7 +134,7 @@ export default function AddMemoryForm(): React.JSX.Element {
         x: img.crop.offsetX,
         y: img.crop.offsetY,
       }));
-      const formData = new FormData(e.currentTarget);
+      const formData = new FormData(form);
       formData.set("images", JSON.stringify({ v: 2, urls, crops }));
       await createDateMemory(formData);
       reset();
