@@ -6,7 +6,8 @@ import { cookies } from "next/headers";
 
 async function isAdmin(): Promise<boolean> {
   const cookieStore = await cookies();
-  return cookieStore.get("solace-admin")?.value === "true";
+  const val = cookieStore.get("solace-admin")?.value;
+  return val === "true" || val?.length === 36;
 }
 
 export async function getAdminLetters(): Promise<{ id: string; title: string; preview: string; content: string; category: string; author: string | null; createdAt: string }[]> {

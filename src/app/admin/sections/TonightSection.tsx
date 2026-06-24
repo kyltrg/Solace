@@ -30,11 +30,13 @@ export default function TonightSection() {
   const handleSave = async () => {
     if (!editId) return;
     setSubmitting(true);
-    const fd = new FormData();
-    fd.set("gratitude", gratitude);
-    fd.set("challenge", challenge);
-    fd.set("prayer", prayer);
-    await updateTonightEntry(editId, fd);
+    try {
+      const fd = new FormData();
+      fd.set("gratitude", gratitude);
+      fd.set("challenge", challenge);
+      fd.set("prayer", prayer);
+      await updateTonightEntry(editId, fd);
+    } catch {}
     setSubmitting(false);
     setEditId(null);
     await load();
@@ -44,7 +46,7 @@ export default function TonightSection() {
   const handleDelete = async () => {
     if (!deleteId) return;
     setSubmitting(true);
-    await deleteTonightEntry(deleteId);
+    try { await deleteTonightEntry(deleteId); } catch {}
     setSubmitting(false);
     setDeleteId(null);
     await load();

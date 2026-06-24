@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 function isSessionValid(cookieValue: string | undefined): boolean {
   if (!cookieValue) return false;
-  return !isNaN(Number(cookieValue));
+  return !isNaN(Number(cookieValue)) || cookieValue.length === 36;
 }
 
 export function proxy(request: NextRequest) {

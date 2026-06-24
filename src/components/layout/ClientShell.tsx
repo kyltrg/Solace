@@ -18,7 +18,7 @@ function scrollTo(id: string) {
 function navigateAndScroll(router: ReturnType<typeof useRouter>, path: string, id: string) {
   if (window.location.pathname !== path) {
     window.dispatchEvent(new CustomEvent("solace-loading"));
-    setTimeout(() => router.push(path), 100);
+    router.push(path);
     const check = setInterval(() => {
       const el = document.getElementById(id);
       if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); clearInterval(check); }
@@ -81,7 +81,7 @@ export default function ClientShell() {
     setMobileMenuOpen(false);
     setSidebarOpen(false);
     window.dispatchEvent(new CustomEvent("solace-loading"));
-    setTimeout(() => router.push("/"), 80);
+    router.push("/");
   };
 
   const navLinks = [
@@ -94,7 +94,7 @@ export default function ClientShell() {
 
   const navigateRoom = (href: string) => () => {
     window.dispatchEvent(new CustomEvent("solace-loading"));
-    setTimeout(() => router.push(href), 80);
+    router.push(href);
     setMobileMenuOpen(false);
   };
 

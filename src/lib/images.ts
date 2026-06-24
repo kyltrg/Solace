@@ -17,6 +17,18 @@ export function optimizeCloudinaryUrl(url: string): string {
   return url;
 }
 
+export function getResponsiveUrl(url: string, width: number): string {
+  if (!url.includes("res.cloudinary.com") || !url.includes("/upload/")) return url;
+  const uploadMarker = "/upload/";
+  const idx = url.indexOf(uploadMarker);
+  const before = url.substring(0, idx + uploadMarker.length);
+  const after = url.substring(idx + uploadMarker.length);
+  if (after.startsWith("f_webp")) {
+    return before + `w_${width},` + after;
+  }
+  return before + `w_${width},f_webp,q_auto/` + after;
+}
+
 export function parseImages(images: string | null): ImageSet {
   if (!images) return { urls: [], crops: [] };
   try {

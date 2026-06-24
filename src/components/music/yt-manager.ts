@@ -4,12 +4,12 @@ let onEndedCallback: (() => void) | null = null;
 
 export function extractYoutubeId(url: string): string | null {
   const m = url.match(
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|music\.youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/
   );
   return m ? m[1] : null;
 }
 
-export function loadAndPlay(videoId: string): void {
+export function loadSong(videoId: string): void {
   if (ytPlayer && typeof ytPlayer.loadVideoById === "function") {
     ytPlayer.loadVideoById(videoId);
     ytPlayer.playVideo();
@@ -18,10 +18,30 @@ export function loadAndPlay(videoId: string): void {
   }
 }
 
+export function playVideo(): void {
+  if (ytPlayer && typeof ytPlayer.playVideo === "function") {
+    ytPlayer.playVideo();
+  }
+}
+
 export function pauseVideo(): void {
   if (ytPlayer && typeof ytPlayer.pauseVideo === "function") {
     ytPlayer.pauseVideo();
   }
+}
+
+export function getCurrentTime(): number {
+  if (ytPlayer && typeof ytPlayer.getCurrentTime === "function") {
+    return ytPlayer.getCurrentTime();
+  }
+  return 0;
+}
+
+export function getDuration(): number {
+  if (ytPlayer && typeof ytPlayer.getDuration === "function") {
+    return ytPlayer.getDuration();
+  }
+  return 0;
 }
 
 export function setOnEnded(cb: () => void): void {
@@ -42,7 +62,7 @@ export function initYtPlayer(containerId: string): void {
       height: "1",
       width: "1",
       playerVars: {
-        autoplay: 0,
+        autoplay: 1,
         playsinline: 1,
         controls: 0,
         modestbranding: 1,
@@ -52,7 +72,6 @@ export function initYtPlayer(containerId: string): void {
         onReady: () => {
           if (pendingVideoId) {
             ytPlayer?.loadVideoById(pendingVideoId);
-            ytPlayer?.playVideo();
             pendingVideoId = null;
           }
         },

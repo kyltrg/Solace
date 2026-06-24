@@ -32,11 +32,13 @@ export default function DreamsSection() {
   const handleSave = async () => {
     if (!editId) return;
     setSubmitting(true);
-    const fd = new FormData();
-    fd.set("title", editTitle);
-    fd.set("description", editDesc);
-    fd.set("status", editStatus);
-    await updateDream(editId, fd);
+    try {
+      const fd = new FormData();
+      fd.set("title", editTitle);
+      fd.set("description", editDesc);
+      fd.set("status", editStatus);
+      await updateDream(editId, fd);
+    } catch {}
     setSubmitting(false);
     setEditId(null);
     await load();
@@ -46,7 +48,7 @@ export default function DreamsSection() {
   const handleDelete = async () => {
     if (!deleteId) return;
     setSubmitting(true);
-    await deleteDream(deleteId);
+    try { await deleteDream(deleteId); } catch {}
     setSubmitting(false);
     setDeleteId(null);
     await load();

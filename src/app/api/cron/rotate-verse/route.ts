@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { pickRandomVerse } from "@/lib/verse";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -10,22 +11,16 @@ export async function GET(request: Request) {
   }
 
   try {
-    const count = await prisma.verse.count();
-    if (count === 0) {
+    const pick = await pickRandomVerse();
+    if (!pick) {
       return Response.json({ ok: true, rotated: false, reason: "No verses" });
-    }
-
-    const skip = Math.floor(Math.random() * count);
-    const verse = await prisma.verse.findFirst({ skip, take: 1 });
-    if (!verse) {
-      return Response.json({ ok: true, rotated: false, reason: "No verse found" });
     }
 
     const today = new Date().toISOString().slice(0, 10);
     await prisma.appConfig.upsert({
       where: { key: "daily_verse" },
-      update: { value: verse.content },
-      create: { key: "daily_verse", value: verse.content },
+      update: { value: pick.formatted },
+      create: { key: "daily_verse", value: pick.formatted },
     });
     await prisma.appConfig.upsert({
       where: { key: "daily_verse_date" },
@@ -33,7 +28,7 @@ export async function GET(request: Request) {
       create: { key: "daily_verse_date", value: today },
     });
 
-    return Response.json({ ok: true, rotated: true, verse: verse.content });
+    return Response.json({ ok: true, rotated: true, verse: pick.formatted });
   } catch (err) {
     return Response.json({ ok: false, error: String(err) }, { status: 500 });
   }

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, Home } from "lucide-react";
-import { imageTransformStyle, type ImageSet, type CropData } from "@/lib/images";
+import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
+import { imageTransformStyle, getResponsiveUrl, type ImageSet, type CropData } from "@/lib/images";
 
 type ImageLightboxProps = {
   imageSet: ImageSet;
@@ -14,6 +14,17 @@ type ImageLightboxProps = {
   onNext: () => void;
 };
 
+function useViewportWidth() {
+  const [width, setWidth] = useState(800);
+  useEffect(() => {
+    setWidth(window.innerWidth);
+    const onResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return width;
+}
+
 export default function ImageLightbox({
   imageSet,
   currentIndex,
@@ -21,9 +32,12 @@ export default function ImageLightbox({
   onPrev,
   onNext,
 }: ImageLightboxProps) {
+  const vw = useViewportWidth();
   const crop = imageSet.crops?.[currentIndex] as CropData | undefined;
   const imgStyle = imageTransformStyle(crop ?? null);
-  const [imgLoaded, setImgLoaded] = useState(false);
+  const [loaded, setLoaded] = useState<Record<number, boolean>>({});
+
+  const lightboxWidth = useMemo(() => Math.min(1400, Math.max(vw * (vw < 768 ? 1.5 : 2), 600)), [vw]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -50,6 +64,25 @@ export default function ImageLightbox({
     };
   }, [handleKeyDown]);
 
+  useEffect(() => {
+    setLoaded({});
+  }, [currentIndex]);
+
+  useEffect(() => {
+    const adjacent = [
+      currentIndex === 0 ? imageSet.urls.length - 1 : currentIndex - 1,
+      currentIndex === imageSet.urls.length - 1 ? 0 : currentIndex + 1,
+    ];
+    for (const idx of adjacent) {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = getResponsiveUrl(imageSet.urls[idx], lightboxWidth);
+      document.head.appendChild(link);
+      setTimeout(() => link.remove(), 5000);
+    }
+  }, [currentIndex, imageSet.urls, lightboxWidth]);
+
   return (
     typeof document !== "undefined" && createPortal(
       <AnimatePresence>
@@ -57,8 +90,8 @@ export default function ImageLightbox({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/95"
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/95 cursor-pointer"
           onClick={onClose}
         >
         {/* Top bar */}
@@ -91,32 +124,26 @@ export default function ImageLightbox({
           </>
         )}
 
-        {!imgLoaded && (
-          <div className="flex items-center justify-center">
-            <div className="relative flex h-16 w-16 items-center justify-center">
-              <div className="absolute inset-0 rounded-full border-2 border-white/20" />
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                className="absolute inset-0 rounded-full border-t-2 border-white"
-              />
-              <Home size={24} className="text-white/60" />
+        <motion.img
+          key={currentIndex}
+          src={getResponsiveUrl(imageSet.urls[currentIndex], lightboxWidth)}
+          alt=""
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: loaded[currentIndex] ? 1 : 0.3, scale: 1 }}
+          transition={{ duration: 0.2 }}
+          className="max-h-[90dvh] md:max-h-[95dvh] max-w-full md:max-w-[95vw] rounded-2xl object-contain shadow-2xl"
+          style={imgStyle as React.CSSProperties}
+          onClick={(e) => e.stopPropagation()}
+          onLoad={() => setLoaded((s) => ({ ...s, [currentIndex]: true }))}
+        />
+
+        {!loaded[currentIndex] && (
+          <div className="absolute inset-0 z-0 flex items-center justify-center">
+            <div className="flex h-12 w-12 items-center justify-center">
+              <ImageIcon size={24} className="text-white/20" />
             </div>
           </div>
         )}
-        <motion.img
-          key={currentIndex}
-          src={imageSet.urls[currentIndex]}
-          alt=""
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.92 }}
-          transition={{ duration: 0.25 }}
-          className="max-h-[90dvh] md:max-h-[95dvh] max-w-full md:max-w-[95vw] rounded-2xl object-contain shadow-2xl"
-          style={{ ...imgStyle, display: imgLoaded ? undefined : "none" } as React.CSSProperties}
-          onClick={(e) => e.stopPropagation()}
-          onLoad={() => setImgLoaded(true)}
-        />
       </motion.div>
       </AnimatePresence>,
       document.body

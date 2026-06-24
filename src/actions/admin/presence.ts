@@ -5,7 +5,8 @@ import { cookies } from "next/headers";
 
 async function isAdmin(): Promise<boolean> {
   const cookieStore = await cookies();
-  return cookieStore.get("solace-admin")?.value === "true";
+  const val = cookieStore.get("solace-admin")?.value;
+  return val === "true" || val?.length === 36;
 }
 
 export type UserStatus = {

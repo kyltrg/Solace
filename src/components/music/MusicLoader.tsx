@@ -1,49 +1,24 @@
 "use client";
 
-import {
-  useEffect,
-} from "react";
-
-import {
-  Song,
-  useMusic,
-} from "./MusicProvider";
-
+import { useEffect } from "react";
+import { Song, Playlist, useMusic } from "./MusicProvider";
 
 export default function MusicLoader({
-
   songs,
-
-}:{
-
+  playlists,
+}: {
   songs: Song[];
+  playlists: Playlist[];
+}): React.JSX.Element {
+  const { setSongs, setPlaylists } = useMusic();
 
-})
-: React.JSX.Element {
+  useEffect(() => {
+    setSongs(songs);
+  }, [songs]);
 
-
-  const {
-    setSongs,
-  } = useMusic();
-
-
-
-  useEffect(()=>{
-
-
-    setSongs(
-      songs
-    );
-
-
-  },[
-
-    songs
-
-  ]);
-
-
+  useEffect(() => {
+    setPlaylists(playlists);
+  }, [playlists]);
 
   return <></>;
-
 }

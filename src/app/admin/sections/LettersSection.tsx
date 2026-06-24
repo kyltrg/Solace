@@ -30,11 +30,13 @@ export default function LettersSection() {
   const handleSave = async () => {
     if (!editId) return;
     setSubmitting(true);
-    const fd = new FormData();
-    fd.set("title", title);
-    fd.set("content", content);
-    fd.set("category", category);
-    await updateLetter(editId, fd);
+    try {
+      const fd = new FormData();
+      fd.set("title", title);
+      fd.set("content", content);
+      fd.set("category", category);
+      await updateLetter(editId, fd);
+    } catch {}
     setSubmitting(false);
     setEditId(null);
     await load();
@@ -44,7 +46,7 @@ export default function LettersSection() {
   const handleDelete = async () => {
     if (!deleteId) return;
     setSubmitting(true);
-    await deleteLetter(deleteId);
+    try { await deleteLetter(deleteId); } catch {}
     setSubmitting(false);
     setDeleteId(null);
     await load();

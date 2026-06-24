@@ -4,7 +4,8 @@ import AdminDashboard from "./AdminDashboard";
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
-  const isAdmin = cookieStore.get("solace-admin")?.value === "true";
+  const adminVal = cookieStore.get("solace-admin")?.value;
+  const isAdmin = adminVal === "true" || adminVal?.length === 36;
   if (!isAdmin) redirect("/");
 
   return <AdminDashboard />;

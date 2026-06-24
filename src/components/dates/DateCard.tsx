@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Heart, MapPin, Clock, MessageCircle } from "lucide-react";
 import { toggleDateMemoryLike } from "@/actions/dates";
 import { parseImages, type ImageSet } from "@/lib/images";
+import { getPfp } from "@/lib/pfp";
 import ImageCarousel from "./ImageCarousel";
 import ImageLightbox from "./ImageLightbox";
 import CommentSection from "./CommentSection";
@@ -66,8 +67,12 @@ export default function DateCard({ memory }: { memory: DateMemory }) {
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent)]/70 text-xs font-bold text-white shadow-sm">
-          {authorInitial}
+        <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent)]/70 text-xs font-bold text-white shadow-sm">
+          {getPfp(memory.author) ? (
+            <img src={getPfp(memory.author)!} alt={memory.author ?? ""} className="absolute inset-0 h-full w-full object-cover" />
+          ) : (
+            authorInitial
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-[var(--text)] leading-tight truncate">

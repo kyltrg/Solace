@@ -46,7 +46,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
     Cookies.remove("solace-admin");
     onClose();
     window.dispatchEvent(new CustomEvent("solace-loading"));
-    setTimeout(() => router.push("/"), 80);
+    router.push("/");
   };
 
   return (
@@ -81,7 +81,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                 return (
                   <button
                     key={room.href}
-                    onClick={() => { window.dispatchEvent(new CustomEvent("solace-loading")); setTimeout(() => router.push(room.href), 80); onClose(); }}
+                    onClick={() => { window.dispatchEvent(new CustomEvent("solace-loading")); router.push(room.href); onClose(); }}
                     className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm transition-all duration-200 ${
                       isActive
                         ? "bg-[var(--accent)]/10 text-[var(--accent)] font-medium"
@@ -99,7 +99,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
 
             {isAdminUser && (
               <button
-                onClick={() => { window.dispatchEvent(new CustomEvent("solace-loading")); setTimeout(() => router.push("/admin"), 80); onClose(); }}
+                  onClick={() => { window.dispatchEvent(new CustomEvent("solace-loading")); router.push("/admin"); onClose(); }}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-[var(--accent)] transition-all duration-200 hover:bg-[var(--accent)]/10"
               >
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--accent)]/10">

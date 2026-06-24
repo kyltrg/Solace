@@ -38,7 +38,7 @@ export default function VersesSection() {
 
   const handleAdd = async () => {
     setSubmitting(true);
-    await createVerse(content, source || undefined);
+    try { await createVerse(content, source || undefined); } catch {}
     setSubmitting(false);
     setShowAdd(false);
     await load();
@@ -47,7 +47,7 @@ export default function VersesSection() {
   const handleEdit = async () => {
     if (!editId) return;
     setSubmitting(true);
-    await updateVerse(editId, editContent, editSource || undefined);
+    try { await updateVerse(editId, editContent, editSource || undefined); } catch {}
     setSubmitting(false);
     setEditId(null);
     await load();
@@ -56,7 +56,7 @@ export default function VersesSection() {
   const handleDelete = async () => {
     if (!deleteId) return;
     setSubmitting(true);
-    await deleteVerse(deleteId);
+    try { await deleteVerse(deleteId); } catch {}
     setSubmitting(false);
     setDeleteId(null);
     await load();

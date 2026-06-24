@@ -1,5 +1,6 @@
 "use client";
 
+import { usePageReady } from "@/components/ui/DoorLoadingOverlay";
 import TransitionLink from "@/components/navigation/TransitionLink";
 import { motion } from "framer-motion";
 
@@ -27,14 +28,15 @@ export default function RoomLayout({
   children,
   backHref = "/home#rooms",
 }: RoomLayoutProps): React.JSX.Element {
+  usePageReady();
   return (
-    <main className="relative min-h-screen">
+    <main className="relative flex min-h-screen flex-col">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-[var(--accent)]/4 blur-[180px]" />
         <div className="absolute bottom-0 right-0 h-[30rem] w-[30rem] rounded-full bg-white/[0.02] blur-[160px] animate-pulse-glow" />
       </div>
 
-      <section className="relative z-10 px-4 sm:px-6 pt-20 sm:pt-28 pb-16 sm:pb-24">
+      <section className="relative z-10 shrink-0 px-4 sm:px-6 pt-20 sm:pt-28 pb-16 sm:pb-24">
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, x: -12 }}
@@ -98,7 +100,7 @@ export default function RoomLayout({
         </div>
       </section>
 
-      <section className="relative z-10 px-4 sm:px-6 pb-20 sm:pb-32">
+      <section className="relative z-10 flex-1 px-4 sm:px-6 pb-24 sm:pb-36">
         <div className="mx-auto max-w-5xl">{children}</div>
       </section>
     </main>

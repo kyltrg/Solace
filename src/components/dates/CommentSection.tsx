@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { createDateMemoryComment, deleteDateMemoryComment } from "@/actions/dates";
+import { getPfp } from "@/lib/pfp";
 import { MessageCircle, Trash2, AlertCircle, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { DateMemoryComment } from "@/types/date-memory";
@@ -75,8 +76,12 @@ export default function CommentSection({ memoryId, comments }: CommentSectionPro
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[9px] font-medium text-[var(--accent)]">
-                        {comment.author.charAt(0).toUpperCase()}
+                      <div className="relative flex h-5 w-5 items-center justify-center overflow-hidden rounded-full bg-[var(--accent-soft)] text-[9px] font-medium text-[var(--accent)]">
+                        {getPfp(comment.author) ? (
+                          <img src={getPfp(comment.author)!} alt={comment.author} className="absolute inset-0 h-full w-full object-cover" />
+                        ) : (
+                          comment.author.charAt(0).toUpperCase()
+                        )}
                       </div>
                       <span className="text-[11px] font-medium text-[var(--accent)]">
                         {comment.author}

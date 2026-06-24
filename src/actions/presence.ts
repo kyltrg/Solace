@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { runInactivityCheck } from "@/actions/cron";
 
 export async function updatePresence(userName: string): Promise<void> {
   const normalized = userName.toLowerCase().trim();
@@ -12,6 +13,8 @@ export async function updatePresence(userName: string): Promise<void> {
     update: { lastSeen: new Date() },
     create: { userName: normalized, lastSeen: new Date() },
   });
+
+  await runInactivityCheck();
 }
 
 export async function getPresence(userNames: string[]): Promise<Record<string, Date | null>> {

@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
-import Cookies from "js-cookie";
 import { motion, AnimatePresence } from "framer-motion";
-import { getPasscodes } from "@/actions/auth";
+import { verifyPasscode } from "@/actions/auth";
 
 
 type Step = "gate" | "name" | "welcome" | "choice" | "quiz" | "vault" | "success" | "wrong-door";
@@ -407,18 +406,6 @@ export default function AuthFlow(): React.JSX.Element {
   const [errorKey, setErrorKey] = useState(0);
   const [codeError, setCodeError] = useState(false);
   const [inputAnswer, setInputAnswer] = useState<string>("");
-  const [userPasscode, setUserPasscode] = useState("022426");
-  const [adminPasscode, setAdminPasscode] = useState("111805");
-  const passcodesFetched = useRef(false);
-
-  useEffect(() => {
-    if (passcodesFetched.current) return;
-    passcodesFetched.current = true;
-    getPasscodes().then((p) => {
-      setUserPasscode(p.passcode);
-      setAdminPasscode(p.adminPasscode);
-    }).catch(() => {});
-  }, []);
 
   useEffect(() => { setInputAnswer(""); }, [questionIndex]);
 
@@ -486,45 +473,50 @@ export default function AuthFlow(): React.JSX.Element {
     setStep("vault");
   }
 
-  function verifyCode(): void {
-    const isAdminUser = name.trim().toLowerCase() === "admin";
-    const isValid = (!isAdminUser && code === userPasscode) || (isAdminUser && code === adminPasscode);
-    if (isValid) {
-      Cookies.set("solace-access", String(Date.now()), { expires: 365 });
-      if (isAdminUser) {
-        Cookies.set("solace-user", "Admin", { expires: 365 });
-        Cookies.set("solace-admin", "true", { expires: 365 });
-      } else {
-        Cookies.set("solace-user", toDisplayName(name), { expires: 365 });
-      }
-      setStep("success");
-      setTimeout(() => { window.location.href = isAdminUser ? "/admin" : "/home"; }, 4200);
-      return;
+async function verifyCode(): Promise<void> {
+  console.log("VERIFY CODE");
+  console.log("RAW NAME:", JSON.stringify(name));
+
+  const isAdminUser = name.trim().toLowerCase() === "admin";
+
+  console.log("IS ADMIN:", isAdminUser);
+
+  const result = await verifyPasscode(code, isAdminUser);
+
+  if (result.ok) {
+    if (isAdminUser) {
+      document.cookie = `solace-user=Admin;path=/;max-age=${365 * 24 * 60 * 60}`;
+    } else {
+      document.cookie = `solace-user=${encodeURIComponent(toDisplayName(name))};path=/;max-age=${365 * 24 * 60 * 60}`;
     }
-    setCodeError(true);
-    setError("The door does not recognize that code.");
-    setErrorKey((k) => k + 1);
+
+    setStep("success");
+
     setTimeout(() => {
-      setCode("");
-      setCodeError(false);
-    }, 600);
+      window.location.href = isAdminUser ? "/admin" : "/home";
+    }, 4200);
+
+    return;
   }
 
+  setCodeError(true);
+  setError("The door does not recognize that code.");
+}
+
   const handleDigit = useCallback((digit: string) => {
+    setNameRefCurrent(name);
     setCode((prev) => {
       const next = prev + digit;
       if (next.length === 6) {
-        setTimeout(() => {
+        setTimeout(async () => {
           const currentName = nameRef.current.toLowerCase().trim();
           const isAdminUser = currentName === "admin";
-          const isValid = (!isAdminUser && next === userPasscodeRef.current) || (isAdminUser && next === adminPasscodeRef.current);
-          if (isValid) {
-            Cookies.set("solace-access", String(Date.now()), { expires: 365 });
+          const result = await verifyPasscode(next, isAdminUser);
+          if (result.ok) {
             if (isAdminUser) {
-              Cookies.set("solace-user", "Admin", { expires: 365 });
-              Cookies.set("solace-admin", "true", { expires: 365 });
+              document.cookie = `solace-user=Admin;path=/;max-age=${365 * 24 * 60 * 60}`;
             } else {
-              Cookies.set("solace-user", toDisplayName(nameRef.current), { expires: 365 });
+              document.cookie = `solace-user=${encodeURIComponent(toDisplayName(nameRef.current))};path=/;max-age=${365 * 24 * 60 * 60}`;
             }
             setStep("success");
             setTimeout(() => { window.location.href = isAdminUser ? "/admin" : "/home"; }, 4200);
@@ -542,15 +534,13 @@ export default function AuthFlow(): React.JSX.Element {
       }
       return next;
     });
+
+
   }, []);
 
   const nameRef = useRef(name);
+  const setNameRefCurrent = (val: string) => { nameRef.current = val; };
   useEffect(() => { nameRef.current = name; }, [name]);
-
-  const userPasscodeRef = useRef(userPasscode);
-  useEffect(() => { userPasscodeRef.current = userPasscode; }, [userPasscode]);
-  const adminPasscodeRef = useRef(adminPasscode);
-  useEffect(() => { adminPasscodeRef.current = adminPasscode; }, [adminPasscode]);
 
   const handleBackspace = useCallback(() => {
     setCode((prev) => prev.slice(0, -1));

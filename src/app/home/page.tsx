@@ -7,9 +7,11 @@ import DailyVerse from "@/components/home/DailyVerse";
 import MemoryOfDay from "@/components/home/MemoryOfDay";
 import StoryPreview from "@/components/home/StoryPreview";
 import RoomsGrid from "@/components/home/RoomsGrid";
+import PageReadyWrapper from "@/components/ui/PageReadyWrapper";
 
 export default function HomePage() {
   return (
+    <PageReadyWrapper>
     <main className="relative">
       <BubbleBackground
         className="min-h-[100dvh] bg-gradient-to-br from-[var(--bg-elevated)] to-[var(--bg)]"
@@ -37,5 +39,6 @@ export default function HomePage() {
       <div className="solace-divider" />
       <RoomsGrid />
     </main>
+    </PageReadyWrapper>
   );
 }

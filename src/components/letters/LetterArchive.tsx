@@ -14,7 +14,7 @@ export default function LetterArchive({ initialLetters }: { initialLetters: Lett
   const [letters, setLetters] = useState<LetterData[]>(initialLetters);
 
   useEffect(() => {
-    getLetters().then(setLetters).catch(() => {});
+    if (highlightId) getLetters().then(setLetters).catch(() => {});
   }, [highlightId]);
   const [filter, setFilter] = useState("All");
   const [authorFilter, setAuthorFilter] = useState("all");

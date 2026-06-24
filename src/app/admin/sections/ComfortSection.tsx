@@ -35,11 +35,13 @@ export default function ComfortSection() {
   const handleSave = async () => {
     if (!editId) return;
     setSubmitting(true);
-    const fd = new FormData();
-    fd.set("title", title);
-    fd.set("content", content);
-    fd.set("category", category);
-    await addComfortMessage(fd);
+    try {
+      const fd = new FormData();
+      fd.set("title", title);
+      fd.set("content", content);
+      fd.set("category", category);
+      await addComfortMessage(fd);
+    } catch {}
     setSubmitting(false);
     setEditId(null);
     await load();
@@ -49,7 +51,7 @@ export default function ComfortSection() {
   const handleDelete = async () => {
     if (!deleteId) return;
     setSubmitting(true);
-    await deleteComfortMessage(deleteId);
+    try { await deleteComfortMessage(deleteId); } catch {}
     setSubmitting(false);
     setDeleteId(null);
     await load();

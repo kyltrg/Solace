@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Heart, Maximize2, Home } from "lucide-react";
-import { imageTransformStyle, type ImageSet, type CropData } from "@/lib/images";
+import { ChevronLeft, ChevronRight, Heart, Maximize2, ImageIcon } from "lucide-react";
+import { imageTransformStyle, getResponsiveUrl, type ImageSet, type CropData } from "@/lib/images";
 
 type ImageCarouselProps = {
   imageSet: ImageSet;
@@ -13,22 +13,36 @@ type ImageCarouselProps = {
   liked?: boolean;
 };
 
+function useViewportWidth() {
+  const [width, setWidth] = useState(800);
+  useEffect(() => {
+    setWidth(window.innerWidth);
+    const onResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return width;
+}
+
 export default function ImageCarousel({
   imageSet,
   onImageClick,
   onDoubleTap,
   liked,
 }: ImageCarouselProps) {
+  const vw = useViewportWidth();
   const { urls: images, crops } = imageSet;
   const [current, setCurrent] = useState(0);
   const [burst, setBurst] = useState(false);
-  const [naturalRatio, setNaturalRatio] = useState<number>(4 / 3);
+  const [naturalRatio, setNaturalRatio] = useState(4 / 3);
   const [preview, setPreview] = useState(false);
   const [imgLoaded, setImgLoaded] = useState<Record<number, boolean>>({});
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
+
+  const carouselWidth = useMemo(() => Math.min(800, Math.max(vw, 400)), [vw]);
 
   if (images.length === 0) return null;
 
@@ -101,6 +115,21 @@ export default function ImageCarousel({
     };
   }, [preview]);
 
+  useEffect(() => {
+    const adjacent = [
+      current === 0 ? images.length - 1 : current - 1,
+      current === images.length - 1 ? 0 : current + 1,
+    ];
+    for (const idx of adjacent) {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = getResponsiveUrl(images[idx], carouselWidth);
+      document.head.appendChild(link);
+      setTimeout(() => link.remove(), 5000);
+    }
+  }, [current, images, carouselWidth]);
+
   const imgStyle = imageTransformStyle(crop ?? null);
 
   return (
@@ -110,10 +139,10 @@ export default function ImageCarousel({
           <AnimatePresence mode="wait">
             <motion.img
               key={current}
-              src={images[current]}
+              src={getResponsiveUrl(images[current], carouselWidth)}
               alt=""
               initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
+              animate={{ opacity: imgLoaded[current] ? 1 : 0.4, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.25 }}
               className="h-full w-full object-cover"
@@ -133,21 +162,13 @@ export default function ImageCarousel({
                 }
               }}
               onError={() => setImgLoaded((s) => ({ ...s, [current]: false }))}
-              style={{ ...imgStyle, display: imgLoaded[current] ? undefined : "none", touchAction: "manipulation" } as React.CSSProperties}
+              style={{ ...imgStyle, touchAction: "manipulation" } as React.CSSProperties}
             />
           </AnimatePresence>
 
           {!imgLoaded[current] && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[var(--bg-soft)]">
-              <div className="relative flex h-12 w-12 items-center justify-center">
-                <div className="absolute inset-0 rounded-full border-2 border-[var(--accent)]/20" />
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                  className="absolute inset-0 rounded-full border-t-2 border-[var(--accent)]"
-                />
-                <Home size={20} className="text-[var(--accent)]/60" />
-              </div>
+            <div className="absolute inset-0 z-0 flex items-center justify-center bg-[var(--bg-soft)]">
+              <ImageIcon size={24} className="text-[var(--muted)]/15" />
             </div>
           )}
 
@@ -233,7 +254,7 @@ export default function ImageCarousel({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="fixed inset-0 z-[9999999] flex items-center justify-center"
+              className="fixed inset-0 z-[9999999] flex items-center justify-center cursor-pointer"
               onClick={() => setPreview(false)}
             >
               <motion.div
@@ -245,7 +266,7 @@ export default function ImageCarousel({
                 onClick={(e) => e.stopPropagation()}
               >
                 <img
-                  src={images[current]}
+                  src={getResponsiveUrl(images[current], carouselWidth)}
                   alt=""
                   className="h-full w-full object-contain"
                   draggable={false}

@@ -2,28 +2,85 @@
 
 import { useState, useEffect } from "react";
 import { getAppConfig, updatePasscodes, setRandomDailyVerse, getStorageStats, type StorageInfo } from "@/actions/admin/config";
+import { getCloudinaryUsage, type CloudinaryUsage } from "@/actions/admin/cloudinary";
 import AdminSkeleton from "../shared/AdminSkeleton";
+
+function formatBytes(bytes: unknown): string {
+  if (typeof bytes !== "number" || !Number.isFinite(bytes) || bytes < 0) return "0 B";
+  if (bytes === 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  const val = bytes / Math.pow(1024, i);
+  return `${val < 10 ? val.toFixed(1) : Math.round(val)} ${units[i]}`;
+}
+
+function CloudinaryStorage() {
+  const [usage, setUsage] = useState<CloudinaryUsage | null>(null);
+
+  const load = () => getCloudinaryUsage().then(setUsage).catch(() => {});
+  useEffect(() => { load(); const id = setInterval(load, 30000); return () => clearInterval(id); }, []);
+
+  if (!usage) return null;
+
+  const creditsPct = usage.creditsLimit > 0 ? (usage.creditsUsed / usage.creditsLimit) * 100 : 0;
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-5">
+        <span className="text-sm font-medium">Cloudinary Storage</span>
+        <span className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-[var(--muted)]/50">{usage.plan}</span>
+      </div>
+
+      <div className="space-y-5">
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs text-[var(--muted)]">Storage</span>
+            <span className="text-xs text-[var(--muted)]/60">{formatBytes(usage.storageUsed)}</span>
+          </div>
+          <div className="flex items-center gap-1 text-[11px] text-[var(--muted)]/40">
+            {usage.resources} {usage.resources === 1 ? "resource" : "resources"}
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs text-[var(--muted)]">Bandwidth</span>
+            <span className="text-xs text-[var(--muted)]/60">{formatBytes(usage.bandwidthUsed)}</span>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs text-[var(--muted)]">Credits</span>
+            <span className="text-xs text-[var(--muted)]/60">{usage.creditsUsed.toFixed(2)} / {usage.creditsLimit.toFixed(2)}</span>
+          </div>
+          <div className="h-2 rounded-full bg-[var(--border)] overflow-hidden">
+            <div className="h-full rounded-full bg-gradient-to-r from-[var(--accent)] to-purple-500 transition-all" style={{ width: `${Math.min(creditsPct, 100)}%` }} />
+          </div>
+          <span className="text-[11px] text-[var(--muted)]/40 mt-0.5 block">{creditsPct.toFixed(2)}% used</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ConfigSection() {
   const [loaded, setLoaded] = useState(false);
   const [userPasscode, setUserPasscode] = useState("");
   const [adminPasscode, setAdminPasscode] = useState("");
   const [currentVerse, setCurrentVerse] = useState("");
-  const [currentUserPasscode, setCurrentUserPasscode] = useState("");
-  const [currentAdminPasscode, setCurrentAdminPasscode] = useState("");
   const [storage, setStorage] = useState<StorageInfo | null>(null);
   const [expandedTable, setExpandedTable] = useState(false);
   const [msg, setMsg] = useState("");
   const [verseLoading, setVerseLoading] = useState(false);
+  const [passcodeOpen, setPasscodeOpen] = useState(false);
 
   const load = async () => {
     setLoaded(false);
     const cfg = await getAppConfig();
     setCurrentVerse(cfg.daily_verse ?? "");
-    setCurrentUserPasscode(cfg.passcode ?? "");
-    setCurrentAdminPasscode(cfg.admin_passcode ?? "");
-    setUserPasscode(cfg.passcode ?? "");
-    setAdminPasscode(cfg.admin_passcode ?? "");
+    setUserPasscode("");
+    setAdminPasscode("");
     const stats = await getStorageStats();
     setStorage(stats);
     setLoaded(true);
@@ -36,6 +93,7 @@ export default function ConfigSection() {
     setMsg("");
     const r = await updatePasscodes(userPasscode, adminPasscode);
     setMsg(r.ok ? "Passcodes updated!" : r.error || "Failed");
+    if (r.ok) setPasscodeOpen(false);
   };
 
   const handleRandomVerse = async () => {
@@ -59,39 +117,51 @@ export default function ConfigSection() {
       {!loaded ? (
         <AdminSkeleton rows={3} />
       ) : (
-      <>{/* Passcodes */}
-      <form onSubmit={handlePasscodes} className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-6">
-        <h4 className="font-display text-lg">Change Passcodes</h4>
-        {currentUserPasscode && (
-          <p className="text-xs text-[var(--muted)]">
-            Current: user=<span className="font-mono text-[var(--text)]">{currentUserPasscode}</span>
-            &nbsp;admin=<span className="font-mono text-[var(--text)]">{currentAdminPasscode}</span>
-          </p>
-        )}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="text-xs uppercase tracking-wider text-[var(--muted)]">User Passcode</label>
-            <input
-              value={userPasscode}
-              onChange={(e) => setUserPasscode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              placeholder="022426"
-              className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none focus:border-[var(--accent)]/50"
-            />
-          </div>
-          <div>
-            <label className="text-xs uppercase tracking-wider text-[var(--muted)]">Admin Passcode</label>
-            <input
-              value={adminPasscode}
-              onChange={(e) => setAdminPasscode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              placeholder="111805"
-              className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none focus:border-[var(--accent)]/50"
-            />
-          </div>
-        </div>
-        <button type="submit" className="rounded-full bg-[var(--accent)] px-6 py-2.5 text-sm font-medium text-[var(--bg)] transition-all hover:opacity-90">
-          Update Passcodes
+      <>
+      {/* Passcodes — collapsible */}
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setPasscodeOpen(!passcodeOpen)}
+          className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-[var(--bg-soft)]/50"
+        >
+          <span className="font-display text-lg">Passcodes</span>
+          <span className={`text-sm text-[var(--muted)] transition-transform ${passcodeOpen ? "rotate-180" : ""}`}>▾</span>
         </button>
-      </form>
+        {passcodeOpen && (
+          <form onSubmit={handlePasscodes} className="space-y-4 px-6 pb-6 border-t border-[var(--border)] pt-4">
+            <p className="text-xs text-[var(--muted)]/60">Enter new 6-digit passcodes for user and admin.</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="text-xs uppercase tracking-wider text-[var(--muted)]">User Passcode</label>
+                <input
+                  value={userPasscode}
+                  onChange={(e) => setUserPasscode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="6 digits"
+                  className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none focus:border-[var(--accent)]/50"
+                />
+              </div>
+              <div>
+                <label className="text-xs uppercase tracking-wider text-[var(--muted)]">Admin Passcode</label>
+                <input
+                  value={adminPasscode}
+                  onChange={(e) => setAdminPasscode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="6 digits"
+                  className="mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm outline-none focus:border-[var(--accent)]/50"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button type="submit" className="rounded-full bg-[var(--accent)] px-6 py-2.5 text-sm font-medium text-[var(--bg)] transition-all hover:opacity-90">
+                Update Passcodes
+              </button>
+              <button type="button" onClick={() => setPasscodeOpen(false)} className="rounded-full border border-[var(--border)] px-6 py-2.5 text-sm text-[var(--muted)] hover:bg-[var(--border)]/20 transition-colors">
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
 
       {/* Daily Verse */}
       <div className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-6">
@@ -112,13 +182,17 @@ export default function ConfigSection() {
         </button>
       </div>
 
-      {/* Storage Stats — iPhone style */}
+      {/* Cloudinary Storage — iPhone style */}
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-6">
-        <h4 className="font-display text-lg mb-5">Storage</h4>
+        <CloudinaryStorage />
+      </div>
+
+      {/* Database Storage — iPhone style */}
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-6">
+        <h4 className="font-display text-lg mb-5">Database Storage</h4>
 
         {storage && (
           <>
-            {/* Storage bar */}
             <div className="mb-5">
               <div className="h-7 w-full overflow-hidden rounded-full bg-[var(--bg-soft)]">
                 <div
@@ -128,7 +202,6 @@ export default function ConfigSection() {
               </div>
             </div>
 
-            {/* Stats row */}
             <div className="mb-5 grid grid-cols-3 gap-4 text-center">
               <div>
                 <p className="text-lg font-semibold text-[var(--text)]">{storage.usedFormatted}</p>
@@ -144,7 +217,6 @@ export default function ConfigSection() {
               </div>
             </div>
 
-            {/* Per-table breakdown */}
             <button
               onClick={() => setExpandedTable(!expandedTable)}
               className="flex w-full items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-3 text-sm text-[var(--muted)] transition-all hover:border-[var(--accent)]/50"

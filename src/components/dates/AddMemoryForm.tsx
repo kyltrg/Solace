@@ -5,12 +5,14 @@ import { createPortal } from "react-dom";
 import { createDateMemory } from "@/actions/dates";
 import { useRouter } from "next/navigation";
 import { uploadToCloudinary } from "@/lib/cloudinary";
+import { getPfp } from "@/lib/pfp";
 import {
   ImagePlus, X, Heart, MapPin, Check,
   ChevronLeft, ChevronRight, Square,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageCropper, { type CropState, type AspectRatioOption } from "./ImageCropper";
+import Cookies from "js-cookie";
 
 type Step = 1 | 2 | 3;
 
@@ -159,12 +161,12 @@ export default function AddMemoryForm(): React.JSX.Element {
         onClick={() => setOpen(true)}
         className="flex w-full items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card-bg)] px-4 py-3 text-left transition-all hover:bg-[var(--bg-soft)] active:scale-[0.99]"
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent)]/70 text-[10px] font-bold text-white shadow-sm">
-          {(
-            typeof document !== "undefined"
-              ? document.cookie.match(/(?:^|;\s*)solace-user=([^;]*)/)?.[1]?.charAt(0)?.toUpperCase() ?? "A"
-              : "A"
-          )}
+        <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent)]/70 text-[10px] font-bold text-white shadow-sm">
+          {(() => {
+            const user = typeof document !== "undefined" ? Cookies.get("solace-user") : null;
+            const pfp = getPfp(user);
+            return pfp ? <img src={pfp} alt={user ?? ""} className="absolute inset-0 h-full w-full object-cover" /> : user?.charAt(0).toUpperCase() ?? "A";
+          })()}
         </div>
         <div className="flex-1">
           <p className="text-sm text-[var(--muted)]/40">What's on your mind?</p>

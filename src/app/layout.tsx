@@ -14,6 +14,9 @@ import ClientShell from "@/components/layout/ClientShell";
 import PageTransition
 from "@/components/navigation/PageTransition";
 
+import DoorLoadingOverlay
+from "@/components/ui/DoorLoadingOverlay";
+
 
 
 import {
@@ -120,6 +123,7 @@ export default function RootLayout({
             <PresenceProvider>
             <SmoothScroll>
             <PageTransition />
+            <DoorLoadingOverlay />
             <ClientShell />
 
             {children}

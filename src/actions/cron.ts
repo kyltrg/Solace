@@ -29,10 +29,11 @@ export async function runInactivityCheck() {
         });
         if (!alreadySent) {
           const otherName = userName === "kyle" ? "Angel" : "Kyle";
+          const displayName = userName === "kyle" ? "Kyle" : "Angel";
           await sendPushToAuthor(
             otherName.toLowerCase(),
-            `${otherName} hasn\u2019t been home for ${hours}h`,
-            `${userName === "kyle" ? "Kyle" : "Angel"} was last seen ${hours} hours ago. Open Solace.`,
+            `${displayName} hasn\u2019t been home for ${hours}h`,
+            `${displayName} was last seen ${hours} hours ago. Open Solace.`,
             "/home",
           );
           await prisma.notificationLog.create({

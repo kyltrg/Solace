@@ -5,9 +5,15 @@ import SongArchive from "@/components/music/SongArchive";
 import MusicLoader from "@/components/music/MusicLoader";
 
 export default async function SongsPage(): Promise<React.JSX.Element> {
-  const songs = await prisma.song.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const [songs, playlists] = await Promise.all([
+    prisma.song.findMany({
+      orderBy: [{ playlistId: "asc" }, { order: "asc" }, { createdAt: "desc" }],
+    }),
+    prisma.playlist.findMany({
+      orderBy: { createdAt: "asc" },
+      include: { _count: { select: { songs: true } } },
+    }),
+  ]);
 
   return (
     <RoomLayout
@@ -22,20 +28,25 @@ export default async function SongsPage(): Promise<React.JSX.Element> {
           artist: song.artist,
           url: song.url,
           note: song.note,
+          thumbnail: song.thumbnail,
+          playlistId: song.playlistId,
+          order: song.order,
+        }))}
+        playlists={playlists.map((p) => ({
+          id: p.id,
+          name: p.name,
+          author: p.author,
+          songCount: p._count.songs,
         }))}
       />
 
-      <div className="space-y-12">
-        <MusicRoom />
-
-        <div className="h-px bg-[var(--border)]" />
+      <div className="space-y-10 pb-24 md:pb-0">
+        <div id="now-playing-section">
+          <MusicRoom />
+        </div>
 
         <div>
-          <h2 className="font-display text-4xl font-light md:text-5xl">Playlist</h2>
-          <p className="mt-2 text-sm text-[var(--muted)]/50">Every song that holds a memory.</p>
-          <div className="mt-8">
-            <SongArchive />
-          </div>
+          <SongArchive />
         </div>
       </div>
     </RoomLayout>

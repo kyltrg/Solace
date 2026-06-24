@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -35,8 +36,8 @@ async function main() {
   console.log("Seeding AppConfig...");
 
   const configDefaults = [
-    { key: "passcode", value: "022426" },
-    { key: "admin_passcode", value: "111805" },
+    { key: "passcode", value: bcrypt.hashSync("022426", 10) },
+    { key: "admin_passcode", value: bcrypt.hashSync("111805", 10) },
     { key: "daily_verse", value: "You are altogether beautiful, my darling; there is no flaw in you. — Song of Solomon 4:7" },
   ];
 
@@ -48,6 +49,27 @@ async function main() {
     }
     await prisma.appConfig.create({ data: cfg });
     console.log(`  Added config: ${cfg.key}`);
+  }
+
+  console.log("");
+  console.log("Seeding playlists...");
+
+  const playlists = [
+    { name: "Kyle's Playlist", author: "Kyle" },
+    { name: "Angel's Playlist", author: "Angel" },
+    { name: "Direk Playlist", author: null },
+  ];
+
+  for (const pl of playlists) {
+    const existing = await prisma.playlist.findFirst({
+      where: { name: pl.name },
+    });
+    if (existing) {
+      console.log(`  Skipped: ${pl.name} (already exists)`);
+      continue;
+    }
+    await prisma.playlist.create({ data: pl });
+    console.log(`  Added playlist: ${pl.name}`);
   }
 
   console.log("");

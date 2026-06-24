@@ -1,32 +1,29 @@
 "use server";
 
+import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { pickRandomVerse } from "@/lib/verse";
 
 async function isAdmin(): Promise<boolean> {
   const cookieStore = await cookies();
-  return cookieStore.get("solace-admin")?.value === "true";
+  const val = cookieStore.get("solace-admin")?.value;
+  return val === "true" || val?.length === 36;
 }
 
 export async function setRandomDailyVerse(): Promise<{ ok: boolean; error?: string }> {
   if (!(await isAdmin())) return { ok: false, error: "Unauthorized" };
 
   try {
-    const count = await prisma.verse.count();
-    if (count === 0) return { ok: false, error: "No verses in collection." };
+    const pick = await pickRandomVerse();
+    if (!pick) return { ok: false, error: "No verses in collection." };
 
-    const skip = Math.floor(Math.random() * count);
-    const verse = await prisma.verse.findFirst({ skip, take: 1 });
-    if (!verse) return { ok: false, error: "No verse found." };
-
-    const hasSource = verse.source && !verse.content.trim().endsWith(` — ${verse.source}`);
-    const val = hasSource ? `${verse.content} — ${verse.source}` : verse.content;
     const today = new Date().toISOString().slice(0, 10);
     await prisma.appConfig.upsert({
       where: { key: "daily_verse" },
-      update: { value: val },
-      create: { key: "daily_verse", value: val },
+      update: { value: pick.formatted },
+      create: { key: "daily_verse", value: pick.formatted },
     });
     await prisma.appConfig.upsert({
       where: { key: "daily_verse_date" },
@@ -36,14 +33,16 @@ export async function setRandomDailyVerse(): Promise<{ ok: boolean; error?: stri
 
     revalidatePath("/home");
     return { ok: true };
-  } catch {
+  } catch (e) {
     return { ok: false, error: "Failed to set random verse." };
   }
 }
 
 export async function getAppConfig(): Promise<Record<string, string>> {
   try {
-    const rows = await prisma.appConfig.findMany();
+    const rows = await prisma.appConfig.findMany({
+      where: { key: { notIn: ["passcode", "admin_passcode"] } },
+    });
     const map: Record<string, string> = {};
     for (const r of rows) map[r.key] = r.value;
     return map;
@@ -65,13 +64,13 @@ export async function updatePasscodes(
   try {
     await prisma.appConfig.upsert({
       where: { key: "passcode" },
-      update: { value: userPasscode },
-      create: { key: "passcode", value: userPasscode },
+      update: { value: bcrypt.hashSync(userPasscode, 10) },
+      create: { key: "passcode", value: bcrypt.hashSync(userPasscode, 10) },
     });
     await prisma.appConfig.upsert({
       where: { key: "admin_passcode" },
-      update: { value: adminPasscode },
-      create: { key: "admin_passcode", value: adminPasscode },
+      update: { value: bcrypt.hashSync(adminPasscode, 10) },
+      create: { key: "admin_passcode", value: bcrypt.hashSync(adminPasscode, 10) },
     });
     return { ok: true };
   } catch {

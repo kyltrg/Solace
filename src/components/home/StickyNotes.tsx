@@ -12,7 +12,7 @@ type NoteRecord = {
 
 const STORAGE_KEY = "solace-stickynotes";
 const DEBOUNCE_MS = 3000;
-const POLL_MS = 1000;
+const POLL_MS = 30000;
 
 function loadFromLocal(): Record<string, string> {
   if (typeof window === "undefined") return {};
